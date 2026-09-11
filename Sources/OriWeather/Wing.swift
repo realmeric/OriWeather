@@ -26,6 +26,18 @@ extension OriWeatherDroplet: LiveActivityProviding {
         AnyView(WingDegrees(droplet: self))
     }
 
+    /// The mark alone in the companion pill, sized to the slot the host
+    /// resolved rather than to the wing's glyph: the default reuses the
+    /// leading accessory, and a 13 pt sun in a 24 pt puck is a dot.
+    public func makeCompanionCompact(context: CompactLiveActivityContext) -> AnyView {
+        AnyView(CompanionMark(droplet: self, slot: context.slotSize))
+    }
+
+    /// One line beside the mark when the pill grows into its capsule.
+    public func makeCompanionDetail(context: LiveActivityContext) -> AnyView? {
+        AnyView(CompanionDetail(droplet: self))
+    }
+
     /// The card the row grows into on hover.
     public func makeExpanded(context: LiveActivityContext) -> AnyView {
         AnyView(ExpandedCard(droplet: self, context: context))
@@ -68,5 +80,41 @@ struct WingFigure: View {
             .foregroundStyle(AdaptiveColors.notchSurfacePrimaryText)
             .lineLimit(1)
             .fixedSize()
+    }
+}
+
+/// The mark, filling the companion pill's round slot.
+struct CompanionMark: View {
+    @ObservedObject var droplet: OriWeatherDroplet
+    let slot: CGSize
+
+    var body: some View {
+        if let glance = droplet.glance {
+            let side = min(slot.width, slot.height)
+            WeatherMark(code: glance.reading.code, isDay: glance.reading.isDay)
+                .frame(width: side, height: side)
+                .frame(width: slot.width, height: slot.height)
+                .accessibilityHidden(true)
+        }
+    }
+}
+
+/// "26° Partly cloudy", laid out leading beside the companion mark.
+struct CompanionDetail: View {
+    @ObservedObject var droplet: OriWeatherDroplet
+
+    var body: some View {
+        if let glance = droplet.glance {
+            HStack(spacing: DroppyLiveActivityMetrics.contentSpacing) {
+                Text(verbatim: glance.degrees)
+                    .monospacedDigit()
+                    .foregroundStyle(AdaptiveColors.notchSurfacePrimaryText)
+                Text(verbatim: glance.detail)
+                    .foregroundStyle(AdaptiveColors.notchSurfaceSecondaryText)
+            }
+            .font(.system(size: DroppyLiveActivityMetrics.labelFontSize, weight: .medium))
+            .lineLimit(1)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
     }
 }

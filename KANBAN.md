@@ -124,6 +124,21 @@ Accept:
 
 Commit: `Put the temperature on the wing when nothing else wants it`
 
+#### OW-7 · The card behind the wing
+
+P1 · M · wing
+
+Done in `78c51d0`. The stale shot is `shots/stale/live-activity.png`, taken with `OW_DEMO=stale droppykit run -- --shots ./shots/stale`.
+
+`makeExpanded(context:)`, the card the compact row grows into on hover, `context.availableWidth` by `cardContentHeight` (59) and not a point taller, because a taller view is clipped without a word. Left, the mark at `Look.cardMark` (20); then the degrees large (20, semibold, monospaced digits, primary) with the condition under them in the tertiary white; right, the city in the secondary white and under it "Feels like 24°", or, when the reading is stale, `Ago.words` in place of the condition and the whole card at `Look.staleOpacity`. Nothing avoids the camera housing: the host has already inset the card below it.
+
+Accept:
+
+- [x] The expanded shot at both shapes shows the four texts and the mark, none clipped, the degrees and the feels-like agreeing with the recorded body (26° and 24°).
+- [x] `OW_DEMO=stale` (OW-14) puts "2 h ago" where "Partly cloudy" was and dims the card, in the shot.
+
+Commit: `Grow the wing into a card on hover`
+
 ## In progress
 
 ## Ready
@@ -131,19 +146,6 @@ Commit: `Put the temperature on the wing when nothing else wants it`
 ### Phase 1: a droplet that loads
 
 ### Phase 2: the wing
-
-#### OW-7 · The card behind the wing
-
-P1 · M · wing
-
-`makeExpanded(context:)`, the card the compact row grows into on hover, `context.availableWidth` by `cardContentHeight` (59) and not a point taller, because a taller view is clipped without a word. Left, the mark at `Look.cardMark` (20); then the degrees large (20, semibold, monospaced digits, primary) with the condition under them in the tertiary white; right, the city in the secondary white and under it "Feels like 24°", or, when the reading is stale, `Ago.words` in place of the condition and the whole card at `Look.staleOpacity`. Nothing avoids the camera housing: the host has already inset the card below it.
-
-Accept:
-
-- [ ] The expanded shot at both shapes shows the four texts and the mark, none clipped, the degrees and the feels-like agreeing with the recorded body (26° and 24°).
-- [ ] `OW_DEMO=stale` (OW-14) puts "2 h ago" where "Partly cloudy" was and dims the card, in the shot.
-
-Commit: `Grow the wing into a card on hover`
 
 #### OW-8 · The puck and the pair
 
