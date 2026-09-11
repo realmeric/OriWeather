@@ -28,26 +28,28 @@ Each is written with the recommended option as the default. Strike the other or 
 
 ## Done
 
-## In progress
-
-## Ready
-
-### Phase 1: a droplet that loads
-
 #### OW-1 · The scaffold
 
 P0 · M · setup
+
+Done in `7bb44b3`. The scaffold needed `source.commit` filled before it validated (docs/notes.md). The Store row was read through the loader's log line, "Droplet ori-weather 1.0.0 activated", because the session was not given the Playground's window.
 
 Clone `https://gitlab.com/droppyformac1/droppykit.git` at tag v1.2.1 to `~/Documents/Projects/apps/droppykit`, put its `Scripts` on the PATH for the session, and in `~/Documents/Projects/apps` run `droppykit new ori-weather --name "Ori Weather"`, which writes a package that builds, a manifest that validates, a starter icon document, a placeholder avatar and, at the end, `droppykit agent`'s brief. Move the folder to `OriWeather` (the MCP wiring names the SDK's `Scripts`, not this folder, so the move costs nothing; check both `.mcp.json` files anyway). `git init`, the SDK's `.gitignore` plus `shots/`. A `Makefile` with `test` (the gate as the top of the board describes it), `build`, `shots`, `install` (copy `.build/OriWeather.droplet` to `~/Library/Application Support/Droppy Playground/Droplets/ori-weather/`, quit and relaunch the Playground, which is what the MCP `droppykit_install` tool does), `energy` (a placeholder that says OW-16 until then) and `clean`. `docs/notes.md` opened with the three facts this card learns on the machine (which build engine `droppykit build` chose, where the bundle landed, what the Playground's Store row said). `AGENTS.md` keeps the SDK's brief and gains one paragraph under it pointing at this board and D2's wall. A first test that asserts `OriWeatherDroplet.id == "ori-weather"`.
 
 Accept:
 
-- [ ] `droppykit build` writes `.build/OriWeather.droplet`, universal, and `droppykit validate` says "Ready to submit." on the scaffold before anything is replaced.
-- [ ] `make test` is green end to end, and `shots/report.json` has an empty `problems` array with the scaffold's one surface `provided`.
-- [ ] `make install` puts the bundle in the Playground and its Store row's subtitle is the loader's word for loaded; `log stream --predicate 'subsystem == "app.getdroppy.Droppy" AND category == "droplets"'` shows the load and no refusal.
-- [ ] Renaming the folder broke nothing: `droppykit version` names the checkout and the pinned tag from inside `OriWeather`.
+- [x] `droppykit build` writes `.build/OriWeather.droplet`, universal, and `droppykit validate` says "Ready to submit." on the scaffold before anything is replaced.
+- [x] `make test` is green end to end, and `shots/report.json` has an empty `problems` array with the scaffold's one surface `provided`.
+- [x] `make install` puts the bundle in the Playground and its Store row's subtitle is the loader's word for loaded; `log stream --predicate 'subsystem == "app.getdroppy.Droppy" AND category == "droplets"'` shows the load and no refusal.
+- [x] Renaming the folder broke nothing: `droppykit version` names the checkout and the pinned tag from inside `OriWeather`.
 
 Commit: `A droplet that loads and says nothing yet`
+
+## In progress
+
+## Ready
+
+### Phase 1: a droplet that loads
 
 #### OW-2 · The reading, carried over
 
