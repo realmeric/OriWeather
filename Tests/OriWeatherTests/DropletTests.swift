@@ -232,6 +232,18 @@ final class ShelfClockTests: XCTestCase {
         droplet.deactivate()
     }
 
+    /// Droppy never hands a solo card less than its floor (352 on a notch,
+    /// 370 as an island), and a narrower declaration is stretched to it; the
+    /// widget declares at least the floor and a height inside the host's range.
+    func testTheWidgetDeclaresNumbersTheHostHonours() throws {
+        let traits = OriWeatherDroplet().widgetDescriptors[0].layoutTraits
+        let solo = try XCTUnwrap(traits.preferredSoloWidth)
+        XCTAssertGreaterThanOrEqual(solo, DroppyShellMetrics.shelfMinimumSoloCardWidth(usesNotchStyle: true))
+        XCTAssertGreaterThanOrEqual(solo, DroppyShellMetrics.shelfMinimumSoloCardWidth(usesNotchStyle: false))
+        guard case .fixed(let height) = traits.contentHeight else { return XCTFail("the height is fixed") }
+        XCTAssertTrue(DroppyShellMetrics.shelfWidgetFixedContentHeightRange.contains(height))
+    }
+
     func testTheWidgetDeclaresBothWidthsAndTheIdThePillOpens() {
         let droplet = OriWeatherDroplet()
         let descriptor = droplet.widgetDescriptors[0]

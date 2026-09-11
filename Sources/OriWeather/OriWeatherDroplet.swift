@@ -33,6 +33,10 @@ struct Glance: Equatable {
     var condition: String { reading.condition }
     /// The condition, or how old the reading is once it has stopped arriving.
     var detail: String { isStale ? Ago.words(reading.at, at: now) : reading.condition }
+    /// Today's high and low on their own, where the reading carried them.
+    var high: String? { reading.high.map { WeatherReading.figure($0, in: unit) } }
+    var low: String? { reading.low.map { WeatherReading.figure($0, in: unit) } }
+
     /// Today's high and low, "H 28°  L 19°", where the reading carried them.
     var highLow: String? {
         guard let high = reading.high, let low = reading.low else { return nil }

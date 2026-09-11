@@ -65,16 +65,44 @@ struct WeatherWidget: View {
     }
 }
 
-/// Alone on the shelf: the reading across the top (the mark and the degrees
-/// large, the condition and what it feels like beside them, the city and
-/// today's high and low on the right) and the hours ahead under it. No age on
-/// a fresh reading; a stale one says its age where the condition was.
+/// The header every Droppy widget opens with: a 12 pt symbol and a 12 pt
+/// title in the secondary white, here the city, with today's high and low as
+/// the trailing number when there is room for them.
+private struct WeatherHeader: View {
+    let glance: Glance
+    let showsHighLow: Bool
+    @Environment(\.weatherInk) private var ink
+
+    var body: some View {
+        HStack(spacing: DroppySpacing.xsm) {
+            Image(systemName: "mappin")
+                .font(.system(size: DroppyLiveActivityMetrics.labelFontSize, weight: .medium))
+                .accessibilityHidden(true)
+            Text(verbatim: glance.city.name)
+                .font(.system(size: DroppyLiveActivityMetrics.labelFontSize, weight: .semibold))
+            Spacer(minLength: DroppySpacing.md)
+            if showsHighLow, let highLow = glance.highLow {
+                Text(verbatim: highLow)
+                    .font(.system(size: DroppyLiveActivityMetrics.labelFontSize, weight: .medium))
+                    .monospacedDigit()
+            }
+        }
+        .lineLimit(1)
+        .foregroundStyle(ink.secondary)
+    }
+}
+
+/// Alone on the shelf: the header, the reading (the mark and the degrees
+/// large, the condition and what it feels like beside them) and the hours
+/// ahead under it. A fresh reading carries no age; a stale one says its age
+/// where the condition was.
 private struct SoloWeather: View {
     let glance: Glance
     @Environment(\.weatherInk) private var ink
 
     var body: some View {
-        VStack(alignment: .leading, spacing: DroppySpacing.smd) {
+        VStack(alignment: .leading, spacing: DroppySpacing.sm) {
+            WeatherHeader(glance: glance, showsHighLow: true)
             HStack(alignment: .center, spacing: DroppySpacing.md) {
                 WeatherMark(code: glance.reading.code, isDay: glance.reading.isDay)
                     .frame(width: Look.shelfMark, height: Look.shelfMark)
@@ -84,7 +112,7 @@ private struct SoloWeather: View {
                     .monospacedDigit()
                     .foregroundStyle(ink.primary)
                     .fixedSize()
-                VStack(alignment: .leading, spacing: DroppySpacing.xs / 2) {
+                VStack(alignment: .leading, spacing: 0) {
                     Text(verbatim: glance.detail)
                         .font(.system(size: Look.shelfLabel, weight: .medium))
                         .foregroundStyle(ink.secondary)
@@ -93,25 +121,13 @@ private struct SoloWeather: View {
                         .monospacedDigit()
                         .foregroundStyle(ink.tertiary)
                 }
-                .layoutPriority(1)
-                Spacer(minLength: DroppySpacing.sm)
-                VStack(alignment: .trailing, spacing: DroppySpacing.xs / 2) {
-                    Text(verbatim: glance.city.name)
-                        .font(.system(size: Look.shelfLabel, weight: .medium))
-                        .foregroundStyle(ink.secondary)
-                    if let highLow = glance.highLow {
-                        Text(verbatim: highLow)
-                            .font(.system(size: DroppyLiveActivityMetrics.labelFontSize))
-                            .monospacedDigit()
-                            .foregroundStyle(ink.tertiary)
-                    }
-                }
+                .lineLimit(1)
+                Spacer(minLength: 0)
             }
-            .lineLimit(1)
             if !glance.hours.isEmpty {
+                Spacer(minLength: 0)
                 HourStrip(hours: glance.hours)
             }
-            Spacer(minLength: 0)
         }
         .opacity(glance.isStale ? Look.staleOpacity : 1)
         .accessibilityElement(children: .combine)
@@ -145,15 +161,17 @@ private struct HourStrip: View {
     }
 }
 
-/// Beside another widget: the mark and the degrees, the condition under them,
-/// and at the foot the city and today's high and low when the slot is tall
-/// enough for them.
+/// Beside another widget: the header, the mark and the degrees, the
+/// condition, and two rows with the label leading and the number trailing:
+/// what it feels like, and today's high and low.
 private struct PairedWeather: View {
     let glance: Glance
     @Environment(\.weatherInk) private var ink
 
     var body: some View {
         VStack(alignment: .leading, spacing: DroppySpacing.xs) {
+            WeatherHeader(glance: glance, showsHighLow: false)
+                .padding(.bottom, DroppySpacing.xs)
             HStack(spacing: DroppySpacing.sm) {
                 WeatherMark(code: glance.reading.code, isDay: glance.reading.isDay)
                     .frame(width: Look.pairedMark, height: Look.pairedMark)
@@ -167,23 +185,25 @@ private struct PairedWeather: View {
                 .font(.system(size: DroppyLiveActivityMetrics.labelFontSize, weight: .medium))
                 .foregroundStyle(ink.secondary)
             Spacer(minLength: 0)
-            ViewThatFits(in: .vertical) {
-                VStack(alignment: .leading, spacing: DroppySpacing.xs / 2) {
-                    Text(verbatim: glance.city.name)
-                        .font(.system(size: DroppyLiveActivityMetrics.labelFontSize, weight: .medium))
-                        .foregroundStyle(ink.secondary)
-                    if let highLow = glance.highLow {
-                        Text(verbatim: highLow)
-                            .font(.system(size: DroppyLiveActivityMetrics.labelFontSize))
-                            .monospacedDigit()
-                            .foregroundStyle(ink.tertiary)
-                    }
-                }
-                EmptyView()
+            row("Feels like", glance.feelsLike)
+            if let high = glance.high, let low = glance.low {
+                row("High / low", "\(high) / \(low)")
             }
         }
         .lineLimit(1)
         .opacity(glance.isStale ? Look.staleOpacity : 1)
         .accessibilityElement(children: .combine)
+    }
+
+    private func row(_ label: String, _ value: String) -> some View {
+        HStack {
+            Text(verbatim: label)
+                .foregroundStyle(ink.tertiary)
+            Spacer(minLength: DroppySpacing.md)
+            Text(verbatim: value)
+                .monospacedDigit()
+                .foregroundStyle(ink.primary)
+        }
+        .font(.system(size: DroppyLiveActivityMetrics.labelFontSize, weight: .medium))
     }
 }

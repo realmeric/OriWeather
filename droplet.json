@@ -1,7 +1,7 @@
 {
   "id": "ori-weather",
   "name": "OriWeather",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "summary": "Weather on the notch, drawn with better taste",
   "description": "The temperature and a mark of its own on the wings, whenever nothing else wants the notch. Hover it and it opens into a card with the condition, the city and what it feels like. On the shelf it shows today's high and low and the next five hours, and while the Mac is locked it sits in the status widgets row.\n\nIt finds your city from your internet address, checked against your time zone, so it asks for no location permission and no account; or name the city yourself. It reads the weather once every half hour and only while you can see it, and stops the moment you cannot. When the network goes, the last reading stays up, dimmed, with its age where the condition was.\n\nCelsius or Fahrenheit, every 15, 30 or 60 minutes, and Control-Option-Command-W to put it on the wings or take it off. Part of Ori, droplets by realmeric.",
   "category": "Productivity",

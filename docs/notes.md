@@ -346,3 +346,34 @@ condition, and the city with the high and low at the foot. It is 136 tall now.
 
 The maker is "Ori by realmeric" and the name is "OriWeather", one word, the
 way every Ori droplet is named.
+
+## DroppyKit 1.4.1, and the widget laid out like Droppy's (2026-09-11)
+
+DroppyKit went from 1.2.1 to 1.4.1 with the same ABI and the same Droppy 15.3,
+and no API this droplet calls changed, so `kit.minAPI` stays 1.1.0. What
+changed is what the host and the guides say about widgets. Since 1.3.0 the
+host honours a fixed height (48 to 480) and never hands a solo card less than
+352 points on a notch or 370 as an island, stretching anything declared
+narrower; since 1.3.1 it paints nothing behind a widget; 1.4.0 writes down the
+layout every Droppy widget shares: fill the rectangle, one 14 point padding,
+leading text and trailing numbers, a header row of a 12 point symbol and a 12
+point title in the secondary white, spacing only in the tokens, no unused
+space. The widget declared 340 wide, had no header and two 2 point gaps. It now
+declares 370 by 152, opens with a pin and the city (today's high and low
+trailing, alone), and beside another widget ends in two label-and-number rows,
+"Feels like" and "High / low". The SDK checkout was on the v1.2.1 tag, so
+`droppykit update`'s fast-forward pull could not run; the checkout was moved to
+the v1.4.1 tag and the package pin with `swift package update droppykit`.
+
+`make energy` after it did not pass, and did not show a regression either.
+Three runs with Meric at the keyboard: one with the machine 21% busy and the
+seat flipping three times (caps lock, the pointer), one with 22%, and one
+quiet run where CPU was the same with and without the droplet (0.412% against
+0.410%) and wakeups rose by 0.7 a second seated and 1.0 unseated, where the
+unseated run starts no timer at all. Today's quiet baselines alone have ranged
+from 0.67 to 2.1 wakeups a second, and the Playground had moved to 1.0.12.
+Nothing that runs while the weather is on the wings changed in this round.
+It is written down as unproven, to be measured again on an idle Mac.
+
+The version is 1.0.1: the Store compares versions to decide who needs an
+update, and the guide says to raise it on every submission.

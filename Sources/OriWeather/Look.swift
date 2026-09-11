@@ -29,10 +29,13 @@ enum Look {
 
     /// The widget's two widths. Both are required: the host refuses a
     /// descriptor that leaves either to a fallback.
-    static let shelfSoloWidth: CGFloat = 340
+    /// The solo width is the floor Droppy 15.3 hands a solo card as an island
+    /// (352 on a notch), so the widget is laid out at the width it gets.
+    static let shelfSoloWidth: CGFloat = 370
     static let shelfPairedWidth: CGFloat = 170
-    /// The widget's height: the reading and, under it, the hours ahead.
-    static let shelfHeight: CGFloat = 136
+    /// The widget's height: the header, the reading and the hours ahead,
+    /// and nothing more.
+    static let shelfHeight: CGFloat = 152
     /// Alone on the shelf: the mark and the degrees large enough to read
     /// from across the desk.
     static let shelfMark: CGFloat = 34
