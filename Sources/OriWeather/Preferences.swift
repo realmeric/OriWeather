@@ -9,6 +9,7 @@ import Foundation
 struct Preferences {
     enum Key {
         static let city = "city"
+        static let automatic = "automatic"
         static let unit = "unit"
         static let intervalMinutes = "intervalMinutes"
         static let pinned = "pinned"
@@ -21,9 +22,22 @@ struct Preferences {
     let service: any DropletPreferencesService
 
     /// Stored as JSON, which is what the service does with any `Codable`.
+    /// A country stored in the geocoder's long form is read in the short one.
     var city: City? {
-        get { service.value(forKey: Key.city, as: City.self) }
+        get {
+            service.value(forKey: Key.city, as: City.self).map {
+                City(name: $0.name, region: $0.region, country: OpenMeteoGeocoder.shortCountry($0.country),
+                     place: $0.place, timeZone: $0.timeZone)
+            }
+        }
         nonmutating set { service.setValue(newValue, forKey: Key.city) }
+    }
+
+    /// Whether the city is found from this Mac's time zone. On until the user
+    /// names one, and never switched on over a city somebody already chose.
+    var automatic: Bool {
+        get { service.value(forKey: Key.automatic, as: Bool.self) ?? !service.hasValue(forKey: Key.city) }
+        nonmutating set { service.setValue(newValue, forKey: Key.automatic) }
     }
 
     /// How the degrees are counted. Celsius unless chosen.

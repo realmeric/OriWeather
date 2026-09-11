@@ -118,8 +118,9 @@ item), and nothing reads it yet.
 `Submitting.md` lists the five reasons review sends a droplet back, most often
 first. Each has a card.
 
-Capabilities you do not use. The manifest asks for `network-client` and
-nothing else, and nothing is read without it (OW-6): the droplet checks the
+Capabilities you do not use. The manifest asks for `network-client`, and
+since the shortcut `global-shortcuts`, each for one use: the weather and the
+geocoder, and the one shortcut. Nothing is read without the first (OW-6): the droplet checks the
 grant at activation and, refused, reads nothing rather than trying. The one
 thing that might have wanted more, where the Mac is, was answered by not
 asking (D4, OW-3).
@@ -164,3 +165,37 @@ and "United Kingdom" for DE and GB. The country is now the English name macOS
 gives the result's `country_code` ("Türkiye"), and the geocoder's own name only
 when there is no code. A city chosen before this keeps the name it was stored
 with until it is chosen again.
+
+## After OW-17: cities, the automatic city, the shortcut (2026-09-11)
+
+The geocoder's answer mixes places people live in with places that are not
+towns: for "Istanbul" it answered the city, a village, two airports and the
+old town. Each result carries a GeoNames `feature_code`, and the reader now
+keeps populated places (`PPL` and its kinds, a capital, a seat of government)
+and drops sections of towns (`PPLX`) and places historical, abandoned or
+destroyed. Ten are asked for so that five are usually left.
+
+The automatic city reads the Mac's time zone, which macOS sets from the Mac's
+location when "Set time zone automatically" is on, and geocodes the city it is
+named after, preferring the match in that zone (Paris, Europe/Paris, not
+Paris, Texas). It is found at activation and when the system says the zone
+changed, and asks nothing while the stored city is already in the zone. It is
+on until somebody names a city and never switches itself on over one that was
+chosen, so Meric's Kaunas stays Kaunas. A zone that names no city ("UTC") finds
+nothing and says so in the log. IP geolocation was the other way and was left
+out: a third company would see the address, and behind a VPN it names the
+VPN's city.
+
+The shortcut needs `global-shortcuts`, the second capability; it is used for
+exactly one thing, the pin, and the room shows it only when granted. The host
+takes the Control-Option-W suggestion only if nothing else has it, and the user
+rebinds it in Droppy's Settings, Shortcuts.
+
+Droppy's Store has three categories, Productivity, Media and AI, read from
+getdroppy.app/droplets, and Droppy's own Weather droplet is in Productivity,
+so that is where this one is.
+
+`make energy` now writes the pin into the Playground's preferences for each
+run (the host stores it as JSON data under `droplet.ori-weather.pinned`) and
+puts the user's value back afterwards; both runs use the demo sky, so the
+unseated run has a reading and holds no seat, which is the case D6 is about.

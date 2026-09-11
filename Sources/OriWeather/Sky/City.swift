@@ -44,7 +44,9 @@ struct OpenMeteoGeocoder: Geocoding {
         var components = URLComponents(string: "https://geocoding-api.open-meteo.com/v1/search")
         components?.queryItems = [
             URLQueryItem(name: "name", value: name),
-            URLQueryItem(name: "count", value: "5"),
+            // Ten asked for, five kept: the answer mixes airports and old
+            // towns in with the cities, and those are dropped.
+            URLQueryItem(name: "count", value: "10"),
             URLQueryItem(name: "language", value: "en"),
             URLQueryItem(name: "format", value: "json"),
         ]
@@ -62,8 +64,9 @@ struct OpenMeteoGeocoder: Geocoding {
     }
 
     /// The answer keeps `name`, `admin1`, the country, `latitude`, `longitude`
-    /// and `timezone`, and nothing else. No `results` is an empty list: a city
-    /// nobody has heard of is not a failure.
+    /// and `timezone`, and nothing else, for places people live in: an airport
+    /// is not a city, and neither is a city's old town. No `results` is an
+    /// empty list: a city nobody has heard of is not a failure.
     ///
     /// The country is the name macOS gives `country_code` in English, the
     /// language the names are asked for in, and the geocoder's own `country`
@@ -74,7 +77,8 @@ struct OpenMeteoGeocoder: Geocoding {
             throw WeatherError.unreadable
         }
         let results = json["results"] as? [[String: Any]] ?? []
-        return results.compactMap { result -> City? in
+        let cities = results.compactMap { result -> City? in
+            if let feature = result["feature_code"] as? String, !isPopulatedPlace(feature) { return nil }
             guard let name = result["name"] as? String,
                   let latitude = (result["latitude"] as? NSNumber)?.doubleValue,
                   let longitude = (result["longitude"] as? NSNumber)?.doubleValue
@@ -86,10 +90,28 @@ struct OpenMeteoGeocoder: Geocoding {
                         place: Place(latitude: latitude, longitude: longitude),
                         timeZone: result["timezone"] as? String)
         }
+        return Array(cities.prefix(5))
+    }
+
+    /// GeoNames' populated places, `PPL` and its kinds (a capital, a seat of
+    /// government, a village), less the ones nobody lives in as a town: a
+    /// section of a city, and places historical, abandoned or destroyed.
+    static func isPopulatedPlace(_ feature: String) -> Bool {
+        feature.hasPrefix("PPL") && !["PPLX", "PPLH", "PPLQ", "PPLW", "PPLCH"].contains(feature)
     }
 
     static func countryName(code: String?) -> String? {
         guard let code, !code.isEmpty else { return nil }
         return Locale(identifier: "en").localizedString(forRegionCode: code)
+    }
+
+    /// A country stored before names came from the code ("Republic of
+    /// Türkiye") read as the name the code gives ("Türkiye"): the longest
+    /// region name it ends with, or itself.
+    static func shortCountry(_ stored: String?) -> String? {
+        guard let stored else { return nil }
+        let english = Locale(identifier: "en")
+        let names = Locale.Region.isoRegions.compactMap { english.localizedString(forRegionCode: $0.identifier) }
+        return names.filter { stored.hasSuffix($0) }.max(by: { $0.count < $1.count }) ?? stored
     }
 }

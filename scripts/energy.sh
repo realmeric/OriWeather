@@ -10,11 +10,15 @@
 # pointer wherever it was left:
 #
 #   removed    the droplet taken out of the Playground's folder: the baseline
-#   seated     installed with OW_DEMO=1, so it publishes, holds the seat and
-#              runs its clock (a 30 minute timer, which should cost nothing
-#              in a minute)
-#   unseated   installed with no city and no demo sky, so it publishes nil,
-#              holds no seat and must hold no timer
+#   seated     installed with OW_DEMO=1 and "Keep on the notch" on, so it
+#              publishes, holds the seat and runs its clock (a 30 minute
+#              timer, which should cost nothing in a minute)
+#   unseated   the same demo sky with "Keep on the notch" off, so it has a
+#              reading, publishes nothing, holds no seat and must hold no timer
+#
+# The pin is written into the Playground's own preferences for each run, the
+# way the droplet stores it (JSON through the host), and whatever the user had
+# is put back afterwards.
 #
 # It fails when a run with the droplet in it wakes the Playground more than
 # the baseline does past noise, or when the droplet's own log says a clock
@@ -34,6 +38,7 @@ SETTLE=20               # seconds between the relaunch and the idle minute
 
 PROCESS=DroppyPlayground
 PLAYGROUND_ID=iordv.DroppyPlayground
+PIN_KEY=droplet.ori-weather.pinned
 FOLDER="$HOME/Library/Application Support/Droppy Playground/Droplets/ori-weather"
 
 root=${0:a:h:h}
@@ -113,6 +118,25 @@ else
     machine="the machine was otherwise quiet"
 fi
 
+# The user's pin, as hex of the JSON the host stored, or empty if none.
+saved_pin=$(defaults export $PLAYGROUND_ID - 2>/dev/null | /usr/bin/python3 -c '
+import plistlib, sys
+value = plistlib.loads(sys.stdin.buffer.read()).get(sys.argv[1])
+print(value.hex() if isinstance(value, bytes) else "")' $PIN_KEY || true)
+
+set_pin() { # set_pin true|false, with the Playground quit
+    quit_playground
+    defaults write $PLAYGROUND_ID $PIN_KEY -data "$(print -n "$1" | xxd -p)"
+}
+
+restore_pin() {
+    if [[ -n "$saved_pin" ]]; then
+        defaults write $PLAYGROUND_ID $PIN_KEY -data "$saved_pin"
+    else
+        defaults delete $PLAYGROUND_ID $PIN_KEY 2>/dev/null || true
+    fi
+}
+
 # --- the three runs -------------------------------------------------------
 
 quit_playground
@@ -121,6 +145,7 @@ rm -rf "$FOLDER"
 # running, the way make install leaves it.
 restore() {
     quit_playground
+    restore_pin
     rm -rf "$FOLDER"
     mkdir -p "$FOLDER"
     cp -R .build/OriWeather.droplet "$FOLDER/"
@@ -135,8 +160,10 @@ measure removed
 mkdir -p "$FOLDER"
 cp -R .build/OriWeather.droplet "$FOLDER/"
 xattr -dr com.apple.quarantine "$FOLDER" 2>/dev/null || true
+set_pin true
 measure seated --env OW_DEMO=1
-measure unseated
+set_pin false
+measure unseated --env OW_DEMO=1
 
 # --- the verdict ----------------------------------------------------------
 
@@ -161,6 +188,12 @@ else
     load_line="The droplet activated in both runs it was installed for."
 fi
 
+# The seated run has to have been seated, or it measured the wrong thing.
+if [[ "$seat_seated" != "compact" && "$seat_seated" != "secondary" ]]; then
+    failed=1
+    load_line="$load_line The seated run was never seated (${seat_seated:-no seat logged}), so it measured nothing."
+fi
+
 # Unseated and unshelved, no timer: the droplet logs every clock it starts.
 if [[ "$started_unseated" -gt 0 ]]; then
     failed=1
@@ -183,8 +216,8 @@ mkdir -p docs/energy
     print "| Run | Idle CPU (%) | Idle wakeups (a second) | POWER | Seat | Clock started | Against removed |"
     print "|---|---|---|---|---|---|---|"
     print "| removed | $cpu_removed | $wakeups_removed | $power_removed | | | baseline |"
-    print "| seated (OW_DEMO=1) | $cpu_seated | $wakeups_seated | $power_seated | ${seat_seated:-none logged} | $started_seated | $seated_verdict |"
-    print "| unseated (no city) | $cpu_unseated | $wakeups_unseated | $power_unseated | ${seat_unseated:-none logged} | $started_unseated | $unseated_verdict |"
+    print "| seated (OW_DEMO=1, pinned) | $cpu_seated | $wakeups_seated | $power_seated | ${seat_seated:-none logged} | $started_seated | $seated_verdict |"
+    print "| unseated (OW_DEMO=1, unpinned) | $cpu_unseated | $wakeups_unseated | $power_unseated | ${seat_unseated:-none logged} | $started_unseated | $unseated_verdict |"
     print ""
     print "The line: a run with the droplet in it may wake the Playground at most"
     print "max($NOISE_WAKEUPS, ${NOISE_FRACTION} of the baseline) a second more than the removed run, and"

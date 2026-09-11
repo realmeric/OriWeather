@@ -4,7 +4,7 @@
 SDK := $(HOME)/Documents/Projects/apps/droppykit
 DROPPYKIT := $(SDK)/Scripts/droppykit
 
-.PHONY: test build validate icon shots offline install energy clean
+.PHONY: test build validate icon shots offline screenshots install energy clean
 
 test:
 	swift test
@@ -42,6 +42,11 @@ offline: shots
 	.build/OriWeatherHarness.app/Contents/MacOS/OriWeatherHarness --manifest "$(CURDIR)/.droplet-offline.json" --shots ./shots/offline --report ./shots/offline/report.json
 	rm -f .droplet-offline.json
 	/usr/bin/python3 scripts/check-report.py shots/offline/report.json --offline
+
+# The Store's screenshots, cut from the harness. Not part of the gate: they
+# are committed, and read by eye when they change.
+screenshots:
+	scripts/screenshots.sh
 
 install: build
 	scripts/install.sh

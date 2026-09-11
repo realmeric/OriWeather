@@ -11,9 +11,11 @@ extension OriWeatherDroplet: SettingsPaneProviding {
     public var settingsSearchEntries: [SettingsSearchEntry] {
         [
             SettingsSearchEntry(title: "City", keywords: ["weather", "place", "location", "where"]),
+            SettingsSearchEntry(title: "Find the city automatically", keywords: ["automatic", "location", "time zone", "travel"]),
             SettingsSearchEntry(title: "Unit", keywords: ["celsius", "fahrenheit", "degrees", "temperature"]),
             SettingsSearchEntry(title: "Refresh every", keywords: ["interval", "minutes", "update"]),
-            SettingsSearchEntry(title: "Keep on the notch", keywords: ["pin", "pinned", "always", "rest"]),
+            SettingsSearchEntry(title: "Keep on the notch", keywords: ["pin", "pinned", "always", "rest", "wings"]),
+            SettingsSearchEntry(title: "Shortcut", keywords: ["keyboard", "wings", "show", "hide"]),
         ]
     }
 }
@@ -58,6 +60,15 @@ struct WeatherRoom: View {
                     subtitle: "On, the weather sits on the wings when nothing else wants the notch. Off, it stays on the shelf and leaves the wings alone.",
                     isOn: Binding(get: { droplet.pinned }, set: { droplet.pinned = $0 })
                 )
+                if droplet.canUseShortcut {
+                    DropletSettingsDivider()
+                    DropletControlRow(
+                        title: "Shortcut",
+                        infoTip: "Shows or hides the weather on the wings from anywhere. Change it in Droppy's Settings, Shortcuts."
+                    ) {
+                        DropletValuePill(text: droplet.shortcut.map(WingShortcut.words) ?? "Not set")
+                    }
+                }
             }
         }
     }
@@ -72,6 +83,12 @@ private struct CityCard: View {
 
     var body: some View {
         DropletSettingsCard {
+            DropletToggleRow(
+                title: "Find the city automatically",
+                subtitle: "From this Mac's time zone, which macOS sets from where you are and keeps right as you travel. One city per zone, so name your own if you live elsewhere in it.",
+                isOn: Binding(get: { droplet.automatic }, set: { droplet.automatic = $0 })
+            )
+            DropletSettingsDivider()
             DropletStackedRow(
                 title: "City",
                 infoTip: "The weather is read for a city you name, not for where this Mac is. Open-Meteo is sent the name while you type and a coordinate rounded to about a kilometre."
@@ -84,7 +101,7 @@ private struct CityCard: View {
                         .padding(.vertical, DroppySpacing.xsm)
                         .background(RoundedRectangle(cornerRadius: DroppyRadius.small, style: .continuous)
                             .fill(AdaptiveColors.overlayAuto(DroppyOpacity.light)))
-                    Text(verbatim: droplet.chosenCity.map(Self.describe) ?? "No city yet.")
+                    Text(verbatim: caption)
                         .font(.caption)
                         .foregroundStyle(AdaptiveColors.secondaryTextAuto)
                 }
@@ -104,6 +121,13 @@ private struct CityCard: View {
                 .buttonStyle(.plain)
             }
         }
+    }
+
+    private var caption: String {
+        guard let city = droplet.chosenCity else {
+            return droplet.automatic ? "Looking for the city from the time zone." : "No city yet."
+        }
+        return Self.describe(city) + (droplet.automatic ? ", found from the time zone" : "")
     }
 
     static func title(_ city: City) -> String {

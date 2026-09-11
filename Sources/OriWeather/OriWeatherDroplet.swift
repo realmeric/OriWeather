@@ -72,6 +72,11 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
     private var subscriptions: Set<AnyCancellable> = []
     private let fetcherOverride: (any WeatherFetching)?
     private let geocoderOverride: (any Geocoding)?
+    private var geocoder: (any Geocoding)?
+    private var finding: Task<Void, Never>?
+    /// This Mac's time zone, which the automatic city is found from. A
+    /// closure so a test can travel.
+    var timeZone: () -> String = { TimeZone.autoupdatingCurrent.identifier }
 
     public override init() {
         fetcherOverride = nil
@@ -79,8 +84,10 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
         super.init()
     }
 
-    /// For the tests: a fetcher and a geocoder that answer from memory.
-    init(fetcher: any WeatherFetching, geocoder: (any Geocoding)? = nil) {
+    /// For the tests: a fetcher and a geocoder that answer from memory. The
+    /// geocoder knows nowhere unless a test gives it somewhere, so no test
+    /// reaches the network by finding a city.
+    init(fetcher: any WeatherFetching, geocoder: any Geocoding = NoGeocoder()) {
         fetcherOverride = fetcher
         geocoderOverride = geocoder
         super.init()
@@ -102,7 +109,9 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
         let log = host.log
         model.log = { log.info($0) }
         self.model = model
-        search = CitySearch(geocoder: geocoder(for: host, demo: demo), log: { log.info($0) })
+        let geocoder = geocoder(for: host, demo: demo)
+        self.geocoder = geocoder
+        search = CitySearch(geocoder: geocoder, log: { log.info($0) })
 
         model.objectWillChange
             .receive(on: RunLoop.main)
@@ -111,6 +120,10 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
         host.preferences.didChange
             .sink { [weak self] key in self?.preferenceChanged(key) }
             .store(in: &subscriptions)
+        NotificationCenter.default.publisher(for: .NSSystemTimeZoneDidChange)
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in self?.findCity(force: false) }
+            .store(in: &subscriptions)
         host.installState.statePublisher
             .map { $0.activeWidgetIDs.contains(Self.widgetID) }
             .removeDuplicates()
@@ -118,9 +131,17 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
             .store(in: &subscriptions)
 
         host.log.info("Ori Weather activated\(demo.map { " with the \($0) demo sky" } ?? "")")
+        if host.isGranted(.globalShortcuts) {
+            host.shortcuts.register(id: WingShortcut.id, title: WingShortcut.title,
+                                    defaultShortcut: WingShortcut.suggestion) { [weak self] in
+                self?.pinned.toggle()
+            }
+        }
+
         // One reading to have something to publish: the host seats nothing
         // until there is a state, and the clock runs only while seated.
         model.refresh(because: .launch)
+        findCity(force: false)
     }
 
     public func deactivate() {
@@ -131,6 +152,12 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
         model = nil
         search?.cancel()
         search = nil
+        finding?.cancel()
+        finding = nil
+        geocoder = nil
+        if host?.isGranted(.globalShortcuts) == true {
+            host?.shortcuts.unregister(id: WingShortcut.id)
+        }
         subscriptions.removeAll()
         glance = nil
         activitySubject.send(nil)
@@ -161,9 +188,59 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
     /// The city the user chose, as stored; the demo sky's city is not one.
     var chosenCity: City? { preferences?.city }
 
+    /// A city the user named, which ends finding one automatically.
     func choose(_ city: City) {
+        preferences?.automatic = false
         preferences?.city = city
         search?.reset()
+    }
+
+    /// Turned on in the room, it finds the zone's city at once, over whatever
+    /// was chosen.
+    var automatic: Bool {
+        get { preferences?.automatic ?? false }
+        set {
+            preferences?.automatic = newValue
+            if newValue { findCity(force: true) }
+        }
+    }
+
+    /// Whether the user granted the shortcut its capability; without it the
+    /// room does not offer a shortcut it cannot honour.
+    var canUseShortcut: Bool { host?.isGranted(.globalShortcuts) ?? false }
+
+    /// The shortcut as the host has it bound, or nil when it is not.
+    var shortcut: DropletKeyboardShortcut? {
+        guard let host, host.isGranted(.globalShortcuts) else { return nil }
+        return host.shortcuts.currentShortcut(id: WingShortcut.id)
+    }
+
+    /// Finds the city from the time zone, when the city is automatic: at
+    /// activation and when the zone changes only if the stored city is not
+    /// already in it, and at once when the user turns it on.
+    func findCity(force: Bool) {
+        guard let preferences, preferences.automatic, let geocoder else { return }
+        let zone = timeZone()
+        if !force, preferences.city?.timeZone == zone { return }
+        guard let name = ZoneCity.name(of: zone) else {
+            host?.log.notice("the time zone \(zone) names no city, so none was found")
+            return
+        }
+        finding?.cancel()
+        finding = Task { [weak self] in
+            let found = (try? await geocoder.cities(named: name)) ?? []
+            guard !Task.isCancelled, let self, let preferences = self.preferences,
+                  preferences.automatic else { return }
+            guard let city = ZoneCity.pick(found, in: zone) else {
+                self.host?.log.notice("the geocoder knows no \(name), so no city was found")
+                return
+            }
+            self.host?.log.info("found \(city.name) from the time zone \(zone)")
+            // Written down, so the city stored next is known to be found and
+            // not chosen.
+            preferences.automatic = true
+            preferences.city = city
+        }
     }
 
     var unit: TemperatureUnit {
@@ -274,7 +351,7 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
 }
 
 /// What finds a city when `network-client` was not granted: nobody.
-private struct NoGeocoder: Geocoding {
+struct NoGeocoder: Geocoding {
     func cities(named name: String) async throws -> [City] { [] }
 }
 

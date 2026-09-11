@@ -14,15 +14,30 @@ final class GeocoderTests: XCTestCase {
          {"id":6299743,"name":"Istanbul Atatürk Airport","latitude":40.97692,"longitude":28.81461,"elevation":49.0,"feature_code":"AIRP","country_code":"TR","admin1_id":745042,"admin2_id":7732461,"timezone":"Europe/Istanbul","country_id":298795,"country":"Republic of Türkiye","admin1":"Istanbul","admin2":"Bakırköy"}],"generationtime_ms":0.38588047}
         """.utf8)
 
-    func testTheAnswerIsFiveCitiesWithTheCoordinateAlreadyRounded() throws {
+    /// Of the five answers, two are places people live in. The two airports
+    /// and the old town are not cities.
+    func testTheAnswerIsTheCitiesWithTheCoordinateAlreadyRounded() throws {
         let cities = try OpenMeteoGeocoder.cities(from: istanbul)
-        XCTAssertEqual(cities.count, 5)
+        XCTAssertEqual(cities.map(\.name), ["Istanbul", "İstanbulboğazı"])
         let first = try XCTUnwrap(cities.first)
         XCTAssertEqual(first.name, "Istanbul")
         XCTAssertEqual(first.region, "Istanbul")
         XCTAssertEqual(first.country, "Türkiye", "the name for TR, not the geocoder's Republic of Türkiye")
         XCTAssertEqual(first.timeZone, "Europe/Istanbul")
         XCTAssertEqual(first.place, Place(latitude: 41.01, longitude: 28.95))
+    }
+
+    /// Ten answers asked for, five kept, all of them towns.
+    func testNoMoreThanFiveAreKept() throws {
+        let place = #"{"name":"Springfield","latitude":1.0,"longitude":2.0,"feature_code":"PPL","country_code":"US"}"#
+        let body = Data("{\"results\":[\(Array(repeating: place, count: 8).joined(separator: ","))]}".utf8)
+        XCTAssertEqual(try OpenMeteoGeocoder.cities(from: body).count, 5)
+    }
+
+    func testAStoredLongCountryReadsShort() {
+        XCTAssertEqual(OpenMeteoGeocoder.shortCountry("Republic of Türkiye"), "Türkiye")
+        XCTAssertEqual(OpenMeteoGeocoder.shortCountry("Germany"), "Germany")
+        XCTAssertEqual(OpenMeteoGeocoder.shortCountry("Elsewhere"), "Elsewhere")
     }
 
     /// No country code, and the geocoder's own name is kept.
@@ -42,7 +57,7 @@ final class GeocoderTests: XCTestCase {
         XCTAssertEqual(url.host, "geocoding-api.open-meteo.com")
         XCTAssertTrue(url.absoluteString.contains("name=%C4%B0stanbul"), url.absoluteString)
         let query = try XCTUnwrap(URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems)
-        XCTAssertEqual(query.first { $0.name == "count" }?.value, "5")
+        XCTAssertEqual(query.first { $0.name == "count" }?.value, "10")
         XCTAssertEqual(query.first { $0.name == "language" }?.value, "en")
         XCTAssertEqual(query.first { $0.name == "format" }?.value, "json")
     }

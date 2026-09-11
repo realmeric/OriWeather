@@ -8,6 +8,10 @@ feels like. Put it on the shelf and it sits there too, alone or beside another
 widget. When the network goes, the last reading stays up, dimmed, with how old
 it is where the condition was.
 
+"Keep on the notch" decides whether it takes the wings at all; off, it stays
+on the shelf. Control-Option-W flips it from anywhere, and Droppy's Settings,
+Shortcuts, rebinds it.
+
 It is a Droplet, an extension that runs inside [Droppy](https://getdroppy.app),
 built with [DroppyKit](https://gitlab.com/droppyformac1/droppykit) 1.2.1.
 
@@ -19,8 +23,9 @@ that loads a droplet straight from `droppykit build`.
 
 ## What it sends
 
-A city's name to Open-Meteo's geocoder while you type it into the settings
-pane, once the typing has paused. A coordinate rounded to two decimals, about a
+A city's name to Open-Meteo's geocoder: the one you type into the settings
+pane, once the typing has paused, or the one your Mac's time zone is named
+after, when the city is found automatically. A coordinate rounded to two decimals, about a
 kilometre, to Open-Meteo's forecast, once every half hour unless you choose 15
 minutes or an hour, and only while the weather is on the notch or the shelf.
 
@@ -28,15 +33,19 @@ Nothing else, to nobody else. Open-Meteo needs no key and no account.
 
 ## What it does not do
 
-It does not know where your Mac is. There is no location permission to grant,
-because it never asks; you name the city instead.
+It does not ask where your Mac is. There is no location permission to grant.
+Until you name a city, it uses the one your time zone is named after:
+Europe/Istanbul is Istanbul, Europe/Paris is Paris. macOS sets the time zone
+from where you are and keeps it right as you travel, so the weather follows
+you from zone to zone.
 
-Why a city and not a location?
+Why the time zone and not the location?
 
 Because a droplet runs inside Droppy with Droppy's permissions, and DroppyKit
 has no location capability to declare. A droplet that quietly used Droppy's
 own location access would be exactly what the Store's review is there to
-catch.
+catch. The price is precision: one city per zone, so all of Türkiye is
+Istanbul. Name your own city if you live elsewhere in it.
 
 It does not run while you cannot see it. Off the notch and off the shelf there
 is no timer and no request; the last reading waits until it is shown again, and

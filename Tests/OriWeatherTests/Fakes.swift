@@ -70,3 +70,14 @@ struct FakeGeocoder: Geocoding {
         return answer
     }
 }
+
+/// A geocoder that knows a few names, and counts how often it was asked.
+struct AtlasGeocoder: Geocoding {
+    let atlas: [String: [City]]
+    let counter = Counter()
+
+    func cities(named name: String) async throws -> [City] {
+        await counter.bump()
+        return atlas[name] ?? []
+    }
+}

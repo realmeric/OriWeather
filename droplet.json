@@ -11,7 +11,8 @@
   },
   "minAppVersion": "15.3.0",
   "capabilities": [
-    "network-client"
+    "network-client",
+    "global-shortcuts"
   ],
   "surfaces": [
     "live-activity",
@@ -20,7 +21,7 @@
   ],
   "icon": "OriWeather.icon",
   "creator": {
-    "name": "Meric",
+    "name": "realmeric",
     "kind": "community",
     "url": "https://github.com/realmeric",
     "avatar": "Creator.png"
