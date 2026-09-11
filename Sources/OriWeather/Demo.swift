@@ -4,7 +4,7 @@ import Foundation
 ///
 /// Read once at activation: in the harness, or with `OW_DEMO=1`, the fetcher
 /// is `DemoWeather` and nothing reaches the network. `OW_DEMO=stale` answers
-/// once and refuses from two seconds on, which is what an aeroplane looks like.
+/// once and refuses two seconds later, which is what an aeroplane looks like.
 enum Demo {
     enum Mode: Equatable {
         case fixed
@@ -40,10 +40,11 @@ final class DemoWeather: WeatherFetching, @unchecked Sendable {
 
     func read(at place: Place) async throws -> WeatherReading {
         let now = Date()
+        // The stale sky answers its first read and refuses every one after,
+        // and the droplet asks again two seconds later.
         let refused: Bool = lock.withLock {
-            let first = firstRead ?? now
-            firstRead = first
-            return mode == .stale && now.timeIntervalSince(first) >= 2
+            defer { firstRead = firstRead ?? now }
+            return mode == .stale && firstRead != nil
         }
         if refused { throw WeatherError.refused }
         // The stale demo's one good reading is two hours old, so the card has

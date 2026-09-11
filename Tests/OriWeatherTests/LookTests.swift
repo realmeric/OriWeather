@@ -30,19 +30,20 @@ final class MarksTests: XCTestCase {
 final class LookTests: XCTestCase {
     /// `Look.swift` is the only file under `Sources/OriWeather/` with a literal
     /// colour or a literal point size in it. A number in a view is a number
-    /// that stops matching the next time Droppy's styling moves (D3).
+    /// that stops matching the next time Droppy's styling moves (D3). Zero is
+    /// nobody's number.
     func testOnlyLookCarriesNumbersOfItsOwn() throws {
         let sources = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
             .appendingPathComponent("Sources/OriWeather")
         let patterns = [
             #"Color\("#,
-            #"size:\s*[0-9]"#,
-            #"(width|height|minWidth|maxWidth|minHeight|maxHeight):\s*[0-9]"#,
-            #"spacing:\s*[0-9]"#,
+            #"size:\s*(?!0\b)[0-9]"#,
+            #"(width|height|minWidth|maxWidth|minHeight|maxHeight):\s*(?!0\b)[0-9]"#,
+            #"spacing:\s*(?!0\b)[0-9]"#,
             #"\.padding\([^)]*[0-9]"#,
             #"\.opacity\(\s*0?\.[0-9]"#,
-            #"cornerRadius:\s*[0-9]"#,
+            #"cornerRadius:\s*(?!0\b)[0-9]"#,
         ].map { try! NSRegularExpression(pattern: $0) }
 
         let files = FileManager.default.enumerator(at: sources, includingPropertiesForKeys: nil)!

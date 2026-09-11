@@ -26,9 +26,9 @@ extension OriWeatherDroplet: LiveActivityProviding {
         AnyView(WingDegrees(droplet: self))
     }
 
+    /// The card the row grows into on hover.
     public func makeExpanded(context: LiveActivityContext) -> AnyView {
-        AnyView(Color.clear.frame(width: context.availableWidth,
-                                  height: DroppyLiveActivityMetrics.cardContentHeight))
+        AnyView(ExpandedCard(droplet: self, context: context))
     }
 }
 

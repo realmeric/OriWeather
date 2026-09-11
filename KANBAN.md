@@ -106,6 +106,24 @@ Accept:
 
 Commit: `Six marks and one file that says what colour they are`
 
+#### OW-6 · The temperature on the wing
+
+P0 · L · wing
+
+Done in `5f52d8a`. The fifth box waits for eyes on the Playground: its window was not given to this session. What the log said instead is in docs/notes.md under OW-6, and it is not what D5 expected: with pinning off the Playground still reports the compact seat at rest.
+
+`OriWeatherDroplet` conforms to `LiveActivityProviding` and the manifest lists `live-activity` under `surfaces` and `network-client` under `capabilities`, and nothing else in either. `liveActivityState` is a `CurrentValueSubject<LiveActivityState?, Never>` fed from the model: `nil` with no city or no reading; otherwise priority 10, the accessibility title "26 degrees, partly cloudy, Istanbul", `isInteractive: false`, `joinsPersistentActivitySet` from the preference `pinned` (default false), and `expandedWidgetID: "weather"` so a tap on the pill opens OW-11's widget once it exists. `makeCompactLeading()` is the mark at `iconSize`; `makeCompactTrailing()` is the degrees at `labelFontSize`, medium, plain SF, `monospacedDigit()`, in `notchSurfacePrimaryText`; neither adds padding of its own. `liveActivitySeatDidChange` is where the clock lives: seated, `model.start()`; `.none`, `model.stop()`, unless OW-11's widget is on a shelf. `activate(host:)` reads the city and the preferences and subscribes to `preferences.didChange` so a new city refetches and a flipped pin republishes; `deactivate()` stops the clock, cancels every subscription and drops the host.
+
+Accept:
+
+- [x] `live-activity.png` shows the mark in the leading wing and "26°" in the trailing one on the notch shape, and the same pair inside the island, with the row 37 pt tall and nothing of this repo's between the host's insets and the glyph.
+- [x] `-12°` fits the trailing wing on the notch without clipping; if it does not, the shot says so and the card drops the sign's thin space rather than the mark.
+- [x] `DropletTests` build a `DropletHost` from the harness services: after `activate` with a city and a fake fetcher the subject carries a state with priority 10; with no city it carries `nil`; `liveActivitySeatDidChange(.none(.outranked))` leaves `model.isRunning` false and `.compact` turns it true; after `deactivate` the subject is `nil`, `isRunning` is false and the fetcher's count stops moving.
+- [x] `overview.png`'s verdict pill for the live activity says provided, and `capabilities.png` shows one switch.
+- [ ] In the Playground with `pinned` off the row appears while the pointer rests on the closed notch and goes when it leaves; with `pinned` on it stays at rest, and starting music in the Playground's player takes the seat and the log says `surface-suppressed`.
+
+Commit: `Put the temperature on the wing when nothing else wants it`
+
 ## In progress
 
 ## Ready
@@ -113,22 +131,6 @@ Commit: `Six marks and one file that says what colour they are`
 ### Phase 1: a droplet that loads
 
 ### Phase 2: the wing
-
-#### OW-6 · The temperature on the wing
-
-P0 · L · wing
-
-`OriWeatherDroplet` conforms to `LiveActivityProviding` and the manifest lists `live-activity` under `surfaces` and `network-client` under `capabilities`, and nothing else in either. `liveActivityState` is a `CurrentValueSubject<LiveActivityState?, Never>` fed from the model: `nil` with no city or no reading; otherwise priority 10, the accessibility title "26 degrees, partly cloudy, Istanbul", `isInteractive: false`, `joinsPersistentActivitySet` from the preference `pinned` (default false), and `expandedWidgetID: "weather"` so a tap on the pill opens OW-11's widget once it exists. `makeCompactLeading()` is the mark at `iconSize`; `makeCompactTrailing()` is the degrees at `labelFontSize`, medium, plain SF, `monospacedDigit()`, in `notchSurfacePrimaryText`; neither adds padding of its own. `liveActivitySeatDidChange` is where the clock lives: seated, `model.start()`; `.none`, `model.stop()`, unless OW-11's widget is on a shelf. `activate(host:)` reads the city and the preferences and subscribes to `preferences.didChange` so a new city refetches and a flipped pin republishes; `deactivate()` stops the clock, cancels every subscription and drops the host.
-
-Accept:
-
-- [ ] `live-activity.png` shows the mark in the leading wing and "26°" in the trailing one on the notch shape, and the same pair inside the island, with the row 37 pt tall and nothing of this repo's between the host's insets and the glyph.
-- [ ] `-12°` fits the trailing wing on the notch without clipping; if it does not, the shot says so and the card drops the sign's thin space rather than the mark.
-- [ ] `DropletTests` build a `DropletHost` from the harness services: after `activate` with a city and a fake fetcher the subject carries a state with priority 10; with no city it carries `nil`; `liveActivitySeatDidChange(.none(.outranked))` leaves `model.isRunning` false and `.compact` turns it true; after `deactivate` the subject is `nil`, `isRunning` is false and the fetcher's count stops moving.
-- [ ] `overview.png`'s verdict pill for the live activity says provided, and `capabilities.png` shows one switch.
-- [ ] In the Playground with `pinned` off the row appears while the pointer rests on the closed notch and goes when it leaves; with `pinned` on it stays at rest, and starting music in the Playground's player takes the seat and the log says `surface-suppressed`.
-
-Commit: `Put the temperature on the wing when nothing else wants it`
 
 #### OW-7 · The card behind the wing
 
@@ -308,6 +310,8 @@ Commit: `Run it on the notch it was for`
 ## Backlog
 
 Unranked. Promote by writing a card.
+
+- A long city name ("Istanbul Atatürk Airport") truncates on the island's 208 pt card; the card gives the left column priority, so it is the city that loses letters, which is the right one to lose, but the Store shots should use a short name.
 
 ## Wishlist
 
