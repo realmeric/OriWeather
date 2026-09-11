@@ -60,25 +60,27 @@ Accept:
 
 Commit: `Read the sky the way OriNotch reads it`
 
-## In progress
-
-## Ready
-
-### Phase 1: a droplet that loads
-
 #### OW-3 · A city, not a location
 
 P0 · M · model
+
+Done in `cf85183`.
 
 `City` (name, region, country, `Place`, time zone identifier), `Geocoding` as a protocol, and `OpenMeteoGeocoder` against `https://geocoding-api.open-meteo.com/v1/search` with `name`, `count=5`, `language=en` and `format=json`: the answer's `results` carry `name`, `admin1`, `country`, `latitude`, `longitude` and `timezone`, and the reader keeps those and nothing else. The chosen city is stored under the preference key `city` as JSON through `DropletPreferencesService`, which is `Codable` in and out. A recorded answer for "Istanbul" is kept inline in `GeocoderTests` the way the forecast body is, taken when the card is built and dated in `docs/notes.md`.
 
 Accept:
 
-- [ ] The recorded answer decodes to five cities with the first one's coordinate already rounded to two decimals, and a body with no `results` decodes to an empty list rather than an error, because a city nobody has heard of is not a failure.
-- [ ] `OpenMeteoGeocoder.url(for: "İstanbul")` percent-encodes the name and the host is `geocoding-api.open-meteo.com`.
-- [ ] A `City` written to a `HarnessPreferencesService` reads back equal; the harness services are public and are this repo's fakes.
+- [x] The recorded answer decodes to five cities with the first one's coordinate already rounded to two decimals, and a body with no `results` decodes to an empty list rather than an error, because a city nobody has heard of is not a failure.
+- [x] `OpenMeteoGeocoder.url(for: "İstanbul")` percent-encodes the name and the host is `geocoding-api.open-meteo.com`.
+- [x] A `City` written to a `HarnessPreferencesService` reads back equal; the harness services are public and are this repo's fakes.
 
 Commit: `Ask Open-Meteo where a city is instead of asking macOS where the Mac is`
+
+## In progress
+
+## Ready
+
+### Phase 1: a droplet that loads
 
 #### OW-4 · The model
 
