@@ -30,6 +30,11 @@ struct Glance: Equatable {
     var condition: String { reading.condition }
     /// The condition, or how old the reading is once it has stopped arriving.
     var detail: String { isStale ? Ago.words(reading.at, at: now) : reading.condition }
+    /// How old the reading is, said on the shelf whether or not it is stale.
+    var age: String {
+        let words = Ago.words(reading.at, at: now)
+        return words == "now" ? "Read just now" : "Read \(words)"
+    }
 }
 
 /// OriNotch's weather, on Droppy's wing when nothing else wants it.
@@ -54,6 +59,9 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
     private var host: DropletHost?
     private(set) var model: WeatherModel?
     private(set) var seat: DropletLiveActivitySeat = .none(.idle)
+    /// Whether the widget is on a shelf, which keeps the clock running whether
+    /// or not the activity is seated.
+    private(set) var isShelved = false
     private var subscriptions: Set<AnyCancellable> = []
     private let fetcherOverride: (any WeatherFetching)?
 
@@ -91,6 +99,11 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
         host.preferences.didChange
             .sink { [weak self] key in self?.preferenceChanged(key) }
             .store(in: &subscriptions)
+        host.installState.statePublisher
+            .map { $0.activeWidgetIDs.contains(Self.widgetID) }
+            .removeDuplicates()
+            .sink { [weak self] shelved in self?.shelfChanged(shelved) }
+            .store(in: &subscriptions)
 
         host.log.info("Ori Weather activated\(demo.map { " with the \($0) demo sky" } ?? "")")
         // One reading to have something to publish: the host seats nothing
@@ -108,6 +121,7 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
         glance = nil
         activitySubject.send(nil)
         seat = .none(.idle)
+        isShelved = false
         host = nil
     }
 
@@ -177,20 +191,28 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
     }
 
     /// The clock runs while somebody can see the weather: the activity is
-    /// seated. Unseated, no timer and no request, and the last reading stays.
-    func updateClock() {
+    /// seated, or the widget is on a shelf. The two are or-ed here and nowhere
+    /// else. Neither, no timer and no request, and the last reading stays.
+    private func updateClock(because reason: WeatherModel.Reason) {
         guard let model else { return }
-        if seat.isPresented {
-            model.start(because: .seat)
+        if seat.isPresented || isShelved {
+            model.start(because: reason)
         } else {
             model.stop()
         }
     }
 
+    private func shelfChanged(_ shelved: Bool) {
+        guard shelved != isShelved else { return }
+        isShelved = shelved
+        host?.log.info(shelved ? "on a shelf" : "off every shelf")
+        updateClock(because: .shelf)
+    }
+
     func seatChanged(_ seat: DropletLiveActivitySeat) {
         self.seat = seat
         host?.log.info("seat is now \(seat)")
-        updateClock()
+        updateClock(because: .seat)
     }
 }
 

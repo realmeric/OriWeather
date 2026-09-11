@@ -20,9 +20,21 @@ enum Look {
     /// ago with its age on it is worth more than an empty card.
     static let staleOpacity = 0.55
 
-    /// The mark on the hover card and on the shelf, which the host has no
-    /// token for.
+    /// The mark on the hover card, which the host has no token for.
     static let cardMark: CGFloat = 20
     /// The degrees on the hover card, beside a mark of the same height.
     static let cardFigure: CGFloat = 20
+
+    // MARK: The shelf
+
+    /// The widget's two widths. Both are required: the host refuses a
+    /// descriptor that leaves either to a fallback.
+    static let shelfSoloWidth: CGFloat = 340
+    static let shelfPairedWidth: CGFloat = 170
+    /// The widget's height, which its content has naturally.
+    static let shelfHeight: CGFloat = 112
+    /// The mark and the degrees on the shelf, where there is room for both to
+    /// be read from across the desk.
+    static let shelfMark: CGFloat = 28
+    static let shelfFigure: CGFloat = 30
 }

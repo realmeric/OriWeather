@@ -14,7 +14,8 @@
     "network-client"
   ],
   "surfaces": [
-    "live-activity"
+    "live-activity",
+    "shelf-widget"
   ],
   "icon": "OriWeather.icon",
   "creator": {

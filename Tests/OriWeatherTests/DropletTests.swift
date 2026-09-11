@@ -169,3 +169,48 @@ enum Shots {
         try png.write(to: directory.appendingPathComponent("\(name).png"))
     }
 }
+
+/// The shelf is the second thing that starts the clock.
+@MainActor
+final class ShelfClockTests: XCTestCase {
+    private func shelved(_ on: Bool) -> DropletInstallState {
+        DropletInstallState(isEnabled: true, activeWidgetIDs: on ? ["weather"] : [])
+    }
+
+    func testTheWidgetOnAShelfRunsTheClockWithTheActivityUnseated() async throws {
+        let droplet = OriWeatherDroplet(fetcher: FakeWeather(reading: Sky.reading()))
+        let test = TestHost()
+        try droplet.activate(host: test.host)
+        await settle()
+        let model = try XCTUnwrap(droplet.model)
+        droplet.liveActivitySeatDidChange(.none(.outranked))
+        XCTAssertFalse(model.isRunning)
+
+        test.installState.setState(shelved(true))
+        XCTAssertTrue(model.isRunning, "on a shelf, seated or not")
+        test.installState.setState(shelved(false))
+        XCTAssertFalse(model.isRunning, "off the shelf and unseated")
+        droplet.deactivate()
+    }
+
+    func testSeatedTheClockOutlivesTheShelf() async throws {
+        let droplet = OriWeatherDroplet(fetcher: FakeWeather(reading: Sky.reading()))
+        let test = TestHost()
+        try droplet.activate(host: test.host)
+        await settle()
+        let model = try XCTUnwrap(droplet.model)
+        droplet.liveActivitySeatDidChange(.compact)
+        test.installState.setState(shelved(true))
+        test.installState.setState(shelved(false))
+        XCTAssertTrue(model.isRunning)
+        droplet.deactivate()
+    }
+
+    func testTheWidgetDeclaresBothWidthsAndTheIdThePillOpens() {
+        let droplet = OriWeatherDroplet()
+        let descriptor = droplet.widgetDescriptors[0]
+        XCTAssertEqual(descriptor.id, "weather")
+        XCTAssertNotNil(descriptor.layoutTraits.preferredSoloWidth)
+        XCTAssertNotNil(descriptor.layoutTraits.preferredPairedWidth)
+    }
+}

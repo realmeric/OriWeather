@@ -47,3 +47,23 @@ Droppy's wing, where the host sizes the accessory and clips it, it is the kind
 of thing that shaves a ray off without a word, so here the rays stop half a
 width short of the edge. `MarksTests` checks every mark stays inside its rect
 at 16 and at 13 pt. The other five were already inside.
+
+## OW-10, what the side-by-side should show
+
+Not yet done: it needs OriNotch and the Playground on the real screen one after
+the other, and eyes. Read from the two codebases, these are the differences
+the pass should find, and every one of them is D3's.
+
+On the wing, OriNotch draws the mark at 14 pt and the degrees at 11 pt, both on
+the right wing, five points apart. Here the mark is 13 pt on the left wing and
+the degrees 12 pt on the right, each at the outer edge of its wing past the
+host's 22 pt inset, with the camera housing between them. Neither dims when
+the reading is stale, in either app.
+
+On the card, the two are different surfaces. OriNotch's weather card is a
+capsule on its shelf with a faint fill: mark, degrees at 13, condition at 11.
+Here the hover card is the host's 59 pt card with no fill of its own: mark at
+20, degrees at 20, the condition under them, and the city and "Feels like"
+on the right, which OriNotch's capsule does not carry. The shelf widget is the
+closer relative of OriNotch's capsule, with the same order left to right and
+the same dimming, at shelf sizes.

@@ -154,6 +154,21 @@ Accept:
 
 Commit: `Fit the mark into the puck`
 
+#### OW-9 · Stale, away and back
+
+P1 · M · wing
+
+Done in `f2d6744`.
+
+The behaviour OriNotch's ORI-36 and ORI-61 settled, made true under a host that seats and unseats: the interval is the only clock, so ten display wakes in a minute are zero fetches; losing the seat stops the clock and keeps the reading; regaining it refreshes only if the reading is older than the interval; a refused refresh dims and dates rather than clears; `now` moves on every attempt so the age on screen is measured against the last attempt and never against a ticking clock. `host.liveActivity.yield(reason: .idle)` is called when the city is cleared, so the seat is given up before the publisher catches up.
+
+Accept:
+
+- [x] `StaleTests` drive the model with fixed dates: seat lost at 14:00, regained at 14:10 fetches nothing, regained at 14:45 fetches once; a wake storm of ten `refresh(at:)` calls inside a minute is one request at most.
+- [x] Clearing the city calls `yield(reason: .idle)` on the harness live activity service exactly once, asserted from its recorder.
+
+Commit: `Keep the last reading and say how old it is`
+
 ## In progress
 
 ## Ready
@@ -162,22 +177,11 @@ Commit: `Fit the mark into the puck`
 
 ### Phase 2: the wing
 
-#### OW-9 · Stale, away and back
-
-P1 · M · wing
-
-The behaviour OriNotch's ORI-36 and ORI-61 settled, made true under a host that seats and unseats: the interval is the only clock, so ten display wakes in a minute are zero fetches; losing the seat stops the clock and keeps the reading; regaining it refreshes only if the reading is older than the interval; a refused refresh dims and dates rather than clears; `now` moves on every attempt so the age on screen is measured against the last attempt and never against a ticking clock. `host.liveActivity.yield(reason: .idle)` is called when the city is cleared, so the seat is given up before the publisher catches up.
-
-Accept:
-
-- [ ] `StaleTests` drive the model with fixed dates: seat lost at 14:00, regained at 14:10 fetches nothing, regained at 14:45 fetches once; a wake storm of ten `refresh(at:)` calls inside a minute is one request at most.
-- [ ] Clearing the city calls `yield(reason: .idle)` on the harness live activity service exactly once, asserted from its recorder.
-
-Commit: `Keep the last reading and say how old it is`
-
 #### OW-10 · Look pass against OriNotch
 
 P1 · S · look · manual
+
+Waiting for eyes: it needs both apps on the real screen, one after the other, and this session was not given the Playground's window. What the pass should find, read from both codebases, is in `docs/look.md`.
 
 `make run` OriNotch with `ORI_DEMO=weather` and take a screenshot of its wing and its card; quit it; `make install` this droplet with `OW_DEMO=1` in the Playground and take the same two. Side by side: the mark, the degrees, the dimming, the words. Differences in size are D3's and are expected (14 against 13, 11 against 12); differences in composition are this card's to fix. What is learnt goes into `docs/look.md`, and the two screenshots are kept under `docs/look/` for the next pass.
 
