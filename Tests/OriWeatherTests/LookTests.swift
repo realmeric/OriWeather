@@ -77,3 +77,47 @@ final class InkTests: XCTestCase {
                        AdaptiveColors.notchSurfacePrimaryText)
     }
 }
+
+/// Every mark the droplet draws, in its tint, on the notch's black: large, and
+/// at the wing's own size under it, with the WMO codes and words each stands
+/// for. Written to shots/extra/marks.png for eyes.
+@MainActor
+final class MarksSheetTests: XCTestCase {
+    private struct Entry: Identifiable {
+        let id: String
+        let code: Int
+        let isDay: Bool
+        let words: String
+    }
+
+    private let entries = [
+        Entry(id: "sun", code: 0, isDay: true, words: "Clear, mainly clear\n0, 1"),
+        Entry(id: "night", code: 0, isDay: false, words: "Clear at night\n0, 1"),
+        Entry(id: "cloud", code: 2, isDay: true, words: "Partly cloudy, overcast\n2, 3"),
+        Entry(id: "fog", code: 45, isDay: true, words: "Fog\n45, 48"),
+        Entry(id: "rain", code: 61, isDay: true, words: "Drizzle, rain, showers\n51–67, 80–82"),
+        Entry(id: "snow", code: 71, isDay: true, words: "Snow, snow showers\n71–77, 85, 86"),
+        Entry(id: "storm", code: 95, isDay: true, words: "Thunderstorm, hail\n95–99"),
+    ]
+
+    func testTheMarksSheet() throws {
+        let sheet = HStack(alignment: .top, spacing: 28) {
+            ForEach(entries) { entry in
+                VStack(spacing: 14) {
+                    WeatherMark(code: entry.code, isDay: entry.isDay)
+                        .frame(width: 56, height: 56)
+                    WeatherMark(code: entry.code, isDay: entry.isDay)
+                        .frame(width: DroppyLiveActivityMetrics.iconSize, height: DroppyLiveActivityMetrics.iconSize)
+                    Text(entry.words)
+                        .font(.system(size: 11))
+                        .multilineTextAlignment(.center)
+                        .foregroundStyle(AdaptiveColors.notchSurfaceSecondaryText)
+                        .frame(width: 110)
+                }
+            }
+        }
+        .padding(32)
+        .background(Color.black)
+        try Shots.write(sheet, name: "marks")
+    }
+}
