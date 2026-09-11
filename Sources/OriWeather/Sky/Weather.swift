@@ -2,8 +2,7 @@ import Foundation
 
 /// What the sky is doing, in the only detail the notch shows.
 ///
-/// Carried over from OriNotch's `Weather.swift`; nothing in `Sky/` knows it is
-/// a droplet.
+/// Nothing in `Sky/` knows it is a droplet.
 struct WeatherReading: Equatable, Sendable {
     /// Celsius.
     let temperature: Double

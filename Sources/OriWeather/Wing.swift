@@ -58,7 +58,7 @@ struct WingMark: View {
     }
 }
 
-/// The degrees at the wing's label size, in plain SF as OriNotch draws them,
+/// The degrees at the wing's label size, in plain SF,
 /// with monospaced digits so the wing does not jitter when the figure moves.
 struct WingDegrees: View {
     @ObservedObject var droplet: OriWeatherDroplet

@@ -1,6 +1,6 @@
 # OriWeather
 
-The weather from OriNotch, drawn on Droppy's notch.
+Weather on Droppy's notch, drawn with better taste.
 
 A mark and the temperature on the wing when nothing else wants the notch.
 Hover it and the wing grows into a card: the condition, the city, what it

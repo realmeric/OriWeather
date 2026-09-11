@@ -3,7 +3,7 @@ import SwiftUI
 
 /// The weather marks, drawn rather than shipped.
 ///
-/// OriNotch's glyph family, flat and filled with one weight, redrawn for a
+/// One glyph family, flat and filled with one weight, drawn for a
 /// surface that shows them from 13 pt on the wing to 20 on the card. Each mark
 /// is one or more parts, and each part has a tone the view colours: a rain
 /// cloud is a pale cloud with blue drops, not a blue cloud. Where one part

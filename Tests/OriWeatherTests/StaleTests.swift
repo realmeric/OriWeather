@@ -2,8 +2,7 @@ import DroppyKit
 import XCTest
 @testable import OriWeather
 
-/// What ORI-36 and ORI-61 settled in OriNotch, made true under a host that
-/// seats and unseats: the interval is the only clock.
+/// The interval is the only clock, under a host that seats and unseats.
 @MainActor
 final class StaleTests: XCTestCase {
     /// 14:00 in Istanbul.

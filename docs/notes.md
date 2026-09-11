@@ -344,5 +344,5 @@ its hour in the Mac's own way of writing one ("15", or "3 PM"), its mark and
 its degrees. Beside another widget it is the mark and the degrees, the
 condition, and the city with the high and low at the foot. It is 136 tall now.
 
-The maker is "Ori by realmeric" and the name is "OriWeather", one word like
-OriNotch.
+The maker is "Ori by realmeric" and the name is "OriWeather", one word, the
+way every Ori droplet is named.

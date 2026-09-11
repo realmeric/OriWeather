@@ -9,9 +9,9 @@ import SwiftUI
 enum Look {
     // MARK: Tints
 
-    /// The sun by day and the bolt: OriNotch's warm yellow.
+    /// The sun by day and the bolt: a warm yellow.
     static let warm = Color(red: 1.0, green: 0.83, blue: 0.35)
-    /// Rain: OriNotch's blue.
+    /// Rain: a clear blue.
     static let rain = Color(red: 0.0, green: 0.48, blue: 1.0)
 
     // MARK: Figures

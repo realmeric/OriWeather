@@ -37,7 +37,7 @@ neither.
 
 ## What was tried and dropped
 
-OriNotch's notch hanging from the top of an ink tile, which read as a clip on
+A notch hanging from the top of an ink tile, which read as a clip on
 a clipboard. A dawn gradient across the whole tile, which all but disappeared
 at 28 pt. A sun always in the top right, which means nothing on a droplet that
 is not about the weather. A half sun on a flat sand horizon, which put two

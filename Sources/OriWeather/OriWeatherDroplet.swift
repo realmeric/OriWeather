@@ -71,14 +71,14 @@ struct HourGlance: Equatable, Identifiable {
     }()
 }
 
-/// OriNotch's weather, on Droppy's wing when nothing else wants it.
+/// The weather, on Droppy's wing when nothing else wants it.
 @MainActor
 public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
     /// Must equal `DroppyDropletID` in the bundle's Info.plist and `id` in
     /// droplet.json. The loader refuses the bundle if the three disagree.
     public nonisolated static let id: DropletID = "ori-weather"
 
-    /// The seat's priority: OriNotch's `ambient`, the lowest honest number
+    /// The seat's priority: ambient, the lowest honest number
     /// among droplets. Against Droppy's own activities it does not matter; a
     /// droplet holds the seat only when none of them want the notch (D5).
     static let priority = 10

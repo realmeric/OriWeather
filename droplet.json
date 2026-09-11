@@ -2,8 +2,8 @@
   "id": "ori-weather",
   "name": "OriWeather",
   "version": "1.0.0",
-  "summary": "OriNotch's weather, on the wing when nothing else wants it",
-  "description": "The weather from OriNotch, on Droppy's notch. When nothing else wants the notch, the wing carries a mark and the temperature; hover it and it grows into a card with the condition, the city and what it feels like. Put it on the shelf and it sits there too, alone or beside another widget, and in the status widgets row while the Mac is locked. Control-Option-Command-W puts it on the wings or takes it off.\n\nIt finds your city from your internet address, checked against your time zone, or reads the city you name, so it asks for no location permission and no account. Open-Meteo is sent a coordinate rounded to about a kilometre, once every half hour unless you choose otherwise, and only while the weather is on screen. When the network goes, the last reading stays up, dimmed, with how old it is where the condition was.",
+  "summary": "Weather on the notch, drawn with better taste",
+  "description": "The temperature and a mark of its own on the wings, whenever nothing else wants the notch. Hover it and it opens into a card with the condition, the city and what it feels like. On the shelf it shows today's high and low and the next five hours, and while the Mac is locked it sits in the status widgets row.\n\nIt finds your city from your internet address, checked against your time zone, so it asks for no location permission and no account; or name the city yourself. It reads the weather once every half hour and only while you can see it, and stops the moment you cannot. When the network goes, the last reading stays up, dimmed, with its age where the condition was.\n\nCelsius or Fahrenheit, every 15, 30 or 60 minutes, and Control-Option-Command-W to put it on the wings or take it off. Part of Ori, droplets by realmeric.",
   "category": "Productivity",
   "kit": {
     "abi": 1,
@@ -43,6 +43,6 @@
     "forecast",
     "city",
     "open-meteo",
-    "orinotch"
+    "ori"
   ]
 }

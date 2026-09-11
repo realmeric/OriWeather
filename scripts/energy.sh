@@ -1,8 +1,8 @@
 #!/bin/zsh
 #
-# What the droplet costs the Playground. D6 in one script, after OriNotch's
-# energy.sh, pointed at the DroppyPlayground process instead of an app of our
-# own: the host is the thing that pays, so the host is what is measured.
+# What the droplet costs the Playground. D6 in one script, pointed at the
+# DroppyPlayground process: the host is the thing that pays, so the host is
+# what is measured.
 #
 #   scripts/energy.sh          measure three runs, print the table, write the report
 #
@@ -22,8 +22,7 @@
 #
 # It fails when a run with the droplet in it wakes the Playground more than
 # the baseline does past noise, or when the droplet's own log says a clock
-# started while it held no seat and no shelf. The Playground and OriNotch
-# never run at once (D8), so it refuses while OriNotch is up.
+# started while it held no seat and no shelf.
 
 set -eu
 
@@ -50,7 +49,6 @@ trap 'rm -rf "$scratch"' EXIT
 say() { print -P "%F{cyan}==%f $*" }
 bad() { print -P "%F{red}xx%f $*" >&2; exit 1 }
 
-pgrep -x OriNotch >/dev/null && bad "OriNotch is running; the Playground and OriNotch never run at once (D8)"
 [[ -d .build/OriWeather.droplet ]] || bad "no .build/OriWeather.droplet; run make build first"
 [[ -d "/Applications/Droppy Playground.app" ]] || bad "Droppy Playground is not installed"
 

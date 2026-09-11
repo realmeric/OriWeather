@@ -6,3 +6,7 @@ shots/
 # Written by `droppykit agent` with absolute paths for one Mac; run it after cloning.
 .mcp.json
 .cursor/
+
+# The planning board and the look notes stay on this Mac.
+KANBAN.md
+docs/look.md

@@ -20,12 +20,6 @@ if [ ! -d "$BUNDLE" ]; then
     exit 1
 fi
 
-# Two notch apps do not share one notch (D8).
-if pgrep -x OriNotch >/dev/null; then
-    echo "error: OriNotch is running. Quit it first; the Playground and OriNotch never run at once." >&2
-    exit 1
-fi
-
 if pgrep -x "$PROCESS" >/dev/null; then
     osascript -e "tell application id \"$PLAYGROUND_ID\" to quit" >/dev/null 2>&1 || true
     for _ in $(seq 40); do pgrep -x "$PROCESS" >/dev/null || break; sleep 0.25; done

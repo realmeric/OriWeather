@@ -14,7 +14,7 @@
 // stays inside the centre 820 of 1024; the rise runs to the edge on purpose,
 // and the corners cut it.
 //
-// The avatar is Meric's mark, OriNotch's notch with a wing out either side, in
+// The avatar is Meric's mark, a notch with a wing out either side, in
 // ink on paper, square and unrounded: the Store clips it to a circle itself.
 //
 // Three previews land in shots/: the icon as the Store would compose it at
@@ -142,7 +142,7 @@ struct MakeIcon {
         context.restoreGState()
     }
 
-    /// OriNotch's mark: the notch, square where the bezel cuts it and round at
+    /// Meric's mark: the notch, square where the bezel cuts it and round at
     /// the bottom, with a wing either side overlapping it so the three are one
     /// object small. Ink on a full paper square, unrounded.
     static func drawNotch(in context: CGContext, side: CGFloat) {

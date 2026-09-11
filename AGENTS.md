@@ -147,11 +147,9 @@ opens getdroppy.app/submit-droplet with the repository, commit and id filled in.
 
 ## This repository
 
-The work is on `KANBAN.md`: one card at a time, top of Ready first, `make test`
-as the gate, and what the machine taught along the way in `docs/notes.md`. Ori
-Weather is one of the Ori family: OriNotch is the parent, and its marks, words
-and behaviour are carried into this droplet as this repository's own files,
-never linked or imported (D2).
+`make test` is the gate, and what the machine taught along the way is in
+`docs/notes.md`. OriWeather is one of the Ori family of droplets;
+`docs/family.md` is the icon rule every one of them shares.
 
 `.mcp.json` and `.cursor/` are not in the repository: `droppykit agent` writes
 them with absolute paths for one Mac. After cloning, run `droppykit agent` in

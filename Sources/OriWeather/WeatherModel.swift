@@ -3,7 +3,7 @@ import Foundation
 
 /// The weather the wing and the card show.
 ///
-/// OriNotch's model without its location half: a fetcher, a city, a clock.
+/// A fetcher, a city, a clock.
 /// Off costs nothing: a model that was built and never started has no timer and
 /// has asked nobody anything. On, one reading per interval, and the last one
 /// stays when the network does not.
