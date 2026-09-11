@@ -127,8 +127,15 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
         guard let model, let preferences else { return }
         switch key {
         case Preferences.Key.city:
-            model.city = preferences.city
-            if !model.isRunning { model.refresh(because: .city) }
+            let city = preferences.city
+            model.city = city
+            if city == nil {
+                // Nothing left to say, so the seat is given up now rather than
+                // when the publisher catches up.
+                host?.liveActivity.yield(reason: .idle)
+            } else if !model.isRunning {
+                model.refresh(because: .city)
+            }
         case Preferences.Key.intervalMinutes:
             model.every = TimeInterval(preferences.intervalMinutes * 60)
         default:

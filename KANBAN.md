@@ -139,6 +139,21 @@ Accept:
 
 Commit: `Grow the wing into a card on hover`
 
+#### OW-8 · The puck and the pair
+
+P2 · S · wing
+
+Done in `bb8497f`. The harness draws no companion pill, so the first box was met by `CompanionTests`, which draws the puck and the capsule into `shots/extra/`. The second waits for eyes on the Playground.
+
+When another activity owns the compact seat and this one rides the companion pill, `makeCompanionCompact(context:)` draws the mark alone, sized to `context.slotSize` rather than to `iconSize`, because the default reuses the leading accessory at wing scale and a 13 pt sun in a 24 pt puck is a dot. `makeCompanionDetail(context:)` is one line, "26° Partly cloudy", leading-aligned beside the mark when the pill grows into its capsule.
+
+Accept:
+
+- [x] The harness's secondary-seat rendering shows the mark filling the puck and the one-line detail in the grown capsule.
+- [ ] In the Playground, with the media player playing, the pill carries the mark and hovering it reads the line.
+
+Commit: `Fit the mark into the puck`
+
 ## In progress
 
 ## Ready
@@ -146,19 +161,6 @@ Commit: `Grow the wing into a card on hover`
 ### Phase 1: a droplet that loads
 
 ### Phase 2: the wing
-
-#### OW-8 · The puck and the pair
-
-P2 · S · wing
-
-When another activity owns the compact seat and this one rides the companion pill, `makeCompanionCompact(context:)` draws the mark alone, sized to `context.slotSize` rather than to `iconSize`, because the default reuses the leading accessory at wing scale and a 13 pt sun in a 24 pt puck is a dot. `makeCompanionDetail(context:)` is one line, "26° Partly cloudy", leading-aligned beside the mark when the pill grows into its capsule.
-
-Accept:
-
-- [ ] The harness's secondary-seat rendering shows the mark filling the puck and the one-line detail in the grown capsule.
-- [ ] In the Playground, with the media player playing, the pill carries the mark and hovering it reads the line.
-
-Commit: `Fit the mark into the puck`
 
 #### OW-9 · Stale, away and back
 
