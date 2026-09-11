@@ -85,7 +85,7 @@ private struct CityCard: View {
         DropletSettingsCard {
             DropletToggleRow(
                 title: "Find the city automatically",
-                subtitle: "From this Mac's time zone, which macOS sets from where you are and keeps right as you travel. One city per zone, so name your own if you live elsewhere in it.",
+                subtitle: "From the city this Mac's internet address is in, checked against its time zone, and looked up again on a new network, after sleep and when the zone changes. With a VPN in another country, the time zone's city instead. GeoJS answers, and sees the address and nothing else.",
                 isOn: Binding(get: { droplet.automatic }, set: { droplet.automatic = $0 })
             )
             DropletSettingsDivider()
@@ -125,9 +125,9 @@ private struct CityCard: View {
 
     private var caption: String {
         guard let city = droplet.chosenCity else {
-            return droplet.automatic ? "Looking for the city from the time zone." : "No city yet."
+            return droplet.automatic ? "Looking for the city." : "No city yet."
         }
-        return Self.describe(city) + (droplet.automatic ? ", found from the time zone" : "")
+        return Self.describe(city) + (droplet.automatic ? ", found automatically" : "")
     }
 
     static func title(_ city: City) -> String {

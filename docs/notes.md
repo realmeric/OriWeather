@@ -215,3 +215,38 @@ Store row's page showed both screenshots and the two capabilities in words,
 
 Not seen: the shelf and the hover card, which open only when the pointer is on
 the notch, and music taking the seat. Those need the screen, not the window.
+
+## After OW-17: the shortcut that ate W, and a better where (2026-09-11)
+
+The shortcut bound a bare W in the Playground: every W typed anywhere on the
+Mac went to the droplet and flipped the pin, and no W reached the app it was
+typed into. `DropletKeyboardShortcut.modifiers` is documented as a
+"Carbon-style modifier mask", and the suggestion carried Carbon's control and
+option bits (1 << 12 and 1 << 11). The host read them as no modifiers. The
+field is a `UInt`, as `NSEvent.ModifierFlags` is, and the suggestion now
+carries AppKit's control and option flags. The host keeps no binding on disk
+(nothing under the Playground's defaults or its folder named the shortcut), so
+nothing stale survives a relaunch. The handler also refuses any press that
+does not hold the binding's modifiers, and a binding with none at all, so a
+host that misreads a mask again costs a key and never the pin.
+
+The time zone could not tell Ankara from Istanbul. The automatic city now asks
+GeoJS (get.geojs.io, free, keyless, HTTPS, and it says it stores nothing) which
+city the Mac's internet address is in, keeps the town, the region, the
+country, a two-decimal coordinate and the zone, and drops the address and the
+network's name. The answer is used when its zone is the Mac's; otherwise it is
+a VPN, and the zone's own city is used, as before. It is looked up at start
+when there is no city, and otherwise only when the Mac may have moved (a new
+network, a wake, a new zone) and somebody can see the weather, never twice in
+ten minutes unless the zone changed. The same town again writes nothing, so
+the weather is not read twice for a place the Mac never left. Of the four
+keyless services tried from here (ipwho.is, ipapi.co, ipinfo.io, GeoJS), all
+four said Istanbul.
+
+Checked on the real screen after the fix, with the Playground in front: a bare
+W typed "w" into its search field and left the wings alone, and Control-Option-W
+took the weather off the wings and put it back, with nothing typed. A
+synthetic press from the shell proved nothing, because the shell may not post
+key events (`CGPreflightPostEventAccess()` is false), so the keys were pressed
+through the screen. `make energy` after the network and wake observers went in:
+2.02 wakeups a second without the droplet, 1.78 seated, 2.03 unseated.

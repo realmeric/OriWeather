@@ -69,3 +69,8 @@ final class CitySearch: ObservableObject {
 struct DemoGeocoder: Geocoding {
     func cities(named name: String) async throws -> [City] { [Demo.city] }
 }
+
+/// Where the demo sky says the Mac is: the demo city, and never a request.
+struct DemoLocator: Locating {
+    func locate() async throws -> City { Demo.city }
+}

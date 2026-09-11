@@ -81,3 +81,15 @@ struct AtlasGeocoder: Geocoding {
         return atlas[name] ?? []
     }
 }
+
+/// A locator that says one place, or nothing, and counts how often it was asked.
+struct FakeLocator: Locating {
+    let answer: City?
+    let counter = Counter()
+
+    func locate() async throws -> City {
+        await counter.bump()
+        guard let answer else { throw WeatherError.nowhere }
+        return answer
+    }
+}

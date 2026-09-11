@@ -1,3 +1,4 @@
+import AppKit
 import DroppyKit
 import Foundation
 
@@ -7,14 +8,37 @@ import Foundation
 enum WingShortcut {
     static let id = "wings"
     static let title = "Show or hide the weather on the wings"
-    /// Control-Option-W, as a Carbon mask: W is virtual key 13, control is
-    /// 1 << 12 and option 1 << 11.
-    static let suggestion = DropletKeyboardShortcut(keyCode: 13, modifiers: 1 << 12 | 1 << 11)
+
+    /// Control-Option-W. The modifiers are AppKit's `NSEvent.ModifierFlags`,
+    /// whatever the SDK's comment says: `DropletKeyboardShortcut.modifiers` is
+    /// "Carbon-style", but Droppy 15.3 (the Playground) read Carbon's control
+    /// and option bits as no modifiers at all and bound a bare W, which ate
+    /// the key everywhere. The field is a `UInt`, as AppKit's flags are.
+    static let suggestion = DropletKeyboardShortcut(
+        keyCode: 13,
+        modifiers: NSEvent.ModifierFlags([.control, .option]).rawValue
+    )
+
+    /// The modifiers a binding asks for, in AppKit's terms.
+    static func flags(_ shortcut: DropletKeyboardShortcut) -> NSEvent.ModifierFlags {
+        NSEvent.ModifierFlags(rawValue: shortcut.modifiers).intersection([.control, .option, .shift, .command])
+    }
+
+    /// Whether a press is the shortcut and not a bare key the host bound by
+    /// mistake: the binding has at least one modifier and every one of them
+    /// is held. A binding without modifiers never flips anything, so a host
+    /// that misreads the mask costs a key, not the user's pin.
+    static func isGenuine(_ shortcut: DropletKeyboardShortcut?, held: NSEvent.ModifierFlags) -> Bool {
+        guard let shortcut else { return false }
+        let wanted = flags(shortcut)
+        return !wanted.isEmpty && held.intersection([.control, .option, .shift, .command]).isSuperset(of: wanted)
+    }
 
     /// "⌃⌥W", in the order macOS writes modifiers.
     static func words(_ shortcut: DropletKeyboardShortcut) -> String {
-        let marks: [(UInt, String)] = [(1 << 12, "⌃"), (1 << 11, "⌥"), (1 << 9, "⇧"), (1 << 8, "⌘")]
-        let modifiers = marks.filter { shortcut.modifiers & $0.0 != 0 }.map(\.1).joined()
+        let held = flags(shortcut)
+        let marks: [(NSEvent.ModifierFlags, String)] = [(.control, "⌃"), (.option, "⌥"), (.shift, "⇧"), (.command, "⌘")]
+        let modifiers = marks.filter { held.contains($0.0) }.map(\.1).joined()
         return modifiers + (keys[shortcut.keyCode] ?? "key \(shortcut.keyCode)")
     }
 

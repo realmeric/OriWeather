@@ -1,3 +1,4 @@
+import AppKit
 import DroppyKit
 import XCTest
 @testable import OriWeather
@@ -56,22 +57,21 @@ final class AutomaticTests: XCTestCase {
         droplet.deactivate()
     }
 
-    /// Travelling to another zone finds its city; staying in one asks nothing.
-    func testTravellingFindsTheNewZonesCity() async throws {
+    /// A new zone is news: seated, the city is found again for it.
+    func testANewZoneFindsItsCity() async throws {
         let geocoder = AtlasGeocoder(atlas: ["Istanbul": [Sky.istanbul], "Paris": [texas, paris]])
         let droplet = OriWeatherDroplet(fetcher: FakeWeather(reading: Sky.reading()), geocoder: geocoder)
         droplet.timeZone = { "Europe/Istanbul" }
         try droplet.activate(host: TestHost(city: nil).host)
         await settle()
         XCTAssertEqual(droplet.chosenCity, Sky.istanbul)
-
-        droplet.findCity(force: false)
+        droplet.liveActivitySeatDidChange(.compact)
         await settle()
         var asked = await geocoder.counter.count
-        XCTAssertEqual(asked, 1, "still in Istanbul's zone, so nothing is asked")
+        XCTAssertEqual(asked, 1, "seated a moment after the city was found, nothing more is asked")
 
         droplet.timeZone = { "Europe/Paris" }
-        droplet.findCity(force: false)
+        droplet.whereaboutsChanged(zoneChanged: true)
         await settle()
         asked = await geocoder.counter.count
         XCTAssertEqual(asked, 2)
@@ -95,10 +95,144 @@ final class AutomaticTests: XCTestCase {
 }
 
 @MainActor
+final class WhereaboutsTests: XCTestCase {
+    private let ankara = City(name: "Ankara", region: "Ankara", country: "Türkiye",
+                              place: Place(latitude: 39.92, longitude: 32.85), timeZone: "Europe/Istanbul")
+    private let frankfurt = City(name: "Frankfurt am Main", region: "Hesse", country: "Germany",
+                                 place: Place(latitude: 50.11, longitude: 8.68), timeZone: "Europe/Berlin")
+
+    /// GeoJS's answer, with a documentation address in it rather than a real
+    /// one: the reader keeps the town and drops the address and the network.
+    func testTheAnswerKeepsTheTownAndDropsTheAddress() throws {
+        let body = Data("""
+            {"accuracy":10,"asn":64500,"city":"Ankara","continent_code":"AS","country":"Türkiye",
+             "country_code":"TR","ip":"203.0.113.7","latitude":"39.9199","longitude":"32.8543",
+             "organization":"AS64500 Example","region":"Ankara","timezone":"Europe/Istanbul"}
+            """.utf8)
+        let city = try GeoJS.city(from: body)
+        XCTAssertEqual(city, ankara)
+        XCTAssertEqual(GeoJS.url.host, "get.geojs.io")
+    }
+
+    func testAnAnswerWithNoTownIsNowhere() {
+        XCTAssertThrowsError(try GeoJS.city(from: Data(#"{"ip":"203.0.113.7","country_code":"TR"}"#.utf8)))
+    }
+
+    /// Ankara is not Istanbul, though they share a zone: the address tells
+    /// them apart, and the geocoder is not asked.
+    func testTheAddressFindsTheCityTheZoneCannot() async throws {
+        let geocoder = AtlasGeocoder(atlas: ["Istanbul": [Sky.istanbul]])
+        let locator = FakeLocator(answer: ankara)
+        let droplet = OriWeatherDroplet(fetcher: FakeWeather(reading: Sky.reading()),
+                                        geocoder: geocoder, locator: locator)
+        droplet.timeZone = { "Europe/Istanbul" }
+        try droplet.activate(host: TestHost(city: nil).host)
+        await settle()
+        XCTAssertEqual(droplet.chosenCity, ankara)
+        let asked = await geocoder.counter.count
+        XCTAssertEqual(asked, 0)
+        droplet.deactivate()
+    }
+
+    /// A VPN in Frankfurt puts the address in another zone; the zone wins.
+    func testAnAddressInAnotherZoneIsAVPNAndTheZoneWins() async throws {
+        let droplet = OriWeatherDroplet(fetcher: FakeWeather(reading: Sky.reading()),
+                                        geocoder: AtlasGeocoder(atlas: ["Istanbul": [Sky.istanbul]]),
+                                        locator: FakeLocator(answer: frankfurt))
+        droplet.timeZone = { "Europe/Istanbul" }
+        try droplet.activate(host: TestHost(city: nil).host)
+        await settle()
+        XCTAssertEqual(droplet.chosenCity, Sky.istanbul)
+        droplet.deactivate()
+    }
+
+    /// Unseen, a new network asks nobody; seated, it does, once in ten minutes.
+    func testAMoveIsLookedUpOnlyWhileTheWeatherIsSeen() async throws {
+        let locator = FakeLocator(answer: ankara)
+        let droplet = OriWeatherDroplet(fetcher: FakeWeather(reading: Sky.reading()),
+                                        geocoder: NoGeocoder(), locator: locator)
+        var now = Sky.now
+        droplet.clock = { now }
+        droplet.timeZone = { "Europe/Istanbul" }
+        let test = TestHost(city: Sky.istanbul)
+        Preferences(service: test.preferences).automatic = true
+        try droplet.activate(host: test.host)
+        await settle()
+        var asked = await locator.counter.count
+        XCTAssertEqual(asked, 0, "a city is stored and nobody can see the weather")
+
+        droplet.whereaboutsChanged(zoneChanged: false)
+        await settle()
+        asked = await locator.counter.count
+        XCTAssertEqual(asked, 0, "a new network, unseen, asks nobody")
+
+        droplet.liveActivitySeatDidChange(.compact)
+        await settle()
+        asked = await locator.counter.count
+        XCTAssertEqual(asked, 1, "seen, the stale whereabouts are looked up")
+        XCTAssertEqual(droplet.chosenCity, ankara)
+
+        now += 5 * 60
+        droplet.whereaboutsChanged(zoneChanged: false)
+        await settle()
+        asked = await locator.counter.count
+        XCTAssertEqual(asked, 1, "five minutes later a flapping network is the same place")
+
+        now += 6 * 60
+        droplet.whereaboutsChanged(zoneChanged: false)
+        await settle()
+        asked = await locator.counter.count
+        XCTAssertEqual(asked, 2)
+        droplet.deactivate()
+    }
+
+    /// The same town again writes nothing, so the weather is not read again
+    /// for a place the Mac never left.
+    func testTheSameTownAgainReadsNoWeather() async throws {
+        let fetcher = FakeWeather(reading: Sky.reading())
+        let nearby = City(name: "Ankara", region: "Ankara", country: "Türkiye",
+                          place: Place(latitude: 39.93, longitude: 32.86), timeZone: "Europe/Istanbul")
+        let droplet = OriWeatherDroplet(fetcher: fetcher, geocoder: NoGeocoder(),
+                                        locator: FakeLocator(answer: nearby))
+        droplet.timeZone = { "Europe/Istanbul" }
+        let test = TestHost(city: ankara)
+        Preferences(service: test.preferences).automatic = true
+        try droplet.activate(host: test.host)
+        droplet.liveActivitySeatDidChange(.compact)
+        await settle()
+        XCTAssertEqual(droplet.chosenCity, ankara, "the stored coordinate stays")
+        let read = await fetcher.counter.count
+        XCTAssertEqual(read, 1, "the launch read, and nothing for the same town")
+        droplet.deactivate()
+    }
+}
+
+@MainActor
 final class ShortcutTests: XCTestCase {
     func testTheSuggestionReadsTheWayMacOSWritesIt() {
         XCTAssertEqual(WingShortcut.words(WingShortcut.suggestion), "⌃⌥W")
-        XCTAssertEqual(WingShortcut.words(DropletKeyboardShortcut(keyCode: 1, modifiers: 1 << 8 | 1 << 9)), "⇧⌘S")
+        let shiftCommandS = DropletKeyboardShortcut(keyCode: 1, modifiers: NSEvent.ModifierFlags([.shift, .command]).rawValue)
+        XCTAssertEqual(WingShortcut.words(shiftCommandS), "⇧⌘S")
+    }
+
+    /// The suggestion's modifiers are AppKit's control and option bits, not
+    /// Carbon's 1 << 12 and 1 << 11, which the host read as nothing and bound
+    /// a bare W.
+    func testTheSuggestionCarriesAppKitsModifiers() {
+        XCTAssertEqual(WingShortcut.suggestion.modifiers, NSEvent.ModifierFlags([.control, .option]).rawValue)
+        XCTAssertEqual(WingShortcut.suggestion.modifiers & 0xFFFF, 0, "no Carbon bits")
+    }
+
+    /// A bare W never flips the pin, whatever the host bound.
+    func testOnlyAPressWithTheModifiersHeldCounts() {
+        XCTAssertTrue(WingShortcut.isGenuine(WingShortcut.suggestion, held: [.control, .option]))
+        XCTAssertTrue(WingShortcut.isGenuine(WingShortcut.suggestion, held: [.control, .option, .capsLock]))
+        XCTAssertFalse(WingShortcut.isGenuine(WingShortcut.suggestion, held: []))
+        XCTAssertFalse(WingShortcut.isGenuine(WingShortcut.suggestion, held: [.control]))
+        let bare = DropletKeyboardShortcut(keyCode: 13, modifiers: 0)
+        XCTAssertFalse(WingShortcut.isGenuine(bare, held: []))
+        let carbon = DropletKeyboardShortcut(keyCode: 13, modifiers: 1 << 12 | 1 << 11)
+        XCTAssertFalse(WingShortcut.isGenuine(carbon, held: []), "the mask that bit the host")
     }
 
     /// Registered at activation, pressing it flips the wings, and deactivate
@@ -112,10 +246,15 @@ final class ShortcutTests: XCTestCase {
         XCTAssertEqual(shortcut.shortcut, WingShortcut.suggestion)
         XCTAssertNil(droplet.activitySubject.value)
 
-        shortcut.handler()
+        // The harness calls the handler without a key, so the press is made
+        // here with and without its modifiers held.
+        droplet.shortcutPressed(held: [])
+        await settle()
+        XCTAssertNil(droplet.activitySubject.value, "a bare W flips nothing")
+        droplet.shortcutPressed(held: [.control, .option])
         await settle()
         XCTAssertNotNil(droplet.activitySubject.value)
-        shortcut.handler()
+        droplet.shortcutPressed(held: [.control, .option])
         await settle()
         XCTAssertNil(droplet.activitySubject.value)
 
