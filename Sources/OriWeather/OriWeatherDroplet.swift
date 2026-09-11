@@ -56,6 +56,9 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
 
     let activitySubject = CurrentValueSubject<LiveActivityState?, Never>(nil)
 
+    /// The room's city search, alive while the droplet is.
+    @Published private(set) var search: CitySearch?
+
     private var host: DropletHost?
     private(set) var model: WeatherModel?
     private(set) var seat: DropletLiveActivitySeat = .none(.idle)
@@ -64,15 +67,18 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
     private(set) var isShelved = false
     private var subscriptions: Set<AnyCancellable> = []
     private let fetcherOverride: (any WeatherFetching)?
+    private let geocoderOverride: (any Geocoding)?
 
     public override init() {
         fetcherOverride = nil
+        geocoderOverride = nil
         super.init()
     }
 
-    /// For the tests: a fetcher that answers from memory.
-    init(fetcher: any WeatherFetching) {
+    /// For the tests: a fetcher and a geocoder that answer from memory.
+    init(fetcher: any WeatherFetching, geocoder: (any Geocoding)? = nil) {
         fetcherOverride = fetcher
+        geocoderOverride = geocoder
         super.init()
     }
 
@@ -91,6 +97,7 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
         let log = host.log
         model.log = { log.info($0) }
         self.model = model
+        search = CitySearch(geocoder: geocoder(for: host, demo: demo), log: { log.info($0) })
 
         model.objectWillChange
             .receive(on: RunLoop.main)
@@ -117,6 +124,8 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
         model?.stop()
         model?.log = nil
         model = nil
+        search?.cancel()
+        search = nil
         subscriptions.removeAll()
         glance = nil
         activitySubject.send(nil)
@@ -133,6 +142,38 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
             return Refused()
         }
         return OpenMeteo()
+    }
+
+    private func geocoder(for host: DropletHost, demo: Demo.Mode?) -> any Geocoding {
+        if let geocoderOverride { return geocoderOverride }
+        if demo != nil { return DemoGeocoder() }
+        guard host.isGranted(.networkClient) else { return NoGeocoder() }
+        return OpenMeteoGeocoder()
+    }
+
+    // MARK: The room's bindings
+
+    /// The city the user chose, as stored; the demo sky's city is not one.
+    var chosenCity: City? { preferences?.city }
+
+    func choose(_ city: City) {
+        preferences?.city = city
+        search?.reset()
+    }
+
+    var unit: TemperatureUnit {
+        get { preferences?.unit ?? .celsius }
+        set { preferences?.unit = newValue }
+    }
+
+    var intervalMinutes: Int {
+        get { preferences?.intervalMinutes ?? 30 }
+        set { preferences?.intervalMinutes = newValue }
+    }
+
+    var pinned: Bool {
+        get { preferences?.pinned ?? false }
+        set { preferences?.pinned = newValue }
     }
 
     // MARK: Changes
@@ -155,6 +196,7 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
         default:
             break
         }
+        objectWillChange.send()
         redraw()
     }
 
@@ -214,6 +256,11 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
         host?.log.info("seat is now \(seat)")
         updateClock(because: .seat)
     }
+}
+
+/// What finds a city when `network-client` was not granted: nobody.
+private struct NoGeocoder: Geocoding {
+    func cities(named name: String) async throws -> [City] { [] }
 }
 
 /// What reads the weather when `network-client` was not granted: nothing,

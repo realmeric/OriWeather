@@ -59,3 +59,14 @@ func settle() async {
         try? await Task.sleep(nanoseconds: 2_000_000)
     }
 }
+
+/// A geocoder that answers from memory and counts how often it was asked.
+struct FakeGeocoder: Geocoding {
+    let answer: [City]
+    let counter = Counter()
+
+    func cities(named name: String) async throws -> [City] {
+        await counter.bump()
+        return answer
+    }
+}

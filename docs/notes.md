@@ -79,3 +79,23 @@ for that reason.
 The harness does not draw the companion pill at all (nothing under
 `DroppyKitHarness` calls `makeCompanionCompact` or `makeCompanionDetail`), so
 the puck is drawn by a test instead (OW-8).
+
+## OW-12, the room (2026-09-11)
+
+The SDK has no text-field row. The city row is a `DropletStackedRow` with a
+plain `TextField` in it, filled with `AdaptiveColors.overlayAuto` at
+`DroppyOpacity.light` inside a `DroppyRadius.small` continuous rectangle,
+because the guidelines forbid outlines and `.roundedBorder` is one. It is the
+one place the room goes off the components.
+
+The harness's sidebar search filters the harness's own page titles and does
+not read `settingsSearchEntries`, so "the harness's search finds Keep on the
+notch" is checked by `RoomTests` against the entries instead; in Droppy those
+entries feed the Settings search.
+
+The harness does not see URLSession, so a geocoder request cannot appear on
+its Activity page by itself. Each request is logged ("asked the geocoder for
+…"), which the Activity page does show, and `RoomTests` counts them: eight
+keystrokes 30 ms apart are one request, and choosing a match is none, because
+the match carries its coordinate. The shots never type, so the shot of the
+room has no matches in it.

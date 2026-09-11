@@ -169,6 +169,22 @@ Accept:
 
 Commit: `Keep the last reading and say how old it is`
 
+#### OW-11 · The card on the shelf
+
+P1 · L · shelf
+
+Done in `048c527`. The harness pairs the widget with a second copy of itself, not with a widget of its own, so the paired shot is two weathers side by side. The Playground box waits for eyes.
+
+`ShelfWidgetProviding` with one descriptor, id `weather`, title "Weather", `systemImage` a symbol name because the descriptor takes one and the grid draws it, `preferredSoloWidth` and `preferredPairedWidth` both declared (the host refuses a descriptor missing either), `contentHeight: .fixed`, and `searchKeywords`. Solo, `context.isCompact` false: the mark, the degrees, the condition, the city, feels like, and the age of the reading on one line at the bottom in the tertiary white. Paired: the mark and the degrees, and the condition if `context.availableSize` has room for one more line, which is a branch on `isCompact`, never on a width. No background of its own; the shelf paints the card. `surfaces` gains `shelf-widget`. This is the second thing that starts the clock: `installState.statePublisher` with `activeWidgetIDs` containing `weather` keeps the model running while the widget is on a shelf, seated or not, and the two conditions are or-ed in one place.
+
+Accept:
+
+- [x] `shelf-widget.png` shows the solo composition alone and the paired one beside the harness's second widget, on both shapes.
+- [x] `DropletTests`: an install state with the widget active starts the clock with the activity unseated; removing it with the activity still unseated stops it; with the activity seated it keeps running.
+- [ ] In the Playground the widget is under its own icon on the Widgets page, opens solo, and pairs when the media player's widget is added beside it; a tap on the compact row's pill lands on it.
+
+Commit: `Put the weather on the shelf, alone and beside another`
+
 ## In progress
 
 ## Ready
@@ -193,20 +209,6 @@ Accept:
 Commit: `The same weather on the other notch`
 
 ### Phase 3: the shelf and the room
-
-#### OW-11 · The card on the shelf
-
-P1 · L · shelf
-
-`ShelfWidgetProviding` with one descriptor, id `weather`, title "Weather", `systemImage` a symbol name because the descriptor takes one and the grid draws it, `preferredSoloWidth` and `preferredPairedWidth` both declared (the host refuses a descriptor missing either), `contentHeight: .fixed`, and `searchKeywords`. Solo, `context.isCompact` false: the mark, the degrees, the condition, the city, feels like, and the age of the reading on one line at the bottom in the tertiary white. Paired: the mark and the degrees, and the condition if `context.availableSize` has room for one more line, which is a branch on `isCompact`, never on a width. No background of its own; the shelf paints the card. `surfaces` gains `shelf-widget`. This is the second thing that starts the clock: `installState.statePublisher` with `activeWidgetIDs` containing `weather` keeps the model running while the widget is on a shelf, seated or not, and the two conditions are or-ed in one place.
-
-Accept:
-
-- [ ] `shelf-widget.png` shows the solo composition alone and the paired one beside the harness's second widget, on both shapes.
-- [ ] `DropletTests`: an install state with the widget active starts the clock with the activity unseated; removing it with the activity still unseated stops it; with the activity seated it keeps running.
-- [ ] In the Playground the widget is under its own icon on the Widgets page, opens solo, and pairs when the media player's widget is added beside it; a tap on the compact row's pill lands on it.
-
-Commit: `Put the weather on the shelf, alone and beside another`
 
 #### OW-12 · The room
 

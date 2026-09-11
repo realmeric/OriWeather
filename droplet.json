@@ -15,7 +15,8 @@
   ],
   "surfaces": [
     "live-activity",
-    "shelf-widget"
+    "shelf-widget",
+    "settings-pane"
   ],
   "icon": "OriWeather.icon",
   "creator": {

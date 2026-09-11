@@ -9,6 +9,7 @@ import Foundation
 struct Preferences {
     enum Key {
         static let city = "city"
+        static let unit = "unit"
         static let intervalMinutes = "intervalMinutes"
         static let pinned = "pinned"
     }
@@ -23,6 +24,12 @@ struct Preferences {
     var city: City? {
         get { service.value(forKey: Key.city, as: City.self) }
         nonmutating set { service.setValue(newValue, forKey: Key.city) }
+    }
+
+    /// How the degrees are counted. Celsius unless chosen.
+    var unit: TemperatureUnit {
+        get { service.value(forKey: Key.unit, default: TemperatureUnit.celsius) }
+        nonmutating set { service.setValue(newValue, forKey: Key.unit) }
     }
 
     /// Minutes between readings: 15, 30 or 60, half an hour unless chosen.
@@ -40,4 +47,11 @@ struct Preferences {
         get { service.value(forKey: Key.pinned, default: false) }
         nonmutating set { service.setValue(newValue, forKey: Key.pinned) }
     }
+}
+
+/// The one reading is in Celsius; Fahrenheit is a conversion, never a second
+/// request.
+enum TemperatureUnit: String, Codable, CaseIterable, Sendable {
+    case celsius
+    case fahrenheit
 }
