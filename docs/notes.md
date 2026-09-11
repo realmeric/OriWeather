@@ -52,3 +52,30 @@ array, which is why the reader treats a missing key as an empty list.
 The reader keeps six fields and drops the rest (`population`, `postcodes`,
 `elevation`, the ids). The coordinate is rounded inside `City.init`, so a city
 never holds more than two decimals, whichever way it was made.
+
+## OW-6, the wing (2026-09-11)
+
+The harness awards the compact seat only after a state has been published,
+and Droppy does the same: no state, no seat. The clock runs only while
+seated, so a droplet that waited for a seat before reading would never read.
+Activation therefore reads once (`WeatherModel.Reason.launch`, gated by the
+interval like a seat) so there is something to publish; from then on the host
+decides the seat and the seat decides the clock.
+
+What the Playground did with `OW_DEMO=1` and "Keep on the notch" off: within
+a quarter of a second of activation the seat went to `none(surface-suppressed)`
+and then `compact`, and the clock started. So with pinning off the host still
+reports the compact seat at rest; the hover-only reveal is how the row is
+drawn, not a seat the droplet is told about. D6 holds as written (the clock
+runs while seated), which in practice means the clock runs at rest on a free
+notch whether or not the row is pinned. The Playground's window was not given
+to this session, so the hover, the pin and the music box on OW-6 wait for eyes.
+
+The droplet's own lines land under `category == "droplet"` (singular), tagged
+`[ori-weather]`, and at the info level, so `log show` needs `--info` to see
+them; the loader's lines are under `droplets`. Seat changes are logged at info
+for that reason.
+
+The harness does not draw the companion pill at all (nothing under
+`DroppyKitHarness` calls `makeCompanionCompact` or `makeCompanionDetail`), so
+the puck is drawn by a test instead (OW-8).

@@ -9,7 +9,13 @@ import Foundation
 struct Preferences {
     enum Key {
         static let city = "city"
+        static let intervalMinutes = "intervalMinutes"
+        static let pinned = "pinned"
     }
+
+    /// The intervals the room offers. Anything else stored is read as the
+    /// default rather than trusted.
+    static let intervals = [15, 30, 60]
 
     let service: any DropletPreferencesService
 
@@ -17,5 +23,21 @@ struct Preferences {
     var city: City? {
         get { service.value(forKey: Key.city, as: City.self) }
         nonmutating set { service.setValue(newValue, forKey: Key.city) }
+    }
+
+    /// Minutes between readings: 15, 30 or 60, half an hour unless chosen.
+    var intervalMinutes: Int {
+        get {
+            let stored = service.value(forKey: Key.intervalMinutes, default: 30)
+            return Self.intervals.contains(stored) ? stored : 30
+        }
+        nonmutating set { service.setValue(newValue, forKey: Key.intervalMinutes) }
+    }
+
+    /// "Keep on the notch". Off by default: pinning is a strong claim on
+    /// somebody else's notch, so the user turns it on (D5).
+    var pinned: Bool {
+        get { service.value(forKey: Key.pinned, default: false) }
+        nonmutating set { service.setValue(newValue, forKey: Key.pinned) }
     }
 }

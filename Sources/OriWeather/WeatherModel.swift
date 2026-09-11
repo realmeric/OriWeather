@@ -20,6 +20,8 @@ final class WeatherModel: ObservableObject {
         case city
         case seat
         case shelf
+        /// Activation, which reads once so there is something to publish.
+        case launch
     }
 
     @Published private(set) var reading: WeatherReading?
@@ -40,6 +42,7 @@ final class WeatherModel: ObservableObject {
             reading = nil
             isStale = false
             lastAttempt = nil
+            asking = nil
             if isRunning {
                 reschedule()
                 refresh(because: .city)
@@ -65,7 +68,9 @@ final class WeatherModel: ObservableObject {
     private let clock: () -> Date
     private var tick: Timer?
     private var lastAttempt: Date?
-    private var inFlight = false
+    /// The attempt in flight, if any. One at a time: a request already out
+    /// absorbs any that arrive behind it.
+    private var asking: UUID?
 
     init(fetcher: any WeatherFetching,
          city: City? = nil,
@@ -102,16 +107,17 @@ final class WeatherModel: ObservableObject {
     /// time it is without waiting for it.
     func refresh(at when: Date? = nil, because reason: Reason = .seat) {
         let when = when ?? clock()
-        guard let city, !inFlight else { return }
+        guard let city, asking == nil else { return }
         switch reason {
         case .clock, .city:
             break
-        case .seat, .shelf:
+        case .seat, .shelf, .launch:
             if let lastAttempt, when.timeIntervalSince(lastAttempt) < every { return }
         }
         now = when
         lastAttempt = when
-        inFlight = true
+        let token = UUID()
+        asking = token
         let fetcher = self.fetcher
         let place = city.place
         Task { [weak self] in
@@ -121,14 +127,15 @@ final class WeatherModel: ObservableObject {
             } catch {
                 result = .failure(error)
             }
-            self?.settle(result, for: city)
+            self?.settle(result, token: token)
         }
     }
 
-    private func settle(_ result: Result<WeatherReading, Error>, for asked: City) {
-        inFlight = false
-        // A reading for a city that is no longer chosen belongs to nobody.
-        guard asked == city else { return }
+    private func settle(_ result: Result<WeatherReading, Error>, token: UUID) {
+        // An answer to a question nobody is asking any more (the city changed
+        // while it was out) belongs to nobody.
+        guard token == asking else { return }
+        asking = nil
         switch result {
         case .success(let reading):
             self.reading = reading

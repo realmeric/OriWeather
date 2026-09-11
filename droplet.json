@@ -10,9 +10,11 @@
     "minAPI": "1.1.0"
   },
   "minAppVersion": "15.3.0",
-  "capabilities": [],
+  "capabilities": [
+    "network-client"
+  ],
   "surfaces": [
-    "shelf-widget"
+    "live-activity"
   ],
   "icon": "OriWeather.icon",
   "creator": {

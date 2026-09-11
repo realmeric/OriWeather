@@ -91,24 +91,26 @@ Accept:
 
 Commit: `A model that reads on a clock it can put down`
 
-## In progress
-
-## Ready
-
-### Phase 1: a droplet that loads
-
 #### OW-5 · The marks and the look
 
 P1 · M · look
+
+Done in `eea59b6`.
 
 `Marks.swift`: the six shapes from OriNotch's `Glyphs.swift`, `Sun`, `Cloud`, `Rain`, `Snow`, `Fog` and `Bolt`, as this repo's own `Shape`s. `Look.swift`: every number and colour of this repo's own in one place, which is the tints (the sun and the bolt in a warm yellow, rain in a blue, snow in the primary white, fog in the tertiary white, cloud in the secondary), the stale opacity 0.55, and the card glyph size 20 that the host has no token for. Everything else a view needs comes from `DroppyLiveActivityMetrics`, `DroppySpacing`, `DroppyRadius` and `AdaptiveColors`. `WeatherMark(code:isDay:)` picks the shape and the tint; by night the sun is drawn in the secondary white, as OriNotch draws it. `docs/look.md` opened with the two surfaces described from OriNotch's `WeatherView.swift`, in this repo's words.
 
 Accept:
 
-- [ ] `Look.swift` is the only file under `Sources/OriWeather/` with a literal `Color(` or a literal point size in it; a grep in the test target asserts it, which is how OriNotch keeps a number in a view a smell.
-- [ ] `MarksTests` renders each shape into a 16 by 16 path and asserts it is non-empty and inside its rect; a shape that leaks past its rect at 13 pt is the kind of thing a wing clips without a word.
+- [x] `Look.swift` is the only file under `Sources/OriWeather/` with a literal `Color(` or a literal point size in it; a grep in the test target asserts it, which is how OriNotch keeps a number in a view a smell.
+- [x] `MarksTests` renders each shape into a 16 by 16 path and asserts it is non-empty and inside its rect; a shape that leaks past its rect at 13 pt is the kind of thing a wing clips without a word.
 
 Commit: `Six marks and one file that says what colour they are`
+
+## In progress
+
+## Ready
+
+### Phase 1: a droplet that loads
 
 ### Phase 2: the wing
 
