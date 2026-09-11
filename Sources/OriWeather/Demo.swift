@@ -50,6 +50,12 @@ final class DemoWeather: WeatherFetching, @unchecked Sendable {
         // The stale demo's one good reading is two hours old, so the card has
         // an age worth saying the moment the next read is refused.
         let at = mode == .stale ? now.addingTimeInterval(-2 * 3600) : now
-        return WeatherReading(temperature: 25.5, feelsLike: 24.2, code: 2, isDay: true, at: at)
+        var reading = WeatherReading(temperature: 25.5, feelsLike: 24.2, code: 2, isDay: true, at: at)
+        reading.high = 28.4
+        reading.low = 19.1
+        reading.hours = [(15, 26.1, 2, true), (16, 25.4, 1, true), (17, 24.2, 3, true),
+                         (18, 22.8, 61, true), (19, 21.3, 2, false)]
+            .map { WeatherReading.Hour(hour: $0.0, temperature: $0.1, code: $0.2, isDay: $0.3) }
+        return reading
     }
 }

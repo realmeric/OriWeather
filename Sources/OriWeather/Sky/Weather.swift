@@ -12,6 +12,19 @@ struct WeatherReading: Equatable, Sendable {
     let isDay: Bool
     /// When the reading was taken, which is what an old one is dimmed by.
     let at: Date
+    /// Today's high and low, where the answer carried them.
+    var high: Double? = nil
+    var low: Double? = nil
+    /// The next few hours, soonest first, where the answer carried them.
+    var hours: [Hour] = []
+
+    /// One hour ahead: its local wall-clock hour in the place, and the sky.
+    struct Hour: Equatable, Sendable {
+        let hour: Int
+        let temperature: Double
+        let code: Int
+        let isDay: Bool
+    }
 
     var degrees: String { degrees(in: .celsius) }
     var condition: String { WeatherCode.words(code) }
@@ -27,7 +40,7 @@ struct WeatherReading: Equatable, Sendable {
         Self.figure(feelsLike, in: unit)
     }
 
-    private static func figure(_ celsius: Double, in unit: TemperatureUnit) -> String {
+    static func figure(_ celsius: Double, in unit: TemperatureUnit) -> String {
         let value = unit == .celsius ? celsius : celsius * 9 / 5 + 32
         // Through Int, so a value that rounds to zero from below is "0°" and
         // never "-0°".

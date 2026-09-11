@@ -321,3 +321,28 @@ The same log showed the demo sky's automatic location "finding" the demo city
 and able to write it into the Playground's preferences, which are the user's
 own. Under the demo sky the city is the demo's and nothing is found or
 written.
+
+## "Read 2 min ago", and a fuller shelf (2026-09-11)
+
+The shelf widget's bottom line said "Read 2 min ago" on a reading fetched a
+moment before. Open-Meteo stamps `current` with the start of its fifteen
+minute slot (14:30 for a request at 14:32), and the line measured that stamp
+against the attempt, so it said how far into the slot the request landed, and
+since nothing ticks, it said it forever. The line is gone: a fresh reading
+needs no age, and a stale one says its age where the condition was, as the
+card does.
+
+The same request now asks for today's high and low and the hours ahead
+(`daily=temperature_2m_max,temperature_2m_min`,
+`hourly=temperature_2m,weather_code,is_day`, `forecast_days=1`,
+`forecast_hours=7`), still one request per interval. The hours are local wall
+clock in the place and are compared as text; the one the reading is in is
+dropped and five are kept. Alone on the shelf, the widget is the reading across
+the top (mark and degrees at 34, the condition and "Feels like" beside them,
+the city and "H 28°  L 19°" on the right) and the five hours under it, each
+its hour in the Mac's own way of writing one ("15", or "3 PM"), its mark and
+its degrees. Beside another widget it is the mark and the degrees, the
+condition, and the city with the high and low at the foot. It is 136 tall now.
+
+The maker is "Ori by realmeric" and the name is "OriWeather", one word like
+OriNotch.

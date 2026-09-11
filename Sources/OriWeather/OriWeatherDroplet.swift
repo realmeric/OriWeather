@@ -33,11 +33,42 @@ struct Glance: Equatable {
     var condition: String { reading.condition }
     /// The condition, or how old the reading is once it has stopped arriving.
     var detail: String { isStale ? Ago.words(reading.at, at: now) : reading.condition }
-    /// How old the reading is, said on the shelf whether or not it is stale.
-    var age: String {
-        let words = Ago.words(reading.at, at: now)
-        return words == "now" ? "Read just now" : "Read \(words)"
+    /// Today's high and low, "H 28°  L 19°", where the reading carried them.
+    var highLow: String? {
+        guard let high = reading.high, let low = reading.low else { return nil }
+        return "H \(WeatherReading.figure(high, in: unit))  L \(WeatherReading.figure(low, in: unit))"
     }
+
+    /// The hours ahead, each with its label in the place's own wall clock.
+    var hours: [HourGlance] {
+        reading.hours.map { hour in
+            HourGlance(label: HourGlance.label(hour.hour), degrees: WeatherReading.figure(hour.temperature, in: unit),
+                       code: hour.code, isDay: hour.isDay)
+        }
+    }
+}
+
+/// One hour ahead, as the shelf draws it.
+struct HourGlance: Equatable, Identifiable {
+    let label: String
+    let degrees: String
+    let code: Int
+    let isDay: Bool
+    var id: String { label }
+
+    /// "15" or "3 PM", as the user's Mac writes an hour. The hour is already
+    /// the place's own wall clock, so it is formatted as if in UTC, where no
+    /// zone moves it.
+    static func label(_ hour: Int) -> String {
+        formatter.string(from: Date(timeIntervalSince1970: TimeInterval(hour * 3600)))
+    }
+
+    private static let formatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.timeZone = TimeZone(identifier: "UTC")
+        formatter.setLocalizedDateFormatFromTemplate("j")
+        return formatter
+    }()
 }
 
 /// OriNotch's weather, on Droppy's wing when nothing else wants it.
@@ -190,7 +221,7 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
             .sink { [weak self] shelved in self?.shelfChanged(shelved) }
             .store(in: &subscriptions)
 
-        host.log.info("Ori Weather activated\(demo.map { " with the \($0) demo sky" } ?? "")")
+        host.log.info("OriWeather activated\(demo.map { " with the \($0) demo sky" } ?? "")")
         if host.isGranted(.globalShortcuts) {
             host.shortcuts.register(id: WingShortcut.id, title: WingShortcut.title,
                                     defaultShortcut: WingShortcut.suggestion) { [weak self] in

@@ -1,4 +1,4 @@
-# Ori Weather
+# OriWeather
 
 The weather from OriNotch, drawn on Droppy's notch.
 

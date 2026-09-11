@@ -10,5 +10,5 @@ droppykit=${DROPPYKIT:-${root:h}/droppykit/Scripts/droppykit}
 "$droppykit" run -- --shots ./shots/tall --shot-height 1900 >/dev/null
 # sips crops as height width, offset as y x, in the shots' 2x pixels.
 sips -c 1395 1820 --cropOffset 560 460 shots/tall/live-activity.png --out Assets/wing.png >/dev/null
-sips -c 1035 1820 --cropOffset 560 460 shots/tall/shelf-widget.png --out Assets/shelf.png >/dev/null
+sips -c 1100 1820 --cropOffset 560 460 shots/tall/shelf-widget.png --out Assets/shelf.png >/dev/null
 print "wrote Assets/wing.png and Assets/shelf.png"

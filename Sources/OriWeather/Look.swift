@@ -31,10 +31,18 @@ enum Look {
     /// descriptor that leaves either to a fallback.
     static let shelfSoloWidth: CGFloat = 340
     static let shelfPairedWidth: CGFloat = 170
-    /// The widget's height, which its content has naturally.
-    static let shelfHeight: CGFloat = 112
-    /// The mark and the degrees on the shelf, where there is room for both to
-    /// be read from across the desk.
-    static let shelfMark: CGFloat = 28
-    static let shelfFigure: CGFloat = 30
+    /// The widget's height: the reading and, under it, the hours ahead.
+    static let shelfHeight: CGFloat = 136
+    /// Alone on the shelf: the mark and the degrees large enough to read
+    /// from across the desk.
+    static let shelfMark: CGFloat = 34
+    static let shelfFigure: CGFloat = 34
+    /// Beside another widget, a size down.
+    static let pairedMark: CGFloat = 28
+    static let pairedFigure: CGFloat = 30
+    /// The condition and the city beside the figure.
+    static let shelfLabel: CGFloat = 13
+    /// The hours ahead: the hour, its mark, its degrees.
+    static let hourLabel: CGFloat = 11
+    static let hourMark: CGFloat = 16
 }

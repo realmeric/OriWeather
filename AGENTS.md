@@ -1,4 +1,4 @@
-# Ori Weather, a Droplet for Droppy
+# OriWeather, a Droplet for Droppy
 
 <!-- Written by `droppykit agent`. Add your own notes below; the file is only rewritten with --force. -->
 
