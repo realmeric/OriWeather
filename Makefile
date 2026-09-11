@@ -4,13 +4,13 @@
 SDK := $(HOME)/Documents/Projects/apps/droppykit
 DROPPYKIT := $(SDK)/Scripts/droppykit
 
-.PHONY: test build validate shots install energy clean
+.PHONY: test build validate shots offline install energy clean
 
 test:
 	swift test
 	$(DROPPYKIT) build
 	$(DROPPYKIT) validate
-	$(MAKE) shots
+	$(MAKE) offline
 
 build:
 	$(DROPPYKIT) build
@@ -21,6 +21,18 @@ validate:
 shots:
 	$(DROPPYKIT) run -- --shots ./shots --report ./shots/report.json
 	/usr/bin/python3 scripts/check-report.py shots/report.json
+
+# The harness again, with network-client taken away. The harness starts with
+# exactly the capabilities the manifest declares and has no flag to deny one,
+# so it is handed a copy of the manifest without it (beside droplet.json,
+# because assets resolve from the manifest's folder). droppykit run puts its
+# own --manifest first, so the app `make shots` built is run directly. The demo
+# sky needs no network, so the wing must still carry a temperature.
+offline: shots
+	/usr/bin/python3 -c 'import json; m = json.load(open("droplet.json")); m["capabilities"] = []; json.dump(m, open(".droplet-offline.json", "w"), indent=2)'
+	.build/OriWeatherHarness.app/Contents/MacOS/OriWeatherHarness --manifest "$(CURDIR)/.droplet-offline.json" --shots ./shots/offline --report ./shots/offline/report.json
+	rm -f .droplet-offline.json
+	/usr/bin/python3 scripts/check-report.py shots/offline/report.json --offline
 
 install: build
 	scripts/install.sh

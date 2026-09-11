@@ -201,6 +201,21 @@ Accept:
 
 Commit: `A room with a city in it`
 
+#### OW-13 · Degrees the way the user counts them
+
+P2 · S · model
+
+Done in `5d44d14`.
+
+The unit preference, `celsius` by default, `fahrenheit` on request, converted from the one reading in Celsius rather than fetched twice: `WeatherReading.degrees(in:)` rounds after converting, so 25.5 °C is 26° and 78° (77.9 rounded), and feels-like follows. The city's own time zone from OW-3 is what `Ago` is not measured in, because an age is a duration; it is what a future hourly row would be labelled in, and the note says so.
+
+Accept:
+
+- [x] `UnitsTests`: 25.5 °C reads "26°" and "78°"; -0.4 °C reads "0°" in both, never "-0°".
+- [x] Flipping the unit in the pane redraws the wing without a fetch, asserted with the counting fetcher.
+
+Commit: `Degrees the way the user counts them`
+
 ## In progress
 
 ## Ready
@@ -225,19 +240,6 @@ Accept:
 Commit: `The same weather on the other notch`
 
 ### Phase 3: the shelf and the room
-
-#### OW-13 · Degrees the way the user counts them
-
-P2 · S · model
-
-The unit preference, `celsius` by default, `fahrenheit` on request, converted from the one reading in Celsius rather than fetched twice: `WeatherReading.degrees(in:)` rounds after converting, so 25.5 °C is 26° and 78° (77.9 rounded), and feels-like follows. The city's own time zone from OW-3 is what `Ago` is not measured in, because an age is a duration; it is what a future hourly row would be labelled in, and the note says so.
-
-Accept:
-
-- [ ] `UnitsTests`: 25.5 °C reads "26°" and "78°"; -0.4 °C reads "0°" in both, never "-0°".
-- [ ] Flipping the unit in the pane redraws the wing without a fetch, asserted with the counting fetcher.
-
-Commit: `Degrees the way the user counts them`
 
 #### OW-14 · Fixed skies for the harness
 
