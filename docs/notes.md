@@ -145,3 +145,22 @@ read before the icon was accepted (OW-15).
 `kit.minAPI` is 1.1.0: the card's `cardContentHeight` and the compact
 padding arrived in 1.1.0, and nothing newer is called; 1.2.0 and 1.2.1
 changed no API.
+
+## After OW-17: the pin, and the country (2026-09-11)
+
+"Keep on the notch" did nothing in the Playground: on or off, the weather sat
+on the wings at rest. That is what the log showed on OW-6 (the compact seat at
+rest with pinning off), seen by eye. The Playground, standing in for Droppy
+15.3, seats a droplet's published state whether or not
+`joinsPersistentActivitySet` is set, so the flag cannot carry the pin. The
+droplet keeps the pin itself now: off, it publishes nil and yields the seat,
+and the weather lives on the shelf; on, it publishes with the flag set. The pin
+is still off until the user turns it on (D5), except under the demo sky, which
+exists to show the wing. Unpinned and unshelved the clock stops, so off is also
+cheaper.
+
+The geocoder answers "Republic of Türkiye" for TR, where it answers "Germany"
+and "United Kingdom" for DE and GB. The country is now the English name macOS
+gives the result's `country_code` ("Türkiye"), and the geocoder's own name only
+when there is no code. A city chosen before this keeps the name it was stored
+with until it is chosen again.

@@ -41,11 +41,15 @@ struct Preferences {
         nonmutating set { service.setValue(newValue, forKey: Key.intervalMinutes) }
     }
 
-    /// "Keep on the notch". Off by default: pinning is a strong claim on
-    /// somebody else's notch, so the user turns it on (D5).
-    var pinned: Bool {
-        get { service.value(forKey: Key.pinned, default: false) }
-        nonmutating set { service.setValue(newValue, forKey: Key.pinned) }
+    /// "Keep on the notch". Off by default: the wing is a strong claim on
+    /// somebody else's notch, so the user turns it on (D5). The demo sky turns
+    /// it on unless told otherwise, because a demo is for looking at the wing.
+    func pinned(byDefault fallback: Bool) -> Bool {
+        service.value(forKey: Key.pinned, default: fallback)
+    }
+
+    func setPinned(_ pinned: Bool) {
+        service.setValue(pinned, forKey: Key.pinned)
     }
 }
 

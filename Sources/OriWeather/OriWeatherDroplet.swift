@@ -66,6 +66,9 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
     /// Whether the widget is on a shelf, which keeps the clock running whether
     /// or not the activity is seated.
     private(set) var isShelved = false
+    /// Whether the pin is on when nobody has said: off, except under the demo
+    /// sky.
+    private var pinnedByDefault = false
     private var subscriptions: Set<AnyCancellable> = []
     private let fetcherOverride: (any WeatherFetching)?
     private let geocoderOverride: (any Geocoding)?
@@ -91,6 +94,7 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
         self.host = host
         let preferences = Preferences(service: host.preferences)
         let demo = Demo.mode(isHarness: host.environment.isHarness)
+        pinnedByDefault = demo != nil
         let model = WeatherModel(fetcher: fetcher(for: host, demo: demo),
                                  city: preferences.city ?? (demo == nil ? nil : Demo.city),
                                  every: TimeInterval(preferences.intervalMinutes * 60))
@@ -173,8 +177,8 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
     }
 
     var pinned: Bool {
-        get { preferences?.pinned ?? false }
-        set { preferences?.pinned = newValue }
+        get { preferences?.pinned(byDefault: pinnedByDefault) ?? false }
+        set { preferences?.setPinned(newValue) }
     }
 
     // MARK: Changes
@@ -194,6 +198,10 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
             }
         case Preferences.Key.intervalMinutes:
             model.every = TimeInterval(preferences.intervalMinutes * 60)
+        case Preferences.Key.pinned where !pinned:
+            // Unpinned, the wing is given back now rather than when the
+            // publisher's nil reaches the host.
+            host?.liveActivity.yield(reason: .idle)
         default:
             break
         }
@@ -216,8 +224,13 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
         publish()
     }
 
+    /// The wing is asked for only while the pin is on. The SDK's
+    /// `joinsPersistentActivitySet` says the same thing to the host, but
+    /// Droppy 15.3 (as the Playground stands in for it) seats a droplet's
+    /// activity at rest whether or not it joins, so the droplet keeps its own
+    /// pin: off, it publishes nothing and the weather lives on the shelf.
     private func publish() {
-        guard let glance else {
+        guard let glance, pinned else {
             if activitySubject.value != nil { activitySubject.send(nil) }
             return
         }
@@ -225,7 +238,7 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
             priority: Self.priority,
             accessibilityTitle: "\(glance.degrees.dropLast()) degrees, \(glance.condition.lowercased()), \(glance.city.name)",
             isInteractive: false,
-            joinsPersistentActivitySet: preferences?.pinned ?? false,
+            joinsPersistentActivitySet: true,
             compactPresentation: nil,
             expandedWidgetID: "weather"
         )

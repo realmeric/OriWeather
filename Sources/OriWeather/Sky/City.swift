@@ -61,24 +61,35 @@ struct OpenMeteoGeocoder: Geocoding {
         return try Self.cities(from: data)
     }
 
-    /// The answer keeps `name`, `admin1`, `country`, `latitude`, `longitude`
+    /// The answer keeps `name`, `admin1`, the country, `latitude`, `longitude`
     /// and `timezone`, and nothing else. No `results` is an empty list: a city
     /// nobody has heard of is not a failure.
+    ///
+    /// The country is the name macOS gives `country_code` in English, the
+    /// language the names are asked for in, and the geocoder's own `country`
+    /// only when there is no code: the geocoder says "Republic of Türkiye"
+    /// where everybody else says "Türkiye".
     static func cities(from data: Data) throws -> [City] {
         guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
             throw WeatherError.unreadable
         }
         let results = json["results"] as? [[String: Any]] ?? []
-        return results.compactMap { result in
+        return results.compactMap { result -> City? in
             guard let name = result["name"] as? String,
                   let latitude = (result["latitude"] as? NSNumber)?.doubleValue,
                   let longitude = (result["longitude"] as? NSNumber)?.doubleValue
             else { return nil }
             return City(name: name,
                         region: result["admin1"] as? String,
-                        country: result["country"] as? String,
+                        country: countryName(code: result["country_code"] as? String)
+                            ?? result["country"] as? String,
                         place: Place(latitude: latitude, longitude: longitude),
                         timeZone: result["timezone"] as? String)
         }
+    }
+
+    static func countryName(code: String?) -> String? {
+        guard let code, !code.isEmpty else { return nil }
+        return Locale(identifier: "en").localizedString(forRegionCode: code)
     }
 }

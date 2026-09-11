@@ -20,9 +20,15 @@ final class GeocoderTests: XCTestCase {
         let first = try XCTUnwrap(cities.first)
         XCTAssertEqual(first.name, "Istanbul")
         XCTAssertEqual(first.region, "Istanbul")
-        XCTAssertEqual(first.country, "Republic of Türkiye")
+        XCTAssertEqual(first.country, "Türkiye", "the name for TR, not the geocoder's Republic of Türkiye")
         XCTAssertEqual(first.timeZone, "Europe/Istanbul")
         XCTAssertEqual(first.place, Place(latitude: 41.01, longitude: 28.95))
+    }
+
+    /// No country code, and the geocoder's own name is kept.
+    func testWithoutACodeTheGeocodersCountryIsKept() throws {
+        let body = Data(#"{"results":[{"name":"Somewhere","latitude":1.0,"longitude":2.0,"country":"Elsewhere"}]}"#.utf8)
+        XCTAssertEqual(try OpenMeteoGeocoder.cities(from: body).first?.country, "Elsewhere")
     }
 
     /// A city nobody has heard of is not a failure.

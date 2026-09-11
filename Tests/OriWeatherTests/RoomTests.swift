@@ -14,7 +14,7 @@ final class RoomTests: XCTestCase {
     func testOneGeocoderRequestPerPauseNonePerKeystroke() async throws {
         let geocoder = FakeGeocoder(answer: [Sky.istanbul])
         let droplet = OriWeatherDroplet(fetcher: FakeWeather(reading: Sky.reading()), geocoder: geocoder)
-        let test = TestHost(city: nil)
+        let test = TestHost(city: nil, pinned: nil)
         try droplet.activate(host: test.host)
         let search = try XCTUnwrap(droplet.search)
         for typed in ["I", "Is", "Ist", "Ista", "Istan", "Istanb", "Istanbu", "Istanbul"] {
@@ -39,7 +39,7 @@ final class RoomTests: XCTestCase {
     func testTheRoomWritesFourKeysAndNothingElse() async throws {
         let droplet = OriWeatherDroplet(fetcher: FakeWeather(reading: Sky.reading()),
                                         geocoder: FakeGeocoder(answer: []))
-        let test = TestHost(city: nil)
+        let test = TestHost(city: nil, pinned: nil)
         try droplet.activate(host: test.host)
         droplet.choose(Sky.istanbul)
         droplet.unit = .fahrenheit

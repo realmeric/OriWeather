@@ -42,7 +42,7 @@ final class SwitchableWeather: WeatherFetching, @unchecked Sendable {
 enum Sky {
     static let now = Date(timeIntervalSince1970: 1_788_000_000)
 
-    static let istanbul = City(name: "Istanbul", region: "Istanbul", country: "Republic of Türkiye",
+    static let istanbul = City(name: "Istanbul", region: "Istanbul", country: "Türkiye",
                                place: Place(latitude: 41.01, longitude: 28.95),
                                timeZone: "Europe/Istanbul")
 

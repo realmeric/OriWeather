@@ -55,7 +55,7 @@ struct WeatherRoom: View {
                 }
                 DropletToggleRow(
                     title: "Keep on the notch",
-                    subtitle: "Off, the weather shows while the pointer rests on the notch.",
+                    subtitle: "On, the weather sits on the wings when nothing else wants the notch. Off, it stays on the shelf and leaves the wings alone.",
                     isOn: Binding(get: { droplet.pinned }, set: { droplet.pinned = $0 })
                 )
             }

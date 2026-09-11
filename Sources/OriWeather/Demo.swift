@@ -23,7 +23,7 @@ enum Demo {
     }
 
     /// Where the demo sky is, when nobody has chosen a city.
-    static let city = City(name: "Istanbul", region: "Istanbul", country: "Republic of Türkiye",
+    static let city = City(name: "Istanbul", region: "Istanbul", country: "Türkiye",
                            place: Place(latitude: 41.01, longitude: 28.95),
                            timeZone: "Europe/Istanbul")
 }

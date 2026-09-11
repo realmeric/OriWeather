@@ -101,7 +101,7 @@ final class WeatherModelTests: XCTestCase {
         let model = WeatherModel(fetcher: fetcher, city: Sky.istanbul, clock: { self.now })
         model.start()
         await settle()
-        let ankara = City(name: "Ankara", region: "Ankara", country: "Republic of Türkiye",
+        let ankara = City(name: "Ankara", region: "Ankara", country: "Türkiye",
                           place: Place(latitude: 39.92, longitude: 32.85), timeZone: "Europe/Istanbul")
         model.city = ankara
         await settle()

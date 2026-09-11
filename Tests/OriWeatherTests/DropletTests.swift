@@ -28,11 +28,14 @@ struct TestHost {
     let installState = HarnessInstallStateService()
     let host: DropletHost
 
-    init(city: City? = Sky.istanbul, granted: Set<DropletPermission> = [.networkClient]) {
+    /// `pinned` nil writes nothing, which is the pin's default: off.
+    init(city: City? = Sky.istanbul, pinned: Bool? = true,
+         granted: Set<DropletPermission> = [.networkClient]) {
         recorder.grantedCapabilities = granted
         preferences = HarnessPreferencesService(dropletID: OriWeatherDroplet.id, recorder: recorder)
         liveActivity = HarnessLiveActivityService(recorder: recorder)
         if let city { Preferences(service: preferences).city = city }
+        if let pinned { Preferences(service: preferences).setPinned(pinned) }
         host = DropletHost(
             grantedCapabilities: granted,
             preferences: preferences,
@@ -69,8 +72,21 @@ final class DropletTests: XCTestCase {
         XCTAssertEqual(state.priority, 10)
         XCTAssertEqual(state.accessibilityTitle, "26 degrees, partly cloudy, Istanbul")
         XCTAssertFalse(state.isInteractive)
-        XCTAssertFalse(state.joinsPersistentActivitySet, "pinning is off until the user turns it on")
+        XCTAssertTrue(state.joinsPersistentActivitySet)
         XCTAssertEqual(state.expandedWidgetID, "weather")
+        droplet.deactivate()
+    }
+
+    /// The pin is off until the user turns it on, and off means no wing: the
+    /// host seats a published state at rest whether or not it joins the
+    /// persistent set, so the droplet does not publish one.
+    func testUnpinnedItLeavesTheWingsAlone() async throws {
+        let fetcher = FakeWeather(reading: Sky.reading())
+        let droplet = OriWeatherDroplet(fetcher: fetcher)
+        try droplet.activate(host: TestHost(pinned: nil).host)
+        await settle()
+        XCTAssertNotNil(droplet.glance, "the reading is there, for the shelf")
+        XCTAssertNil(droplet.activitySubject.value)
         droplet.deactivate()
     }
 
@@ -100,14 +116,24 @@ final class DropletTests: XCTestCase {
         droplet.deactivate()
     }
 
-    func testAPinFlippedInThePreferencesIsRepublished() async throws {
+    /// Flipping the pin puts the weather on the wing and takes it off again,
+    /// and taking it off gives the seat back at once.
+    func testThePinPutsTheWeatherOnTheWingAndTakesItOff() async throws {
         let droplet = OriWeatherDroplet(fetcher: FakeWeather(reading: Sky.reading()))
-        let test = TestHost()
+        let test = TestHost(pinned: nil)
         try droplet.activate(host: test.host)
         await settle()
-        Preferences(service: test.preferences).pinned = true
+        XCTAssertNil(droplet.activitySubject.value)
+
+        droplet.pinned = true
         await settle()
-        XCTAssertEqual(droplet.activitySubject.value?.joinsPersistentActivitySet, true)
+        XCTAssertNotNil(droplet.activitySubject.value)
+
+        droplet.pinned = false
+        await settle()
+        XCTAssertNil(droplet.activitySubject.value)
+        let yields = test.recorder.effects.filter { $0.service == "liveActivity" && $0.detail == "yield idle" }
+        XCTAssertEqual(yields.count, 1)
         droplet.deactivate()
     }
 
