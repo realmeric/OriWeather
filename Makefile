@@ -19,12 +19,11 @@ build:
 validate:
 	$(DROPPYKIT) validate
 
-# The icon layer and the avatar, drawn from Marks.swift. Deterministic, so a
-# run that changed nothing leaves git clean.
+# The icon's three layers and the avatar. Deterministic, so a run that
+# changed nothing leaves git clean.
 icon:
 	@mkdir -p .build
-	swiftc -parse-as-library -O -o .build/make-icon scripts/make-icon.swift \
-		Sources/OriWeather/Marks.swift Sources/OriWeather/Sky/Weather.swift
+	swiftc -parse-as-library -O -o .build/make-icon scripts/make-icon.swift
 	.build/make-icon
 
 shots:

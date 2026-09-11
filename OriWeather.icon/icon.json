@@ -3,8 +3,8 @@
     {
       "value": {
         "linear-gradient": [
-          "srgb:0.16471,0.19608,0.25490,1.00000",
-          "srgb:0.16471,0.19608,0.25490,1.00000"
+          "srgb:0.96863,0.97647,0.98824,1.00000",
+          "srgb:0.78824,0.82745,0.88627,1.00000"
         ]
       }
     }
@@ -14,10 +14,34 @@
       "layers": [
         {
           "hidden": false,
-          "image-name": "mark.png",
-          "name": "sky",
+          "image-name": "rise.png",
+          "name": "rise",
           "position": {
-            "scale": 0.8,
+            "scale": 1.0,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "hidden": false,
+          "image-name": "sun.png",
+          "name": "sun",
+          "position": {
+            "scale": 1.0,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "hidden": false,
+          "image-name": "cloud.png",
+          "name": "cloud",
+          "position": {
+            "scale": 1.0,
             "translation-in-points": [
               0,
               0

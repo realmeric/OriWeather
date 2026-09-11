@@ -1,15 +1,18 @@
 //
-// Draws the droplet's icon layer and the creator avatar. Run it when a mark
-// changes:
+// Draws the droplet's icon layers and the creator avatar. Run it when the
+// artwork changes:
 //
 //     make icon
 //
-// The icon is a sun behind a cloud, drawn from this droplet's own shapes
-// (`Sources/OriWeather/Marks.swift`, compiled in beside this file), so the icon
-// and the wing cannot drift apart. The layer is artwork only: no square, no
-// rounded corners and no shadow, because Icon Composer adds all three and a
-// painted-in one shows as a double edge. The artwork stays inside the centre
-// 820 of 1024.
+// The icon is the Ori family's rise: the top of a large sun coming up over the
+// tile's bottom edge, which is the family's signature (docs/family.md), and
+// this droplet's own mark above it, a sun behind an ink cloud. Three layers,
+// back to front, so Icon Composer can light each one: rise.png, sun.png and
+// cloud.png. The paper ground is the document's own fill, a gradient in
+// icon.json. The layers are artwork only: no square, no rounded corners and
+// no drop shadow of the icon, because Icon Composer adds all three. The mark
+// stays inside the centre 820 of 1024; the rise runs to the edge on purpose,
+// and the corners cut it.
 //
 // The avatar is Meric's mark, OriNotch's notch with a wing out either side, in
 // ink on paper, square and unrounded: the Store clips it to a circle itself.
@@ -19,70 +22,124 @@
 // draws and the one that decides whether it reads.
 
 import AppKit
-import SwiftUI
 
 /// Paper and ink, the two colours everything of Meric's is built from.
 let paper = NSColor(srgbRed: 0.757, green: 0.792, blue: 0.851, alpha: 1)   // #c1cad9
 let ink = NSColor(srgbRed: 0.165, green: 0.196, blue: 0.255, alpha: 1)     // #2a3241
-/// OriNotch's warm yellow, the sun's colour on the wing.
-let warm = NSColor(srgbRed: 1.0, green: 0.83, blue: 0.35, alpha: 1)
+
+/// The ground, top to bottom, which icon.json carries as its fill.
+let groundTop = rgb(0xF7F9FC)
+let groundBottom = rgb(0xC9D3E2)
+
+func rgb(_ hex: UInt32, _ alpha: CGFloat = 1) -> CGColor {
+    CGColor(srgbRed: CGFloat((hex >> 16) & 0xff) / 255, green: CGFloat((hex >> 8) & 0xff) / 255,
+            blue: CGFloat(hex & 0xff) / 255, alpha: alpha)
+}
+
+let space = CGColorSpace(name: CGColorSpace.sRGB)!
+
+func gradient(_ colors: [CGColor], _ locations: [CGFloat]? = nil) -> CGGradient {
+    CGGradient(colorsSpace: space, colors: colors as CFArray, locations: locations)!
+}
 
 @main
 struct MakeIcon {
+    typealias Layer = (CGContext, CGFloat) -> Void
+
+    static let layers: [(String, Layer)] = [("rise.png", drawRise), ("sun.png", drawSun), ("cloud.png", drawCloud)]
+
     static func main() throws {
         let root = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
-        let icon = root.appendingPathComponent("OriWeather.icon/Assets/mark.png")
+        let assets = root.appendingPathComponent("OriWeather.icon/Assets", isDirectory: true)
         let avatar = root.appendingPathComponent("Assets/Creator.png")
         let shots = root.appendingPathComponent("shots", isDirectory: true)
         try FileManager.default.createDirectory(at: shots, withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: assets, withIntermediateDirectories: true)
 
-        try png(pixels: 1024) { drawSky(in: $0, side: 1024) }.write(to: icon)
+        for (name, draw) in layers {
+            try png(pixels: 1024) { draw($0, 1024) }.write(to: assets.appendingPathComponent(name))
+        }
         try png(pixels: 512) { drawNotch(in: $0, side: 512) }.write(to: avatar)
 
-        // What the Store composes: the document's flat ink fill in a rounded
-        // square, and the layer at the document's 0.8 scale on top.
+        // What the Store composes: the document's paper gradient in a rounded
+        // square, and the three layers on it at the document's scale, 1.0.
         for (pixels, name) in [(1024, "icon-preview.png"), (56, "icon-28pt@2x.png"), (28, "icon-28pt.png")] {
             try png(pixels: pixels) { context in
                 let side = CGFloat(pixels)
                 let radius = side * 0.2237
-                context.setFillColor(ink.cgColor)
                 context.addPath(CGPath(roundedRect: CGRect(x: 0, y: 0, width: side, height: side),
                                        cornerWidth: radius, cornerHeight: radius, transform: nil))
-                context.fillPath()
-                context.translateBy(x: side * 0.1, y: side * 0.1)
-                context.scaleBy(x: 0.8, y: 0.8)
-                drawSky(in: context, side: side)
+                context.clip()
+                context.drawLinearGradient(gradient([groundTop, groundBottom]), start: .zero,
+                                           end: CGPoint(x: 0, y: side), options: [])
+                for (_, draw) in layers { draw(context, side) }
             }.write(to: shots.appendingPathComponent(name))
         }
-        print("wrote \(icon.path), \(avatar.path) and three previews in shots/")
+        print("wrote \(layers.count) icon layers, \(avatar.path) and three previews in shots/")
     }
 
-    /// The sun up and to the right, the cloud in front of it down and to the
-    /// left, with a gap cut round the cloud so the two stay two shapes at 28 pt.
-    static func drawSky(in context: CGContext, side: CGFloat) {
-        let unit = side / 1024
-        let sun = CGRect(x: 420, y: 118, width: 486, height: 486).scaled(by: unit)
-        let cloud = CGRect(x: 118, y: 330, width: 700, height: 560).scaled(by: unit)
-
-        let sunPath = Marks.Sun().path(in: sun).cgPath
-        let cloudPath = Marks.Cloud().path(in: cloud).cgPath
-
-        context.setFillColor(warm.cgColor)
-        context.addPath(sunPath)
-        context.fillPath()
-
-        // The gap: the cloud's outline, stroked wide, erased out of the sun.
+    /// The family's signature: the top of a sun far larger than the tile,
+    /// coming up over its bottom edge, with its glow above it. The same on
+    /// every Ori icon.
+    static func drawRise(_ context: CGContext, _ side: CGFloat) {
+        let centre = CGPoint(x: side / 2, y: side * 2.02)
+        let radius = side * 1.22
+        context.drawRadialGradient(gradient([rgb(0xFFB85A, 0.55), rgb(0xFFB85A, 0)]),
+                                   startCenter: centre, startRadius: radius,
+                                   endCenter: centre, endRadius: radius + side * 0.22, options: [])
         context.saveGState()
-        context.setBlendMode(.clear)
-        context.setLineWidth(56 * unit)
-        context.setLineJoin(.round)
-        context.addPath(cloudPath)
-        context.strokePath()
+        context.addEllipse(in: CGRect(x: centre.x - radius, y: centre.y - radius, width: 2 * radius, height: 2 * radius))
+        context.clip()
+        context.drawLinearGradient(gradient([rgb(0xFFD58F), rgb(0xFFA23A)]),
+                                   start: CGPoint(x: 0, y: centre.y - radius), end: CGPoint(x: 0, y: side), options: [])
         context.restoreGState()
+    }
 
-        context.setFillColor(NSColor.white.cgColor)
-        context.addPath(cloudPath)
+    /// This droplet's sun, up and to the right, half behind the cloud: a warm
+    /// disc lit from its upper left, in its own glow.
+    static func drawSun(_ context: CGContext, _ side: CGFloat) {
+        let unit = side / 1024
+        let centre = CGPoint(x: 668 * unit, y: 318 * unit)
+        let radius = 150 * unit
+        context.drawRadialGradient(gradient([rgb(0xFFA928, 0.45), rgb(0xFFA928, 0)]),
+                                   startCenter: centre, startRadius: radius * 0.9,
+                                   endCenter: centre, endRadius: radius * 2.1, options: [])
+        context.saveGState()
+        context.addEllipse(in: CGRect(x: centre.x - radius, y: centre.y - radius, width: 2 * radius, height: 2 * radius))
+        context.clip()
+        context.drawRadialGradient(gradient([rgb(0xFFE7A0), rgb(0xFFA928)]),
+                                   startCenter: CGPoint(x: centre.x - radius * 0.3, y: centre.y - radius * 0.35),
+                                   startRadius: 0, endCenter: centre, endRadius: radius * 1.05,
+                                   options: [.drawsAfterEndLocation])
+        context.restoreGState()
+    }
+
+    /// The cloud in front, in ink, softer than the wing's three-lump glyph
+    /// because an icon is seen larger: a pill for its base and three bumps,
+    /// shaded top to bottom and resting on a soft shadow of its own.
+    static func drawCloud(_ context: CGContext, _ side: CGFloat) {
+        let unit = side / 1024
+        let rect = CGRect(x: 172 * unit, y: 320 * unit, width: 640 * unit, height: 380 * unit)
+        let path = CGMutablePath()
+        let h = rect.height, w = rect.width
+        path.addRoundedRect(in: CGRect(x: rect.minX, y: rect.minY + 0.52 * h, width: w, height: 0.48 * h),
+                            cornerWidth: 0.24 * h, cornerHeight: 0.24 * h)
+        for (x, y, r) in [(0.30, 0.56, 0.25), (0.56, 0.40, 0.38), (0.80, 0.62, 0.22)] as [(CGFloat, CGFloat, CGFloat)] {
+            path.addEllipse(in: CGRect(x: rect.minX + x * w - r * h, y: rect.minY + y * h - r * h,
+                                       width: 2 * r * h, height: 2 * r * h))
+        }
+        context.saveGState()
+        context.setShadow(offset: CGSize(width: 0, height: 20 * unit), blur: 50 * unit, color: rgb(0x0B1220, 0.25))
+        context.addPath(path)
+        context.setFillColor(rgb(0x262F42))
         context.fillPath()
+        context.restoreGState()
+        context.saveGState()
+        context.addPath(path)
+        context.clip()
+        context.drawLinearGradient(gradient([rgb(0x3A4660), rgb(0x262F42)]),
+                                   start: CGPoint(x: 0, y: rect.minY), end: CGPoint(x: 0, y: rect.maxY), options: [])
+        context.restoreGState()
     }
 
     /// OriNotch's mark: the notch, square where the bezel cuts it and round at
