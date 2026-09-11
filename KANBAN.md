@@ -261,6 +261,21 @@ Accept:
 
 Commit: `Measure what the guest costs the host`
 
+#### OW-17 · The words on the Store row
+
+P1 · S · ship
+
+Done in `1e9bb9a`.
+
+`droplet.json` filled in: `summary` under 60 characters ("OriNotch's weather, on the wing when nothing else wants it" is 58), a `description` of two paragraphs in Meric's voice, `category`, `keywords`, `screenshots` chosen from the shots and copied into `Assets/`, `creator` with his name, `community`, his URL and the avatar, `kit.minAPI` at the oldest API the code calls (1.1.0 unless a card used something newer, and the card that did says so), `minAppVersion` 15.3.0, `version` 1.0.0. `docs/notes.md` gains the review's five reasons for sending a droplet back and, beside each, the card that answered it.
+
+Accept:
+
+- [x] `droppykit validate` says "Ready to submit." and the manifest's `capabilities` is exactly `["network-client"]`.
+- [x] `overview.png` shows the summary, the creator and the icon as the Store row would.
+
+Commit: `Say what it is in sixty characters`
+
 ## In progress
 
 ## Ready
@@ -288,22 +303,11 @@ Commit: `The same weather on the other notch`
 
 ### Phase 4: ship it
 
-#### OW-17 · The words on the Store row
-
-P1 · S · ship
-
-`droplet.json` filled in: `summary` under 60 characters ("OriNotch's weather, on the wing when nothing else wants it" is 58), a `description` of two paragraphs in Meric's voice, `category`, `keywords`, `screenshots` chosen from the shots and copied into `Assets/`, `creator` with his name, `community`, his URL and the avatar, `kit.minAPI` at the oldest API the code calls (1.1.0 unless a card used something newer, and the card that did says so), `minAppVersion` 15.3.0, `version` 1.0.0. `docs/notes.md` gains the review's five reasons for sending a droplet back and, beside each, the card that answered it.
-
-Accept:
-
-- [ ] `droppykit validate` says "Ready to submit." and the manifest's `capabilities` is exactly `["network-client"]`.
-- [ ] `overview.png` shows the summary, the creator and the icon as the Store row would.
-
-Commit: `Say what it is in sixty characters`
-
 #### OW-18 · The repository and the submission
 
 P0 · M · ship
+
+In progress: the README and the licence are committed. Waiting for Meric's word on `gh repo create realmeric/OriWeather --public`, which publishes the repository, and then on the submission, whose form he completes with his name and an address.
 
 `README.md` in Meric's voice: what it is, what it needs (Droppy 15.3 or the Playground), what it sends (a rounded coordinate to Open-Meteo, a city name to its geocoder, nothing else), what it does not do (no location, no account). `LICENSE` is MIT (D7). `gh repo create realmeric/OriWeather --public --source . --push` after Meric says so. `droppykit submit` opens the intake with the repository, the commit and the id filled in and refuses on uncommitted changes, so this card commits before it runs; the `DS-` reference the page answers with is written at the top of this card on the board, and the email it arrives in is where review replies. `source.repository` and `source.commit` in the manifest name that commit, which means the manifest is written, committed, and then the commit hash is the one submitted, in that order.
 
