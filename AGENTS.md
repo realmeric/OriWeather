@@ -148,8 +148,7 @@ opens getdroppy.app/submit-droplet with the repository, commit and id filled in.
 ## This repository
 
 The work is on `KANBAN.md`: one card at a time, top of Ready first, `make test`
-as the gate, and what the machine taught along the way in `docs/notes.md`. The
-SDK checkout is read from this repository and from nowhere else. OriNotch never
-reads it, and nothing learnt here (`DroppyLiveActivityMetrics`,
-`DroppyShellMetrics`, the 70 and the 22) is carried back into OriNotch; code
-travels the other way only, copied in as this repository's own files (D2).
+as the gate, and what the machine taught along the way in `docs/notes.md`. Ori
+Weather is one of the Ori family: OriNotch is the parent, and its marks, words
+and behaviour are carried into this droplet as this repository's own files,
+never linked or imported (D2).
