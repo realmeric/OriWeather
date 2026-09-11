@@ -267,3 +267,30 @@ the board and these notes were moved to the new ones, and the old history is
 kept on the local branch `backup/before-scrub`, which is never pushed. The
 agent files are ignored now and live only on this Mac. The Makefile finds
 DroppyKit on the PATH or beside the repository, so a reviewer's clone builds.
+
+## The status widgets row (2026-09-11)
+
+Droppy's lock screen has a "Status widgets row" with two styles, horizontal
+and rounded, which the user picks in Droppy, and DroppyKit feeds it through
+`LockScreenStatusProviding`. The host draws the row from a symbol name and
+text, so this is the one surface where the weather is an SF Symbol and not the
+droplet's own mark: `sun.max.fill`, `moon.fill`, `cloud.sun.fill`,
+`cloud.moon.fill`, `cloud.fill`, `cloud.fog.fill`, `cloud.rain.fill`,
+`cloud.snow.fill`, `cloud.bolt.fill`. Both styles are filled: the horizontal
+strip is the symbol, "26°" and "Partly cloudy"; the rounded one is "26°" in the
+ring and a caption of eight letters at most ("Some sun", "Showers"), because a
+long condition under a ring is cut. A stale reading says its age in both. The
+row does not wait for "Keep on the notch", which is about the wings; Droppy's
+own switch governs the row.
+
+Locking takes the wings away, so without a change the row would have shown an
+hours-old reading as if it were fresh. The Mac locked with its screen awake is
+now the third way the weather is seen, beside the seat and the shelf: the
+distributed `com.apple.screenIsLocked` and `…Unlocked` notifications and the
+workspace's screens sleeping and waking say when, and the clock runs only
+then, and only if `lock-screen` was granted. There is no way for a droplet to
+know whether the user turned Droppy's row on, so with it off a locked, lit
+screen still reads once per interval; that is the one cost the row adds.
+
+`lock-screen` is the third capability, and the harness draws both styles on
+its Lock screen page.

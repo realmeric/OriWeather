@@ -276,6 +276,23 @@ Accept:
 
 Commit: `Say what it is in sixty characters`
 
+#### OW-20 · The status widgets row
+
+P1 · M · lock screen
+
+Done in `LOCKHASH`. Added after OW-17 at Meric's request.
+
+`LockScreenStatusProviding` for Droppy's status widgets row: the SF Symbol nearest each mark, the degrees and the condition in the horizontal style, the degrees in the ring and a short caption in the rounded one, the age when stale, nothing without a reading, independent of the pin. The Mac locked with its screen awake counts as seen, so the clock runs then and only then, and only with `lock-screen` granted.
+
+Accept:
+
+- [x] Both styles filled, by day and by night, and stale, in `LockScreenTests`; every code has a symbol and a caption of eight letters at most.
+- [x] Locked and awake runs the clock; the display asleep, unlocked or ungranted does not.
+- [x] `lock-screen.png` shows both styles, the report has `lock-screen-status` provided, and `make energy` is inside D6.
+- [ ] The row seen on the real lock screen, which needs the Mac locked.
+
+Commit: `Put the weather in the status widgets row`
+
 ## In progress
 
 ## Ready

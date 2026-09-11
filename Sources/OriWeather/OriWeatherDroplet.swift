@@ -58,6 +58,10 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
     @Published private(set) var glance: Glance?
 
     let activitySubject = CurrentValueSubject<LiveActivityState?, Never>(nil)
+    let lockScreenSubject = CurrentValueSubject<LockScreenStatusEntry?, Never>(nil)
+    /// Whether the Mac is locked with its screen awake, which is the third
+    /// way the weather is seen: the status widgets row.
+    private(set) var lockState = LockState()
 
     /// The room's city search, alive while the droplet is.
     @Published private(set) var search: CitySearch?
@@ -150,6 +154,23 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
             .receive(on: RunLoop.main)
             .sink { [weak self] _ in self?.whereaboutsChanged(zoneChanged: false) }
             .store(in: &subscriptions)
+        let distributed = DistributedNotificationCenter.default()
+        distributed.publisher(for: LockState.locked)
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in self?.lockChanged(locked: true) }
+            .store(in: &subscriptions)
+        distributed.publisher(for: LockState.unlocked)
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in self?.lockChanged(locked: false) }
+            .store(in: &subscriptions)
+        NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.screensDidSleepNotification)
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in self?.displayChanged(awake: false) }
+            .store(in: &subscriptions)
+        NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.screensDidWakeNotification)
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in self?.displayChanged(awake: true) }
+            .store(in: &subscriptions)
         // A new network is the likeliest sign of a new city. The first path
         // the monitor reports is the one the Mac is on already, and costs
         // nothing: the droplet starts stale anyway.
@@ -203,6 +224,8 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
         subscriptions.removeAll()
         glance = nil
         activitySubject.send(nil)
+        lockScreenSubject.send(nil)
+        lockState = LockState()
         seat = .none(.idle)
         isShelved = false
         host = nil
@@ -397,6 +420,11 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
     /// activity at rest whether or not it joins, so the droplet keeps its own
     /// pin: off, it publishes nothing and the weather lives on the shelf.
     private func publish() {
+        // The lock screen's row has its own switch in Droppy, so it does not
+        // wait for the pin: a reading is enough.
+        let entry = glance.map(LockScreenRow.entry)
+        if lockScreenSubject.value != entry { lockScreenSubject.send(entry) }
+
         guard let glance, pinned else {
             if activitySubject.value != nil { activitySubject.send(nil) }
             return
@@ -415,11 +443,13 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
     }
 
     /// The clock runs while somebody can see the weather: the activity is
-    /// seated, or the widget is on a shelf. The two are or-ed here and nowhere
-    /// else. Neither, no timer and no request, and the last reading stays.
+    /// seated, the widget is on a shelf, or the Mac is locked with its screen
+    /// awake and the status widgets row granted. The three are or-ed here and
+    /// nowhere else. None, no timer and no request, and the last reading stays.
     private func updateClock(because reason: WeatherModel.Reason) {
         guard let model else { return }
-        if seat.isPresented || isShelved {
+        let lockSeen = lockState.isSeen && host?.isGranted(.lockScreen) == true
+        if seat.isPresented || isShelved || lockSeen {
             if !model.isRunning, whereaboutsStale { findCity(force: false) }
             model.start(because: reason)
         } else {
@@ -432,6 +462,21 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
         isShelved = shelved
         host?.log.info(shelved ? "on a shelf" : "off every shelf")
         updateClock(because: .shelf)
+    }
+
+    /// The Mac locked or unlocked.
+    func lockChanged(locked: Bool) {
+        guard locked != lockState.isLocked else { return }
+        lockState.isLocked = locked
+        host?.log.info(locked ? "locked" : "unlocked")
+        updateClock(because: .lock)
+    }
+
+    /// The display slept or woke. Asleep, the lock screen is not seen.
+    func displayChanged(awake: Bool) {
+        guard awake != lockState.isDisplayAwake else { return }
+        lockState.isDisplayAwake = awake
+        updateClock(because: .lock)
     }
 
     func seatChanged(_ seat: DropletLiveActivitySeat) {

@@ -3,7 +3,7 @@
   "name": "Ori Weather",
   "version": "1.0.0",
   "summary": "OriNotch's weather, on the wing when nothing else wants it",
-  "description": "The weather from OriNotch, on Droppy's notch. When nothing else wants the notch, the wing carries a mark and the temperature; hover it and it grows into a card with the condition, the city and what it feels like. Put it on the shelf and it sits there too, alone or beside another widget. Control-Option-Command-W puts it on the wings or takes it off.\n\nIt finds your city from your internet address, checked against your time zone, or reads the city you name, so it asks for no location permission and no account. Open-Meteo is sent a coordinate rounded to about a kilometre, once every half hour unless you choose otherwise, and only while the weather is on screen. When the network goes, the last reading stays up, dimmed, with how old it is where the condition was.",
+  "description": "The weather from OriNotch, on Droppy's notch. When nothing else wants the notch, the wing carries a mark and the temperature; hover it and it grows into a card with the condition, the city and what it feels like. Put it on the shelf and it sits there too, alone or beside another widget, and in the status widgets row while the Mac is locked. Control-Option-Command-W puts it on the wings or takes it off.\n\nIt finds your city from your internet address, checked against your time zone, or reads the city you name, so it asks for no location permission and no account. Open-Meteo is sent a coordinate rounded to about a kilometre, once every half hour unless you choose otherwise, and only while the weather is on screen. When the network goes, the last reading stays up, dimmed, with how old it is where the condition was.",
   "category": "Productivity",
   "kit": {
     "abi": 1,
@@ -12,12 +12,14 @@
   "minAppVersion": "15.3.0",
   "capabilities": [
     "network-client",
-    "global-shortcuts"
+    "global-shortcuts",
+    "lock-screen"
   ],
   "surfaces": [
     "live-activity",
     "shelf-widget",
-    "settings-pane"
+    "settings-pane",
+    "lock-screen-status"
   ],
   "icon": "OriWeather.icon",
   "creator": {

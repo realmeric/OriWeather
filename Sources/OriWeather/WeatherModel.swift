@@ -22,6 +22,9 @@ final class WeatherModel: ObservableObject {
         case shelf
         /// Activation, which reads once so there is something to publish.
         case launch
+        /// The Mac locked with its screen awake, where the status widgets
+        /// row shows the weather.
+        case lock
     }
 
     @Published private(set) var reading: WeatherReading?
@@ -111,7 +114,7 @@ final class WeatherModel: ObservableObject {
         switch reason {
         case .clock, .city:
             break
-        case .seat, .shelf, .launch:
+        case .seat, .shelf, .launch, .lock:
             if let lastAttempt, when.timeIntervalSince(lastAttempt) < every { return }
         }
         now = when

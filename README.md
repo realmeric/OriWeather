@@ -8,6 +8,10 @@ feels like. Put it on the shelf and it sits there too, alone or beside another
 widget. When the network goes, the last reading stays up, dimmed, with how old
 it is where the condition was.
 
+While the Mac is locked it sits in Droppy's status widgets row too, as a
+symbol, the degrees and the condition, or the degrees in a ring, whichever
+style you picked in Droppy.
+
 "Keep on the notch" decides whether it takes the wings at all; off, it stays
 on the shelf. Control-Option-Command-W flips it from anywhere, and Droppy's Settings,
 Shortcuts, rebinds it. A press without all three never flips it.
@@ -56,8 +60,8 @@ zone only catches it when it lies. The address can still be wrong inside a
 country, a VPN exit in the same zone or a mobile network's gateway in the next
 city, which is what the city field is for.
 
-It does not run while you cannot see it. Off the notch and off the shelf there
-is no timer and no request; the last reading waits until it is shown again, and
+It does not run while you cannot see it. Off the notch, off the shelf and off
+a lit lock screen there is no timer and no request; the last reading waits until it is shown again, and
 is only fetched again if it is older than the interval.
 
 ## Building it
