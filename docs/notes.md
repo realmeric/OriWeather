@@ -199,3 +199,19 @@ so that is where this one is.
 run (the host stores it as JSON data under `droplet.ori-weather.pinned`) and
 puts the user's value back afterwards; both runs use the demo sky, so the
 unseated run has a reading and holds no seat, which is the case D6 is about.
+
+## Seen in the Playground (2026-09-11)
+
+With the Playground's window given to the session, on the build of `c05350b`:
+with "Keep on the notch" off the notch carried nothing; turned on, the leading
+wing showed the sun and the trailing one 17° for Kaunas within a second, and
+the log said `seat is now compact` and `clock started (seat)`; turned off
+again, the wings cleared. The room rendered in the Store row's page with the
+automatic toggle, the city, the unit and interval pickers, the pin and the
+shortcut bound as ⌃⌥W. Typing "Istanbul" logged one geocoder request and
+listed Istanbul and İstanbulboğazı, Ordu, both "Türkiye", no airports. The
+Store row's page showed both screenshots and the two capabilities in words,
+"Connect to the internet" and "Use keyboard shortcuts".
+
+Not seen: the shelf and the hover card, which open only when the pointer is on
+the notch, and music taking the seat. Those need the screen, not the window.
