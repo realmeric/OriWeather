@@ -216,8 +216,42 @@ enum Marks {
 }
 
 /// One part of a mark as a SwiftUI shape.
+///
+/// The parts are built with path arithmetic (unions, a gap cut round the part
+/// in front, a ray dropped when the cloud would cut it), which is too much work
+/// to repeat every time the host lays the wing out. Each part is built once
+/// and kept; drawing it at any size is a scale and a move.
 struct MarkPart: Shape {
-    let part: Marks.Part
+    let mark: WeatherCode.Mark
+    let isDay: Bool
+    let index: Int
 
-    func path(in rect: CGRect) -> Path { Path(part.path(rect)) }
+    func path(in rect: CGRect) -> Path {
+        let built = MarkCache.parts(mark, isDay: isDay)[index]
+        let side = min(rect.width, rect.height)
+        let scale = side / MarkCache.canvas
+        var place = CGAffineTransform(translationX: rect.midX - side / 2, y: rect.midY - side / 2)
+            .scaledBy(x: scale, y: scale)
+        return Path(built.copy(using: &place) ?? built)
+    }
+}
+
+/// Every mark's parts, built once on a 1000 point canvas: Core Graphics
+/// flattens round caps and curves to a fixed precision in absolute units, so
+/// a part stroked in a one-point square comes out visibly smaller.
+enum MarkCache {
+    static let canvas: CGFloat = 1000
+    private static let lock = NSLock()
+    nonisolated(unsafe) private static var built: [String: [CGPath]] = [:]
+
+    static func parts(_ mark: WeatherCode.Mark, isDay: Bool) -> [CGPath] {
+        let key = "\(mark)-\(isDay)"
+        return lock.withLock {
+            if let parts = built[key] { return parts }
+            let square = CGRect(x: 0, y: 0, width: canvas, height: canvas)
+            let parts = Marks.parts(mark, isDay: isDay).map { $0.path(square) }
+            built[key] = parts
+            return parts
+        }
+    }
 }

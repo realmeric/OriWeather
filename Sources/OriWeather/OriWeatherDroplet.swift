@@ -75,6 +75,9 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
     /// Whether the pin is on when nobody has said: off, except under the demo
     /// sky.
     private var pinnedByDefault = false
+    /// The demo sky, if one is on. It has its own city and never writes one
+    /// into the user's preferences.
+    private var demo: Demo.Mode?
     private var subscriptions: Set<AnyCancellable> = []
     private let fetcherOverride: (any WeatherFetching)?
     private let geocoderOverride: (any Geocoding)?
@@ -124,6 +127,7 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
         self.host = host
         let preferences = Preferences(service: host.preferences)
         let demo = Demo.mode(isHarness: host.environment.isHarness)
+        self.demo = demo
         pinnedByDefault = demo != nil
         let model = WeatherModel(fetcher: fetcher(for: host, demo: demo),
                                  city: preferences.city ?? (demo == nil ? nil : Demo.city),
@@ -305,6 +309,9 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
     /// only when the Mac may have moved and not within ten minutes of the last
     /// lookup, unless there is no city at all.
     func findCity(force: Bool) {
+        // Under the demo sky the city is the demo's, and a found one would be
+        // written into the user's real preferences.
+        guard demo == nil else { return }
         guard let preferences, preferences.automatic, let geocoder, let locator else { return }
         if !force, preferences.city != nil {
             guard whereaboutsStale else { return }

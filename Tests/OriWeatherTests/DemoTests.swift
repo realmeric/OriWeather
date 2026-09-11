@@ -1,3 +1,5 @@
+import DroppyKit
+import DroppyKitHarness
 import XCTest
 @testable import OriWeather
 
@@ -44,5 +46,34 @@ final class DemoTests: XCTestCase {
         XCTAssertEqual(model.reading?.degrees, "26°")
         let age = try XCTUnwrap(model.reading.map { Ago.words($0.at, at: model.now) })
         XCTAssertEqual(age, "2 h ago")
+    }
+}
+
+@MainActor
+final class DemoPreferencesTests: XCTestCase {
+    /// The harness is a demo sky; finding a city there would write the demo's
+    /// city into preferences, and in the Playground those are the user's own.
+    func testTheDemoSkyWritesNoCity() async throws {
+        let droplet = OriWeatherDroplet()
+        let test = TestHost(city: nil)
+        let harness = DropletHost(
+            grantedCapabilities: [.networkClient],
+            preferences: test.preferences,
+            environment: HarnessEnvironmentService(appVersion: "15.3.0", dropletID: OriWeatherDroplet.id),
+            log: HarnessLogService(recorder: test.recorder),
+            installState: test.installState,
+            hud: HarnessHUDService(recorder: test.recorder),
+            shelf: HarnessShelfService(recorder: test.recorder),
+            liveActivity: test.liveActivity,
+            notchSurface: HarnessNotchSurfaceService(recorder: test.recorder, dropletID: OriWeatherDroplet.id),
+            shortcuts: HarnessShortcutsService(recorder: test.recorder),
+            workspace: HarnessWorkspaceService(recorder: test.recorder),
+            feedback: HarnessFeedbackService(recorder: test.recorder),
+            permissions: HarnessPermissionsService(recorder: test.recorder))
+        try droplet.activate(host: harness)
+        await settle()
+        XCTAssertEqual(droplet.glance?.city, Demo.city, "the demo sky shows its own city")
+        XCTAssertFalse(test.preferences.hasValue(forKey: Preferences.Key.city), "and stores none")
+        droplet.deactivate()
     }
 }

@@ -28,6 +28,25 @@ final class MarksTests: XCTestCase {
     }
 }
 
+final class MarkCacheTests: XCTestCase {
+    /// A part built once in a unit square and scaled lands exactly where the
+    /// same part built at that size does.
+    func testACachedPartIsTheSamePartScaled() {
+        let rect = CGRect(x: 3, y: 5, width: 20, height: 13)
+        for mark in WeatherCode.Mark.allCases {
+            for isDay in [true, false] {
+                for (index, part) in Marks.parts(mark, isDay: isDay).enumerated() {
+                    let direct = part.path(rect).boundingBoxOfPath
+                    let cached = MarkPart(mark: mark, isDay: isDay, index: index).path(in: rect).cgPath.boundingBoxOfPath
+                    XCTAssertEqual(direct.minX, cached.minX, accuracy: 0.01, "\(mark) \(index)")
+                    XCTAssertEqual(direct.maxY, cached.maxY, accuracy: 0.01, "\(mark) \(index)")
+                    XCTAssertEqual(direct.width, cached.width, accuracy: 0.01, "\(mark) \(index)")
+                }
+            }
+        }
+    }
+}
+
 final class LookTests: XCTestCase {
     /// `Look.swift` is the only file under `Sources/OriWeather/` with a literal
     /// colour or a literal point size in it. A number in a view is a number

@@ -294,3 +294,30 @@ screen still reads once per interval; that is the one cost the row adds.
 
 `lock-screen` is the third capability, and the harness draws both styles on
 its Lock screen page.
+
+## Three things the energy check caught after the row went in (2026-09-11)
+
+The first run after the status widgets row failed, and the table was right to:
+the Playground had updated itself to 1.0.11 and relaunched partway through,
+with a browser busy beside it, so its baseline read 17 wakeups a second. Two
+changes to the script came of it. It had printed "fail" in its table and
+"inside D6" underneath, because each verdict was worked out inside `$(…)`,
+where setting `failed` never reaches the script; the verdicts are read from
+what they print now. And a baseline over 1% CPU or six wakeups a second is a
+busy Mac, reported as such and never judged.
+
+On a quiet Mac the seated run then cost the Playground 0.27% more CPU than no
+droplet at all, where the builds before had cost about 0.05%. The unseated run
+matched the baseline, observers and all, so the cost was drawing the wing: the
+partly cloudy mark (code 2, the demo sky's) does path arithmetic (a union, a
+gap cut round the cloud, rays tested against it) in `path(in:)`, and the host
+lays the wing out often. Each mark's parts are now built once, on a 1000 point
+canvas because Core Graphics flattens round caps to a fixed precision in
+absolute units and a part stroked in a one-point square comes out small, and
+scaled on every draw. Two quiet runs after: seated 0.365% against 0.338%, and
+0.323% against 0.372%, and wakeups within noise.
+
+The same log showed the demo sky's automatic location "finding" the demo city
+and able to write it into the Playground's preferences, which are the user's
+own. Under the demo sky the city is the demo's and nothing is found or
+written.

@@ -168,18 +168,30 @@ measure unseated --env OW_DEMO=1
 # --- the verdict ----------------------------------------------------------
 
 failed=0
-verdict() { # verdict <run>: the run against the baseline
+verdict() { # verdict <run>: the run against the baseline, printed
     local run=$1
     local w=${(P)${:-wakeups_$run}} c=${(P)${:-cpu_$run}}
-    local ok=$(awk -v w="$w" -v b="$wakeups_removed" -v c="$c" -v bc="$cpu_removed" \
+    awk -v w="$w" -v b="$wakeups_removed" -v c="$c" -v bc="$cpu_removed" \
         -v nw="$NOISE_WAKEUPS" -v nf="$NOISE_FRACTION" -v nc="$NOISE_CPU" \
-        'BEGIN { n = nw; if (b * nf > n) n = b * nf; print (w - b <= n && c - bc <= nc) ? "pass" : "fail" }')
-    [[ "$ok" == "fail" ]] && failed=1
-    print "$ok"
+        'BEGIN { n = nw; if (b * nf > n) n = b * nf; print (w - b <= n && c - bc <= nc) ? "pass" : "fail" }'
 }
+
+# Captured in a subshell, so the failure is read from what it printed: a
+# variable set inside $(…) never reaches this shell, which is how an early
+# version of this script printed "fail" in the table and passed anyway.
+# A baseline this loud is a busy Mac, not a Playground at rest: the same
+# build has read 1.0 wakeups a second quiet and 18 with a browser working,
+# and a verdict against 18 is a verdict about the browser.
+if awk -v c="$cpu_removed" -v w="$wakeups_removed" 'BEGIN { exit !(c > 1.0 || w > 6) }'; then
+    failed=1
+    busy_line="The baseline itself was busy ($cpu_removed% CPU, $wakeups_removed wakeups a second), so nothing here is a verdict; measure again on a quiet Mac."
+else
+    busy_line=""
+fi
 
 seated_verdict=$(verdict seated)
 unseated_verdict=$(verdict unseated)
+[[ "$seated_verdict" == "fail" || "$unseated_verdict" == "fail" ]] && failed=1
 
 if [[ "$loaded_seated" -lt 1 || "$loaded_unseated" -lt 1 ]]; then
     failed=1
@@ -224,6 +236,7 @@ mkdir -p docs/energy
     print "cost at most $NOISE_CPU% more CPU; the unseated run may start no clock."
     print ""
     print "$load_line"
+    [[ -n "$busy_line" ]] && print "$busy_line"
     print "Unseated and unshelved: $clock_line."
 } > "$report"
 

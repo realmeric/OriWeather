@@ -51,10 +51,11 @@ struct WeatherMark: View {
     @Environment(\.weatherInk) private var ink
 
     var body: some View {
-        let parts = Marks.parts(WeatherCode.mark(code), isDay: isDay)
+        let mark = WeatherCode.mark(code)
+        let parts = Marks.parts(mark, isDay: isDay)
         ZStack {
             ForEach(parts.indices, id: \.self) { index in
-                MarkPart(part: parts[index]).fill(color(parts[index].tone))
+                MarkPart(mark: mark, isDay: isDay, index: index).fill(color(parts[index].tone))
             }
         }
     }
