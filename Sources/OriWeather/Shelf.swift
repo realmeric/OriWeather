@@ -36,6 +36,13 @@ extension OriWeatherDroplet: ShelfWidgetProviding {
 struct WeatherWidget: View {
     @ObservedObject var droplet: OriWeatherDroplet
     let context: ShelfWidgetContext
+    /// The user's Widget Text colour, when the host hands one down. Read from
+    /// the SDK's own key: a local key of the same name would never receive it.
+    @Environment(\.dropletShelfWidgetTextColor) private var textColor
+
+    private var ink: WeatherInk {
+        .shelf(textColor: textColor, adaptive: context.usesAdaptiveForegrounds)
+    }
 
     var body: some View {
         Group {
@@ -48,12 +55,13 @@ struct WeatherWidget: View {
             } else {
                 Text(verbatim: "Choose a city in the droplet's settings.")
                     .font(.system(size: DroppyLiveActivityMetrics.labelFontSize))
-                    .foregroundStyle(AdaptiveColors.notchSurfaceTertiaryText)
+                    .foregroundStyle(ink.tertiary)
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
             }
         }
         .padding(DroppySpacing.mdl)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .environment(\.weatherInk, ink)
     }
 }
 
@@ -61,6 +69,7 @@ struct WeatherWidget: View {
 /// feels like, and how old the reading is on a line of its own.
 private struct SoloWeather: View {
     let glance: Glance
+    @Environment(\.weatherInk) private var ink
 
     var body: some View {
         VStack(alignment: .leading, spacing: DroppySpacing.sm) {
@@ -72,26 +81,26 @@ private struct SoloWeather: View {
                     Text(verbatim: glance.degrees)
                         .font(.system(size: Look.shelfFigure, weight: .semibold))
                         .monospacedDigit()
-                        .foregroundStyle(AdaptiveColors.notchSurfacePrimaryText)
+                        .foregroundStyle(ink.primary)
                     Text(verbatim: glance.condition)
                         .font(.system(size: DroppyLiveActivityMetrics.labelFontSize, weight: .medium))
-                        .foregroundStyle(AdaptiveColors.notchSurfaceSecondaryText)
+                        .foregroundStyle(ink.secondary)
                 }
                 Spacer(minLength: 0)
                 VStack(alignment: .trailing, spacing: 0) {
                     Text(verbatim: glance.city.name)
                         .font(.system(size: DroppyLiveActivityMetrics.labelFontSize, weight: .medium))
-                        .foregroundStyle(AdaptiveColors.notchSurfaceSecondaryText)
+                        .foregroundStyle(ink.secondary)
                     Text(verbatim: "Feels like \(glance.feelsLike)")
                         .font(.system(size: DroppyLiveActivityMetrics.labelFontSize))
                         .monospacedDigit()
-                        .foregroundStyle(AdaptiveColors.notchSurfaceTertiaryText)
+                        .foregroundStyle(ink.tertiary)
                 }
             }
             Spacer(minLength: 0)
             Text(verbatim: glance.age)
                 .font(.system(size: DroppyLiveActivityMetrics.labelFontSize))
-                .foregroundStyle(AdaptiveColors.notchSurfaceTertiaryText)
+                .foregroundStyle(ink.tertiary)
         }
         .lineLimit(1)
         .opacity(glance.isStale ? Look.staleOpacity : 1)
@@ -103,6 +112,7 @@ private struct SoloWeather: View {
 /// them when the slot is tall enough for one more line.
 private struct PairedWeather: View {
     let glance: Glance
+    @Environment(\.weatherInk) private var ink
 
     var body: some View {
         VStack(alignment: .leading, spacing: DroppySpacing.xs) {
@@ -113,12 +123,12 @@ private struct PairedWeather: View {
                 Text(verbatim: glance.degrees)
                     .font(.system(size: Look.shelfFigure, weight: .semibold))
                     .monospacedDigit()
-                    .foregroundStyle(AdaptiveColors.notchSurfacePrimaryText)
+                    .foregroundStyle(ink.primary)
             }
             ViewThatFits(in: .vertical) {
                 Text(verbatim: glance.detail)
                     .font(.system(size: DroppyLiveActivityMetrics.labelFontSize, weight: .medium))
-                    .foregroundStyle(AdaptiveColors.notchSurfaceSecondaryText)
+                    .foregroundStyle(ink.secondary)
                 EmptyView()
             }
             Spacer(minLength: 0)

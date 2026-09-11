@@ -1,3 +1,4 @@
+import DroppyKit
 import SwiftUI
 import XCTest
 @testable import OriWeather
@@ -62,5 +63,17 @@ final class LookTests: XCTestCase {
             }
         }
         XCTAssertEqual(offenders, [], "a number of this droplet's own outside Look.swift")
+    }
+}
+
+final class InkTests: XCTestCase {
+    /// On the shelf the host's Widget Text colour wins, then the adaptive
+    /// text when the shelf is transparent, then the notch's own ladder.
+    func testTheShelfWritesInWhateverTheHostAsksFor() {
+        XCTAssertEqual(WeatherInk.shelf(textColor: .red, adaptive: true).primary, .red)
+        XCTAssertEqual(WeatherInk.shelf(textColor: nil, adaptive: true).primary,
+                       AdaptiveColors.primaryTextAuto)
+        XCTAssertEqual(WeatherInk.shelf(textColor: nil, adaptive: false).primary,
+                       AdaptiveColors.notchSurfacePrimaryText)
     }
 }
