@@ -76,24 +76,26 @@ Accept:
 
 Commit: `Ask Open-Meteo where a city is instead of asking macOS where the Mac is`
 
-## In progress
-
-## Ready
-
-### Phase 1: a droplet that loads
-
 #### OW-4 · The model
 
 P0 · M · model
+
+Done in `a457d7e`.
 
 `WeatherModel`, OriNotch's shape without its location half: a fetcher, a city, a clock, `reading`, `isStale`, and `now` published on every attempt and never between them, so an old reading's age is right when it is drawn and no clock ticks for a figure that changes twice an hour (D6). `every` from the preference `intervalMinutes` (15, 30 or 60, default 30) times 60. `start()` registers the clock and refreshes at once, `stop()` invalidates it, `isRunning` says which, and `refresh(at:)` is what a seat or a shelf calls with a reason. A refused read leaves the last reading up and sets `isStale`; nothing was ever read is `nil`, not stale. The model knows nothing about seats or widgets: OW-6 and OW-11 decide when to start it.
 
 Accept:
 
-- [ ] `WeatherModelTests`: it reads and puts a temperature up; a refused read leaves the last one up and dimmed; off costs nothing (a model built and never started has called nothing, with an actor counting the fetcher's calls); the clock lives as long as the feature does; with no city nothing is fetched.
-- [ ] `refresh(at:)` with a `now` inside the interval of the last successful reading is a no-op, asserted with a fixed date and the counting fetcher.
+- [x] `WeatherModelTests`: it reads and puts a temperature up; a refused read leaves the last one up and dimmed; off costs nothing (a model built and never started has called nothing, with an actor counting the fetcher's calls); the clock lives as long as the feature does; with no city nothing is fetched.
+- [x] `refresh(at:)` with a `now` inside the interval of the last successful reading is a no-op, asserted with a fixed date and the counting fetcher.
 
 Commit: `A model that reads on a clock it can put down`
+
+## In progress
+
+## Ready
+
+### Phase 1: a droplet that loads
 
 #### OW-5 · The marks and the look
 

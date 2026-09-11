@@ -76,15 +76,15 @@ private struct OriWeatherWidget: View {
         VStack(alignment: .leading, spacing: DroppySpacing.sm) {
             HStack(spacing: DroppySpacing.xsm) {
                 Image(systemName: "drop.fill")
-                    .font(.system(size: 12, weight: .medium))
+                    .font(.system(size: DroppyLiveActivityMetrics.labelFontSize, weight: .medium))
                 Text("Ori Weather")
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.system(size: DroppyLiveActivityMetrics.labelFontSize, weight: .semibold))
                 Spacer(minLength: 0)
             }
             .foregroundStyle(AdaptiveColors.notchSurfaceSecondaryText)
 
             Text(context.isCompact ? "Compact" : "Standalone")
-                .font(.system(size: 22, weight: .semibold, design: .rounded))
+                .font(.system(size: Look.cardFigure, weight: .semibold))
                 .foregroundStyle(AdaptiveColors.notchSurfacePrimaryText)
 
             Spacer(minLength: 0)
