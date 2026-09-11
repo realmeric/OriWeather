@@ -231,6 +231,21 @@ Accept:
 
 Commit: `A sky the harness can count on`
 
+#### OW-15 · The icon and the avatar
+
+P1 · M · look
+
+Done in `0d87c6d`. The 28 pt render is `shots/icon-28pt.png` (and `@2x`): a sun and a cloud, so the cloud kept its lumps.
+
+`scripts/make-icon.swift` renders the sun behind a cloud, this repo's own shapes, into `OriWeather.icon/Assets/mark.png` at 1024 with the artwork inside the centre 820, no baked corners and no shadow, because Icon Composer adds both; `OriWeather.icon/icon.json` declares one group, one layer at scale 0.8, a flat fill and no gradient of consequence. `Assets/Creator.png` is Meric's mark, square, unrounded, at least 256 px, rendered by the same script from OriNotch's notch-with-wings unless he hands over another; the Store clips it to a circle itself. `make icon` runs the script and is part of `make test`'s validate step by way of `droppykit validate`.
+
+Accept:
+
+- [x] `droppykit validate` passes the icon and the avatar checks, and `overview.png` shows the icon on the identity card.
+- [x] The icon read at 28 pt (a 28 by 28 render from the same script, kept beside the shots) is a sun and a cloud and not a blob; if it is a blob, the cloud loses a lump before the rays get sharper.
+
+Commit: `An icon that is a sun behind a cloud`
+
 ## In progress
 
 ## Ready
@@ -255,19 +270,6 @@ Accept:
 Commit: `The same weather on the other notch`
 
 ### Phase 3: the shelf and the room
-
-#### OW-15 · The icon and the avatar
-
-P1 · M · look
-
-`scripts/make-icon.swift` renders the sun behind a cloud, this repo's own shapes, into `OriWeather.icon/Assets/mark.png` at 1024 with the artwork inside the centre 820, no baked corners and no shadow, because Icon Composer adds both; `OriWeather.icon/icon.json` declares one group, one layer at scale 0.8, a flat fill and no gradient of consequence. `Assets/Creator.png` is Meric's mark, square, unrounded, at least 256 px, rendered by the same script from OriNotch's notch-with-wings unless he hands over another; the Store clips it to a circle itself. `make icon` runs the script and is part of `make test`'s validate step by way of `droppykit validate`.
-
-Accept:
-
-- [ ] `droppykit validate` passes the icon and the avatar checks, and `overview.png` shows the icon on the identity card.
-- [ ] The icon read at 28 pt (a 28 by 28 render from the same script, kept beside the shots) is a sun and a cloud and not a blob; if it is a blob, the cloud loses a lump before the rays get sharper.
-
-Commit: `An icon that is a sun behind a cloud`
 
 #### OW-16 · What the droplet costs the Playground
 

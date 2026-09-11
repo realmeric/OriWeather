@@ -46,8 +46,11 @@ offline: shots
 install: build
 	scripts/install.sh
 
-energy:
-	@echo "make energy arrives with OW-16."
+# What the droplet costs the Playground (D6): three minutes of top against
+# the host with the droplet removed, seated, and unseated. Part of the gate
+# from OW-16 on, run after make test because it relaunches the Playground.
+energy: build
+	scripts/energy.sh
 
 clean:
 	rm -rf .build shots
