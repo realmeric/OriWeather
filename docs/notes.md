@@ -202,7 +202,7 @@ unseated run has a reading and holds no seat, which is the case D6 is about.
 
 ## Seen in the Playground (2026-09-11)
 
-With the Playground's window given to the session, on the build of `c05350b`:
+With the Playground's window given to the session, on the build of `0a5b1c6`:
 with "Keep on the notch" off the notch carried nothing; turned on, the leading
 wing showed the sun and the trailing one 17° for Kaunas within a second, and
 the log said `seat is now compact` and `clock started (seat)`; turned off
@@ -255,3 +255,15 @@ The shortcut is Control-Option-Command-W since Meric asked for it. Pressed on
 the real screen with the Playground in front: W typed "w", Control-Option-W
 now does nothing, and Control-Option-Command-W took the weather off the wings
 and put it back.
+
+## Before the repository went public (2026-09-11)
+
+The macOS home folder, which is Meric's full name, was in `.mcp.json`,
+`.cursor/` and `AGENTS.md` from the first commit, because `droppykit agent`
+writes absolute paths. Before anything was pushed, the history was rewritten
+with `git filter-branch`: the two agent files taken out of every commit and
+the paths in `AGENTS.md` made relative (`../droppykit`). Every hash changed;
+the board and these notes were moved to the new ones, and the old history is
+kept on the local branch `backup/before-scrub`, which is never pushed. The
+agent files are ignored now and live only on this Mac. The Makefile finds
+DroppyKit on the PATH or beside the repository, so a reviewer's clone builds.

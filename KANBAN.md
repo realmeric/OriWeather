@@ -32,7 +32,7 @@ Each is written with the recommended option as the default. Strike the other or 
 
 P0 · M · setup
 
-Done in `7bb44b3`. The scaffold needed `source.commit` filled before it validated (docs/notes.md). The Store row was read through the loader's log line, "Droplet ori-weather 1.0.0 activated", because the session was not given the Playground's window.
+Done in `933baa3`. The scaffold needed `source.commit` filled before it validated (docs/notes.md). The Store row was read through the loader's log line, "Droplet ori-weather 1.0.0 activated", because the session was not given the Playground's window.
 
 Clone `https://gitlab.com/droppyformac1/droppykit.git` at tag v1.2.1 to `~/Documents/Projects/apps/droppykit`, put its `Scripts` on the PATH for the session, and in `~/Documents/Projects/apps` run `droppykit new ori-weather --name "Ori Weather"`, which writes a package that builds, a manifest that validates, a starter icon document, a placeholder avatar and, at the end, `droppykit agent`'s brief. Move the folder to `OriWeather` (the MCP wiring names the SDK's `Scripts`, not this folder, so the move costs nothing; check both `.mcp.json` files anyway). `git init`, the SDK's `.gitignore` plus `shots/`. A `Makefile` with `test` (the gate as the top of the board describes it), `build`, `shots`, `install` (copy `.build/OriWeather.droplet` to `~/Library/Application Support/Droppy Playground/Droplets/ori-weather/`, quit and relaunch the Playground, which is what the MCP `droppykit_install` tool does), `energy` (a placeholder that says OW-16 until then) and `clean`. `docs/notes.md` opened with the three facts this card learns on the machine (which build engine `droppykit build` chose, where the bundle landed, what the Playground's Store row said). `AGENTS.md` keeps the SDK's brief and gains one paragraph under it pointing at this board and the Ori family. A first test that asserts `OriWeatherDroplet.id == "ori-weather"`.
 
@@ -49,7 +49,7 @@ Commit: `A droplet that loads and says nothing yet`
 
 P0 · S · model
 
-Done in `e9f25ca`.
+Done in `ba31acf`.
 
 `WeatherReading`, `WeatherCode` with its marks and words, `Place` with its two-decimal rounding, `WeatherFetching`, `OpenMeteo` with `url(for:)` and `reading(from:now:)`, `WeatherError` and `Ago`, copied from OriNotch's `Weather.swift` and `Notices.swift` as this repo's own files under `Sources/OriWeather/Sky/`, with `OpenMeteoTests` beside them: the recorded body from 2026-09-08 kept inline so no test reaches the network, the local wall clock with the offset beside it (14:00 in Istanbul is 11:00 UTC), the coordinate rounded before it is sent, the code table saying what to draw. Nothing in these files imports DroppyKit.
 
@@ -64,7 +64,7 @@ Commit: `Read the sky the way OriNotch reads it`
 
 P0 · M · model
 
-Done in `cf85183`.
+Done in `0b5a779`.
 
 `City` (name, region, country, `Place`, time zone identifier), `Geocoding` as a protocol, and `OpenMeteoGeocoder` against `https://geocoding-api.open-meteo.com/v1/search` with `name`, `count=5`, `language=en` and `format=json`: the answer's `results` carry `name`, `admin1`, `country`, `latitude`, `longitude` and `timezone`, and the reader keeps those and nothing else. The chosen city is stored under the preference key `city` as JSON through `DropletPreferencesService`, which is `Codable` in and out. A recorded answer for "Istanbul" is kept inline in `GeocoderTests` the way the forecast body is, taken when the card is built and dated in `docs/notes.md`.
 
@@ -80,7 +80,7 @@ Commit: `Ask Open-Meteo where a city is instead of asking macOS where the Mac is
 
 P0 · M · model
 
-Done in `a457d7e`.
+Done in `83767dc`.
 
 `WeatherModel`, OriNotch's shape without its location half: a fetcher, a city, a clock, `reading`, `isStale`, and `now` published on every attempt and never between them, so an old reading's age is right when it is drawn and no clock ticks for a figure that changes twice an hour (D6). `every` from the preference `intervalMinutes` (15, 30 or 60, default 30) times 60. `start()` registers the clock and refreshes at once, `stop()` invalidates it, `isRunning` says which, and `refresh(at:)` is what a seat or a shelf calls with a reason. A refused read leaves the last reading up and sets `isStale`; nothing was ever read is `nil`, not stale. The model knows nothing about seats or widgets: OW-6 and OW-11 decide when to start it.
 
@@ -95,7 +95,7 @@ Commit: `A model that reads on a clock it can put down`
 
 P1 · M · look
 
-Done in `eea59b6`.
+Done in `a4f1015`.
 
 `Marks.swift`: the six shapes from OriNotch's `Glyphs.swift`, `Sun`, `Cloud`, `Rain`, `Snow`, `Fog` and `Bolt`, as this repo's own `Shape`s. `Look.swift`: every number and colour of this repo's own in one place, which is the tints (the sun and the bolt in a warm yellow, rain in a blue, snow in the primary white, fog in the tertiary white, cloud in the secondary), the stale opacity 0.55, and the card glyph size 20 that the host has no token for. Everything else a view needs comes from `DroppyLiveActivityMetrics`, `DroppySpacing`, `DroppyRadius` and `AdaptiveColors`. `WeatherMark(code:isDay:)` picks the shape and the tint; by night the sun is drawn in the secondary white, as OriNotch draws it. `docs/look.md` opened with the two surfaces described from OriNotch's `WeatherView.swift`, in this repo's words.
 
@@ -110,7 +110,7 @@ Commit: `Six marks and one file that says what colour they are`
 
 P0 · L · wing
 
-Done in `5f52d8a`. The pin half of the fifth box was seen after OW-17 (docs/notes.md, "Seen in the Playground"): off, nothing on the wings; on, the mark and the degrees. The music half still waits for eyes on the Playground: its window was not given to this session. What the log said instead is in docs/notes.md under OW-6, and it is not what D5 expected: with pinning off the Playground still reports the compact seat at rest.
+Done in `c01c15f`. The pin half of the fifth box was seen after OW-17 (docs/notes.md, "Seen in the Playground"): off, nothing on the wings; on, the mark and the degrees. The music half still waits for eyes on the Playground: its window was not given to this session. What the log said instead is in docs/notes.md under OW-6, and it is not what D5 expected: with pinning off the Playground still reports the compact seat at rest.
 
 `OriWeatherDroplet` conforms to `LiveActivityProviding` and the manifest lists `live-activity` under `surfaces` and `network-client` under `capabilities`, and nothing else in either. `liveActivityState` is a `CurrentValueSubject<LiveActivityState?, Never>` fed from the model: `nil` with no city or no reading; otherwise priority 10, the accessibility title "26 degrees, partly cloudy, Istanbul", `isInteractive: false`, `joinsPersistentActivitySet` from the preference `pinned` (default false), and `expandedWidgetID: "weather"` so a tap on the pill opens OW-11's widget once it exists. `makeCompactLeading()` is the mark at `iconSize`; `makeCompactTrailing()` is the degrees at `labelFontSize`, medium, plain SF, `monospacedDigit()`, in `notchSurfacePrimaryText`; neither adds padding of its own. `liveActivitySeatDidChange` is where the clock lives: seated, `model.start()`; `.none`, `model.stop()`, unless OW-11's widget is on a shelf. `activate(host:)` reads the city and the preferences and subscribes to `preferences.didChange` so a new city refetches and a flipped pin republishes; `deactivate()` stops the clock, cancels every subscription and drops the host.
 
@@ -128,7 +128,7 @@ Commit: `Put the temperature on the wing when nothing else wants it`
 
 P1 · M · wing
 
-Done in `78c51d0`. The stale shot is `shots/stale/live-activity.png`, taken with `OW_DEMO=stale droppykit run -- --shots ./shots/stale`.
+Done in `9935670`. The stale shot is `shots/stale/live-activity.png`, taken with `OW_DEMO=stale droppykit run -- --shots ./shots/stale`.
 
 `makeExpanded(context:)`, the card the compact row grows into on hover, `context.availableWidth` by `cardContentHeight` (59) and not a point taller, because a taller view is clipped without a word. Left, the mark at `Look.cardMark` (20); then the degrees large (20, semibold, monospaced digits, primary) with the condition under them in the tertiary white; right, the city in the secondary white and under it "Feels like 24°", or, when the reading is stale, `Ago.words` in place of the condition and the whole card at `Look.staleOpacity`. Nothing avoids the camera housing: the host has already inset the card below it.
 
@@ -143,7 +143,7 @@ Commit: `Grow the wing into a card on hover`
 
 P2 · S · wing
 
-Done in `bb8497f`. The harness draws no companion pill, so the first box was met by `CompanionTests`, which draws the puck and the capsule into `shots/extra/`. The second waits for eyes on the Playground.
+Done in `27fd488`. The harness draws no companion pill, so the first box was met by `CompanionTests`, which draws the puck and the capsule into `shots/extra/`. The second waits for eyes on the Playground.
 
 When another activity owns the compact seat and this one rides the companion pill, `makeCompanionCompact(context:)` draws the mark alone, sized to `context.slotSize` rather than to `iconSize`, because the default reuses the leading accessory at wing scale and a 13 pt sun in a 24 pt puck is a dot. `makeCompanionDetail(context:)` is one line, "26° Partly cloudy", leading-aligned beside the mark when the pill grows into its capsule.
 
@@ -158,7 +158,7 @@ Commit: `Fit the mark into the puck`
 
 P1 · M · wing
 
-Done in `f2d6744`.
+Done in `c758dbc`.
 
 The behaviour OriNotch's ORI-36 and ORI-61 settled, made true under a host that seats and unseats: the interval is the only clock, so ten display wakes in a minute are zero fetches; losing the seat stops the clock and keeps the reading; regaining it refreshes only if the reading is older than the interval; a refused refresh dims and dates rather than clears; `now` moves on every attempt so the age on screen is measured against the last attempt and never against a ticking clock. `host.liveActivity.yield(reason: .idle)` is called when the city is cleared, so the seat is given up before the publisher catches up.
 
@@ -173,7 +173,7 @@ Commit: `Keep the last reading and say how old it is`
 
 P1 · L · shelf
 
-Done in `048c527`. The harness pairs the widget with a second copy of itself, not with a widget of its own, so the paired shot is two weathers side by side. The Playground box waits for eyes.
+Done in `b22b620`. The harness pairs the widget with a second copy of itself, not with a widget of its own, so the paired shot is two weathers side by side. The Playground box waits for eyes.
 
 `ShelfWidgetProviding` with one descriptor, id `weather`, title "Weather", `systemImage` a symbol name because the descriptor takes one and the grid draws it, `preferredSoloWidth` and `preferredPairedWidth` both declared (the host refuses a descriptor missing either), `contentHeight: .fixed`, and `searchKeywords`. Solo, `context.isCompact` false: the mark, the degrees, the condition, the city, feels like, and the age of the reading on one line at the bottom in the tertiary white. Paired: the mark and the degrees, and the condition if `context.availableSize` has room for one more line, which is a branch on `isCompact`, never on a width. No background of its own; the shelf paints the card. `surfaces` gains `shelf-widget`. This is the second thing that starts the clock: `installState.statePublisher` with `activeWidgetIDs` containing `weather` keeps the model running while the widget is on a shelf, seated or not, and the two conditions are or-ed in one place.
 
@@ -189,7 +189,7 @@ Commit: `Put the weather on the shelf, alone and beside another`
 
 P1 · M · settings
 
-Done in `9242aa9`. The harness's sidebar search does not read `settingsSearchEntries`, so the first box is checked by `RoomTests` against the entries. The second box is met by `RoomTests` too, because a shot run cannot type: choosing a city writes `city` alone, and every control together writes the four keys and nothing else. The third waits for the Playground; the one-request-per-pause half of it is `RoomTests` and the log line each request writes (docs/notes.md, OW-12).
+Done in `579b8fa`. The harness's sidebar search does not read `settingsSearchEntries`, so the first box is checked by `RoomTests` against the entries. The second box is met by `RoomTests` too, because a shot run cannot type: choosing a city writes `city` alone, and every control together writes the four keys and nothing else. The third waits for the Playground; the one-request-per-pause half of it is `RoomTests` and the log line each request writes (docs/notes.md, OW-12).
 
 `SettingsPaneProviding`, a pane built from `DropletSettingsCard` and its rows so it stays in step with Droppy's own pages. A city row: `DropletStackedRow` with a `TextField` in it (the SDK has no text field row of its own; this is the one place the pane goes off the components, and the card says so in `docs/notes.md`), typing runs the geocoder after a pause of 400 ms and lists up to five matches as `DropletControlRow`s with a `DropletValuePill` for the country; choosing one writes `city`. Then a `DropletGroupedPickerRow` for the unit, a `DropletGroupedPickerRow` for the interval (15, 30, 60 minutes) with `SettingsGroupPosition` set so the group draws its corners, and a `DropletToggleRow` "Keep on the notch" with the subtitle "Off, the weather shows while the pointer rests on the notch." Sentence case throughout. `settingsSearchEntries` for city, unit, interval and the pin. `surfaces` gains `settings-pane`.
 
@@ -205,7 +205,7 @@ Commit: `A room with a city in it`
 
 P2 · S · model
 
-Done in `5d44d14`.
+Done in `079fd83`.
 
 The unit preference, `celsius` by default, `fahrenheit` on request, converted from the one reading in Celsius rather than fetched twice: `WeatherReading.degrees(in:)` rounds after converting, so 25.5 °C is 26° and 78° (77.9 rounded), and feels-like follows. The city's own time zone from OW-3 is what `Ago` is not measured in, because an age is a duration; it is what a future hourly row would be labelled in, and the note says so.
 
@@ -220,7 +220,7 @@ Commit: `Degrees the way the user counts them`
 
 P2 · S · setup
 
-Done in `916bd0b`. The harness has no flag to switch a capability off, so `make offline` hands the built harness a copy of the manifest without `network-client` and `check-report.py --offline` asserts nothing was granted and the wing still publishes; `make shots` itself stays the run with the switch on, which OW-6's capabilities box needs.
+Done in `8eaab3a`. The harness has no flag to switch a capability off, so `make offline` hands the built harness a copy of the manifest without `network-client` and `check-report.py --offline` asserts nothing was granted and the wing still publishes; `make shots` itself stays the run with the switch on, which OW-6's capabilities box needs.
 
 `environment.isHarness` and an `OW_DEMO` variable read once at activation: in the harness, or with `OW_DEMO=1`, the fetcher is `DemoWeather`, which answers 25.5°, feels 24.2°, code 2, day, from Istanbul, with no request; `OW_DEMO=stale` answers once and refuses after two seconds, which is what an aeroplane looks like. The shots never touch the network, and neither does a Playground run that carries the variable.
 
@@ -235,7 +235,7 @@ Commit: `A sky the harness can count on`
 
 P1 · M · look
 
-Done in `0d87c6d`. The 28 pt render is `shots/icon-28pt.png` (and `@2x`): a sun and a cloud, so the cloud kept its lumps.
+Done in `f42f738`. The 28 pt render is `shots/icon-28pt.png` (and `@2x`): a sun and a cloud, so the cloud kept its lumps.
 
 `scripts/make-icon.swift` renders the sun behind a cloud, this repo's own shapes, into `OriWeather.icon/Assets/mark.png` at 1024 with the artwork inside the centre 820, no baked corners and no shadow, because Icon Composer adds both; `OriWeather.icon/icon.json` declares one group, one layer at scale 0.8, a flat fill and no gradient of consequence. `Assets/Creator.png` is Meric's mark, square, unrounded, at least 256 px, rendered by the same script from OriNotch's notch-with-wings unless he hands over another; the Store clips it to a circle itself. `make icon` runs the script and is part of `make test`'s validate step by way of `droppykit validate`.
 
@@ -250,7 +250,7 @@ Commit: `An icon that is a sun behind a cloud`
 
 P1 · M · energy
 
-Done in `da5910b`. The unseated run is the droplet with no city and no demo sky, which publishes nil and is never seated; the Playground offers no way to unseat a publishing droplet without music, and nothing in this session could start its player. The log shows no clock started rather than one stopped.
+Done in `acbca18`. The unseated run is the droplet with no city and no demo sky, which publishes nil and is never seated; the Playground offers no way to unseat a publishing droplet without music, and nothing in this session could start its player. The log shows no clock started rather than one stopped.
 
 `scripts/energy.sh` after OriNotch's, pointed at the `DroppyPlayground` process: idle CPU averaged over a minute, idle wakeups a second and `top`'s POWER figure, sampled twice, once with the droplet removed from its folder and once installed, seated and pinned, on the same wallpaper with the same player state. The figures and their difference go into `docs/energy/<date>.md`; the first report is the baseline and `make energy` fails on a difference past D6's line (no added idle wakeups within noise, no timer while unseated and unshelved, which the script checks by reading the droplet's own log line for the clock's state). `make energy` joins the gate from this card onward.
 
@@ -265,7 +265,7 @@ Commit: `Measure what the guest costs the host`
 
 P1 · S · ship
 
-Done in `1e9bb9a`.
+Done in `8fd0ce2`.
 
 `droplet.json` filled in: `summary` under 60 characters ("OriNotch's weather, on the wing when nothing else wants it" is 58), a `description` of two paragraphs in Meric's voice, `category`, `keywords`, `screenshots` chosen from the shots and copied into `Assets/`, `creator` with his name, `community`, his URL and the avatar, `kit.minAPI` at the oldest API the code calls (1.1.0 unless a card used something newer, and the card that did says so), `minAppVersion` 15.3.0, `version` 1.0.0. `docs/notes.md` gains the review's five reasons for sending a droplet back and, beside each, the card that answered it.
 
@@ -307,7 +307,7 @@ Commit: `The same weather on the other notch`
 
 P0 · M · ship
 
-In progress: the README and the licence are committed. Waiting for Meric's word on `gh repo create realmeric/OriWeather --public`, which publishes the repository, and then on the submission, whose form he completes with his name and an address.
+In progress: the README, the licence and the Store text are committed, the history is scrubbed of the home path (docs/notes.md, "Before the repository went public"), and `make test` and `make energy` are green. What is left is outward: `gh repo create realmeric/OriWeather --public`, pinning `source.commit`, and `droppykit submit`, whose form Meric completes with his name and an address.
 
 `README.md` in Meric's voice: what it is, what it needs (Droppy 15.3 or the Playground), what it sends (a rounded coordinate to Open-Meteo, a city name to its geocoder, nothing else), what it does not do (no location, no account). `LICENSE` is MIT (D7). `gh repo create realmeric/OriWeather --public --source . --push` after Meric says so. `droppykit submit` opens the intake with the repository, the commit and the id filled in and refuses on uncommitted changes, so this card commits before it runs; the `DS-` reference the page answers with is written at the top of this card on the board, and the email it arrives in is where review replies. `source.repository` and `source.commit` in the manifest name that commit, which means the manifest is written, committed, and then the commit hash is the one submitted, in that order.
 

@@ -3,3 +3,6 @@
 .DS_Store
 shots/
 .droplet-offline.json
+# Written by `droppykit agent` with absolute paths for one Mac; run it after cloning.
+.mcp.json
+.cursor/

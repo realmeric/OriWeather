@@ -152,3 +152,7 @@ as the gate, and what the machine taught along the way in `docs/notes.md`. Ori
 Weather is one of the Ori family: OriNotch is the parent, and its marks, words
 and behaviour are carried into this droplet as this repository's own files,
 never linked or imported (D2).
+
+`.mcp.json` and `.cursor/` are not in the repository: `droppykit agent` writes
+them with absolute paths for one Mac. After cloning, run `droppykit agent` in
+the package to write your own, with the DroppyKit checkout beside this one.
