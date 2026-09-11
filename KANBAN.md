@@ -246,6 +246,21 @@ Accept:
 
 Commit: `An icon that is a sun behind a cloud`
 
+#### OW-16 · What the droplet costs the Playground
+
+P1 · M · energy
+
+Done in `da5910b`. The unseated run is the droplet with no city and no demo sky, which publishes nil and is never seated; the Playground offers no way to unseat a publishing droplet without music, and nothing in this session could start its player. The log shows no clock started rather than one stopped.
+
+`scripts/energy.sh` after OriNotch's, pointed at the `DroppyPlayground` process: idle CPU averaged over a minute, idle wakeups a second and `top`'s POWER figure, sampled twice, once with the droplet removed from its folder and once installed, seated and pinned, on the same wallpaper with the same player state. The figures and their difference go into `docs/energy/<date>.md`; the first report is the baseline and `make energy` fails on a difference past D6's line (no added idle wakeups within noise, no timer while unseated and unshelved, which the script checks by reading the droplet's own log line for the clock's state). `make energy` joins the gate from this card onward.
+
+Accept:
+
+- [x] The baseline report exists and names both runs' figures.
+- [x] With the activity unseated and the widget off the shelf, the log shows the clock stopped and the wakeup figure equals the removed run's within noise.
+
+Commit: `Measure what the guest costs the host`
+
 ## In progress
 
 ## Ready
@@ -270,19 +285,6 @@ Accept:
 Commit: `The same weather on the other notch`
 
 ### Phase 3: the shelf and the room
-
-#### OW-16 · What the droplet costs the Playground
-
-P1 · M · energy
-
-`scripts/energy.sh` after OriNotch's, pointed at the `DroppyPlayground` process: idle CPU averaged over a minute, idle wakeups a second and `top`'s POWER figure, sampled twice, once with the droplet removed from its folder and once installed, seated and pinned, on the same wallpaper with the same player state. The figures and their difference go into `docs/energy/<date>.md`; the first report is the baseline and `make energy` fails on a difference past D6's line (no added idle wakeups within noise, no timer while unseated and unshelved, which the script checks by reading the droplet's own log line for the clock's state). `make energy` joins the gate from this card onward.
-
-Accept:
-
-- [ ] The baseline report exists and names both runs' figures.
-- [ ] With the activity unseated and the widget off the shelf, the log shows the clock stopped and the wakeup figure equals the removed run's within noise.
-
-Commit: `Measure what the guest costs the host`
 
 ### Phase 4: ship it
 
@@ -328,6 +330,9 @@ Commit: `Run it on the notch it was for`
 ## Backlog
 
 Unranked. Promote by writing a card.
+
+- `creator.name` is "Meric" and `creator.url` the GitHub profile, because nothing on this Mac records the name he wants beside the droplet; say the full one before OW-18 submits.
+- `category` is the scaffold's "Productivity". The SDK names no list of categories and weather is not productivity; ask at intake whether "Utilities" or "Weather" exists.
 
 - A long city name ("Istanbul Atatürk Airport") truncates on the island's 208 pt card; the card gives the left column priority, so it is the city that loses letters, which is the right one to lose, but the Store shots should use a short name.
 

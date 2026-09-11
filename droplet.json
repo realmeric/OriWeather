@@ -2,8 +2,8 @@
   "id": "ori-weather",
   "name": "Ori Weather",
   "version": "1.0.0",
-  "summary": "One line about Ori Weather",
-  "description": "A longer description, in plain paragraphs.",
+  "summary": "OriNotch's weather, on the wing when nothing else wants it",
+  "description": "The weather from OriNotch, on Droppy's notch. When nothing else wants the notch, the wing carries a mark and the temperature; hover it and it grows into a card with the condition, the city and what it feels like. Put it on the shelf and it sits there too, alone or beside another widget.\n\nIt reads the weather for a city you name, not for where your Mac is, so it asks for no location and no account. Open-Meteo is sent the name while you type it and a coordinate rounded to about a kilometre, once every half hour unless you choose otherwise, and only while the weather is on screen. When the network goes, the last reading stays up, dimmed, with how old it is where the condition was.",
   "category": "Productivity",
   "kit": {
     "abi": 1,
@@ -20,9 +20,9 @@
   ],
   "icon": "OriWeather.icon",
   "creator": {
-    "name": "Your name",
+    "name": "Meric",
     "kind": "community",
-    "url": "https://example.com",
+    "url": "https://github.com/realmeric",
     "avatar": "Creator.png"
   },
   "source": {
@@ -30,5 +30,16 @@
     "commit": "unpinned",
     "license": "MIT"
   },
-  "keywords": []
+  "screenshots": [
+    "wing.png",
+    "shelf.png"
+  ],
+  "keywords": [
+    "weather",
+    "temperature",
+    "forecast",
+    "city",
+    "open-meteo",
+    "orinotch"
+  ]
 }

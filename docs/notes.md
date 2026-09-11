@@ -112,3 +112,36 @@ The city's time zone, kept since OW-3, is deliberately not what `Ago` is
 measured in: an age is a duration between two instants and has no zone. The
 zone is what a future hourly row would be labelled in (the Wishlist's second
 item), and nothing reads it yet.
+
+## OW-17, what review sends back and what answered it (2026-09-11)
+
+`Submitting.md` lists the five reasons review sends a droplet back, most often
+first. Each has a card.
+
+Capabilities you do not use. The manifest asks for `network-client` and
+nothing else, and nothing is read without it (OW-6): the droplet checks the
+grant at activation and, refused, reads nothing rather than trying. The one
+thing that might have wanted more, where the Mac is, was answered by not
+asking (D4, OW-3).
+
+Design that ignores the surface. Every number and colour of the droplet's own
+is in `Look.swift`, and `LookTests` fails on one anywhere else (OW-5); the
+wing, the card and the shelf use Droppy's metrics and white ladder (OW-6, OW-7,
+OW-11), and the room is built from the settings components, with the one
+exception written down under OW-12.
+
+Work that does not stop. `deactivate()` stops the clock, cancels every
+subscription and the city search, and publishes nil, and `DropletTests` checks
+that nothing is fetched afterwards (OW-6). The clock runs only while seated or
+shelved (OW-11), and `make energy` checks from the host's side that an
+unseated droplet starts none (OW-16).
+
+A live activity that never yields. No city or no reading publishes nil, never
+an empty wing (OW-6), and clearing the city yields the seat at once (OW-9).
+
+An icon that does not read at 28 pt. The 28 pt render is kept in `shots/` and
+read before the icon was accepted (OW-15).
+
+`kit.minAPI` is 1.1.0: the card's `cardContentHeight` and the compact
+padding arrived in 1.1.0, and nothing newer is called; 1.2.0 and 1.2.1
+changed no API.
