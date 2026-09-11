@@ -30,7 +30,7 @@
   },
   "source": {
     "repository": "https://github.com/realmeric/OriWeather",
-    "commit": "unpinned",
+    "commit": "e1732dd620c6847dc81ebe7df10cc4534e06e903",
     "license": "MIT"
   },
   "screenshots": [

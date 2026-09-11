@@ -324,7 +324,7 @@ Commit: `The same weather on the other notch`
 
 P0 · M · ship
 
-In progress: the README, the licence and the Store text are committed, the history is scrubbed of the home path (docs/notes.md, "Before the repository went public"), and `make test` and `make energy` are green. What is left is outward: `gh repo create realmeric/OriWeather --public`, pinning `source.commit`, and `droppykit submit`, whose form Meric completes with his name and an address.
+In progress: the repository is public at https://github.com/realmeric/OriWeather. `source.commit` names the last commit of the droplet itself; the commit submitted is the one after it, which changes nothing but that line, because a manifest cannot name the commit it is in. The submission form is open for Meric's name and address; the `DS-` reference goes here when the page answers.
 
 `README.md` in Meric's voice: what it is, what it needs (Droppy 15.3 or the Playground), what it sends (a rounded coordinate to Open-Meteo, a city name to its geocoder, nothing else), what it does not do (no location, no account). `LICENSE` is MIT (D7). `gh repo create realmeric/OriWeather --public --source . --push` after Meric says so. `droppykit submit` opens the intake with the repository, the commit and the id filled in and refuses on uncommitted changes, so this card commits before it runs; the `DS-` reference the page answers with is written at the top of this card on the board, and the email it arrives in is where review replies. `source.repository` and `source.commit` in the manifest name that commit, which means the manifest is written, committed, and then the commit hash is the one submitted, in that order.
 
