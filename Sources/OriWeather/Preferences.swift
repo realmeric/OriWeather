@@ -49,9 +49,3 @@ struct Preferences {
     }
 }
 
-/// The one reading is in Celsius; Fahrenheit is a conversion, never a second
-/// request.
-enum TemperatureUnit: String, Codable, CaseIterable, Sendable {
-    case celsius
-    case fahrenheit
-}

@@ -185,6 +185,22 @@ Accept:
 
 Commit: `Put the weather on the shelf, alone and beside another`
 
+#### OW-12 · The room
+
+P1 · M · settings
+
+Done in `9242aa9`. The harness's sidebar search does not read `settingsSearchEntries`, so the first box is checked by `RoomTests` against the entries. The second box is met by `RoomTests` too, because a shot run cannot type: choosing a city writes `city` alone, and every control together writes the four keys and nothing else. The third waits for the Playground; the one-request-per-pause half of it is `RoomTests` and the log line each request writes (docs/notes.md, OW-12).
+
+`SettingsPaneProviding`, a pane built from `DropletSettingsCard` and its rows so it stays in step with Droppy's own pages. A city row: `DropletStackedRow` with a `TextField` in it (the SDK has no text field row of its own; this is the one place the pane goes off the components, and the card says so in `docs/notes.md`), typing runs the geocoder after a pause of 400 ms and lists up to five matches as `DropletControlRow`s with a `DropletValuePill` for the country; choosing one writes `city`. Then a `DropletGroupedPickerRow` for the unit, a `DropletGroupedPickerRow` for the interval (15, 30, 60 minutes) with `SettingsGroupPosition` set so the group draws its corners, and a `DropletToggleRow` "Keep on the notch" with the subtitle "Off, the weather shows while the pointer rests on the notch." Sentence case throughout. `settingsSearchEntries` for city, unit, interval and the pin. `surfaces` gains `settings-pane`.
+
+Accept:
+
+- [x] `settings-pane.png` shows the card with its rows and the harness's search finds "Keep on the notch".
+- [x] `preferences.png` after choosing a city in the harness shows `city`, `unit`, `intervalMinutes` and `pinned` and nothing else written.
+- [ ] Choosing a city in the Playground's Store row pane puts its temperature on the wing within the interval, and `activity.png` shows one geocoder request per chosen city, none per keystroke.
+
+Commit: `A room with a city in it`
+
 ## In progress
 
 ## Ready
@@ -209,20 +225,6 @@ Accept:
 Commit: `The same weather on the other notch`
 
 ### Phase 3: the shelf and the room
-
-#### OW-12 · The room
-
-P1 · M · settings
-
-`SettingsPaneProviding`, a pane built from `DropletSettingsCard` and its rows so it stays in step with Droppy's own pages. A city row: `DropletStackedRow` with a `TextField` in it (the SDK has no text field row of its own; this is the one place the pane goes off the components, and the card says so in `docs/notes.md`), typing runs the geocoder after a pause of 400 ms and lists up to five matches as `DropletControlRow`s with a `DropletValuePill` for the country; choosing one writes `city`. Then a `DropletGroupedPickerRow` for the unit, a `DropletGroupedPickerRow` for the interval (15, 30, 60 minutes) with `SettingsGroupPosition` set so the group draws its corners, and a `DropletToggleRow` "Keep on the notch" with the subtitle "Off, the weather shows while the pointer rests on the notch." Sentence case throughout. `settingsSearchEntries` for city, unit, interval and the pin. `surfaces` gains `settings-pane`.
-
-Accept:
-
-- [ ] `settings-pane.png` shows the card with its rows and the harness's search finds "Keep on the notch".
-- [ ] `preferences.png` after choosing a city in the harness shows `city`, `unit`, `intervalMinutes` and `pinned` and nothing else written.
-- [ ] Choosing a city in the Playground's Store row pane puts its temperature on the wing within the interval, and `activity.png` shows one geocoder request per chosen city, none per keystroke.
-
-Commit: `A room with a city in it`
 
 #### OW-13 · Degrees the way the user counts them
 

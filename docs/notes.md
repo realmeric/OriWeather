@@ -99,3 +99,16 @@ its Activity page by itself. Each request is logged ("asked the geocoder for
 keystrokes 30 ms apart are one request, and choosing a match is none, because
 the match carries its coordinate. The shots never type, so the shot of the
 room has no matches in it.
+
+## OW-13, the unit (2026-09-11)
+
+One reading, in Celsius, converted at draw time. `degrees(in:)` rounds after
+converting, so 25.5 °C is 77.9 °F and reads 78°; rounding to 26° first would
+say 79°. The figure goes through `Int`, so anything that rounds to zero from
+below reads "0°": -0.4 °C, and -18 °C, which is -0.4 °F. The card's "in both"
+is those two, one in each unit; -0.4 °C itself is 31° in Fahrenheit.
+
+The city's time zone, kept since OW-3, is deliberately not what `Ago` is
+measured in: an age is a duration between two instants and has no zone. The
+zone is what a future hourly row would be labelled in (the Wishlist's second
+item), and nothing reads it yet.

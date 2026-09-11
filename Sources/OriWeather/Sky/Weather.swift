@@ -13,8 +13,33 @@ struct WeatherReading: Equatable, Sendable {
     /// When the reading was taken, which is what an old one is dimmed by.
     let at: Date
 
-    var degrees: String { "\(Int(temperature.rounded()))°" }
+    var degrees: String { degrees(in: .celsius) }
     var condition: String { WeatherCode.words(code) }
+
+    /// The temperature the way the user counts it, converted from the one
+    /// Celsius reading and rounded after converting: 25.5 °C is 26° and 78°,
+    /// where rounding first would say 79°.
+    func degrees(in unit: TemperatureUnit) -> String {
+        Self.figure(temperature, in: unit)
+    }
+
+    func feelsLike(in unit: TemperatureUnit) -> String {
+        Self.figure(feelsLike, in: unit)
+    }
+
+    private static func figure(_ celsius: Double, in unit: TemperatureUnit) -> String {
+        let value = unit == .celsius ? celsius : celsius * 9 / 5 + 32
+        // Through Int, so a value that rounds to zero from below is "0°" and
+        // never "-0°".
+        return "\(Int(value.rounded()))°"
+    }
+}
+
+/// The one reading is in Celsius; Fahrenheit is a conversion, never a second
+/// request.
+enum TemperatureUnit: String, Codable, CaseIterable, Sendable {
+    case celsius
+    case fahrenheit
 }
 
 /// The WMO code table, as much of it as anybody reads.

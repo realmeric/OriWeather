@@ -24,9 +24,10 @@ struct Glance: Equatable {
     /// against.
     let now: Date
     let city: City
+    let unit: TemperatureUnit
 
-    var degrees: String { reading.degrees }
-    var feelsLike: String { "\(Int(reading.feelsLike.rounded()))°" }
+    var degrees: String { reading.degrees(in: unit) }
+    var feelsLike: String { reading.feelsLike(in: unit) }
     var condition: String { reading.condition }
     /// The condition, or how old the reading is once it has stopped arriving.
     var detail: String { isStale ? Ago.words(reading.at, at: now) : reading.condition }
@@ -209,7 +210,8 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
             publish()
             return
         }
-        let next = Glance(reading: reading, isStale: model.isStale, now: model.now, city: city)
+        let next = Glance(reading: reading, isStale: model.isStale, now: model.now, city: city,
+                          unit: preferences?.unit ?? .celsius)
         if next != glance { glance = next }
         publish()
     }
