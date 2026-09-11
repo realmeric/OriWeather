@@ -280,7 +280,7 @@ Commit: `Say what it is in sixty characters`
 
 P1 · M · lock screen
 
-Done in `LOCKHASH`. Added after OW-17 at Meric's request.
+Done in `e6f8132`. Added after OW-17 at Meric's request.
 
 `LockScreenStatusProviding` for Droppy's status widgets row: the SF Symbol nearest each mark, the degrees and the condition in the horizontal style, the degrees in the ring and a short caption in the rounded one, the age when stale, nothing without a reading, independent of the pin. The Mac locked with its screen awake counts as seen, so the clock runs then and only then, and only with `lock-screen` granted.
 
