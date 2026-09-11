@@ -42,27 +42,30 @@ extension EnvironmentValues {
     }
 }
 
-/// The weather's mark in its tint. By night the sun is drawn in the secondary
-/// white, as OriNotch draws it; the whites are whichever ink the surface uses.
+/// The weather's mark, each part in its tone. By night the sun is a moon.
+/// The whites are whichever ink the surface uses; the warm yellow and the
+/// blue are the droplet's own, from Look.
 struct WeatherMark: View {
     let code: Int
     let isDay: Bool
     @Environment(\.weatherInk) private var ink
 
     var body: some View {
-        switch WeatherCode.mark(code) {
-        case .sun:
-            Marks.Sun().fill(isDay ? Look.warm : ink.secondary)
-        case .cloud:
-            Marks.Cloud().fill(ink.secondary)
-        case .rain:
-            Marks.Rain().fill(Look.rain)
-        case .snow:
-            Marks.Snow().fill(ink.primary)
-        case .fog:
-            Marks.Fog().fill(ink.tertiary)
-        case .storm:
-            Marks.Bolt().fill(Look.warm)
+        let parts = Marks.parts(WeatherCode.mark(code), isDay: isDay)
+        ZStack {
+            ForEach(parts.indices, id: \.self) { index in
+                MarkPart(part: parts[index]).fill(color(parts[index].tone))
+            }
+        }
+    }
+
+    private func color(_ tone: Marks.Tone) -> Color {
+        switch tone {
+        case .warm: Look.warm
+        case .rain: Look.rain
+        case .primary: ink.primary
+        case .secondary: ink.secondary
+        case .tertiary: ink.tertiary
         }
     }
 }

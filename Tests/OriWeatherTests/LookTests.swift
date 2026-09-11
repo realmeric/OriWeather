@@ -8,7 +8,7 @@ final class MarksTests: XCTestCase {
     func testEveryMarkIsInsideItsRect() {
         let rect = CGRect(x: 0, y: 0, width: 16, height: 16)
         for mark in WeatherCode.Mark.allCases {
-            let path = Marks.path(mark, in: rect)
+            let path = Marks.path(mark, in: rect).union(Marks.path(mark, in: rect, isDay: false))
             XCTAssertFalse(path.isEmpty, "\(mark) drew nothing")
             let bounds = path.boundingRect
             XCTAssertGreaterThan(bounds.width * bounds.height, 16, "\(mark) is a dot")
@@ -21,7 +21,7 @@ final class MarksTests: XCTestCase {
     func testEveryMarkIsInsideItsRectAtTheWingsSize() {
         let rect = CGRect(x: 0, y: 0, width: 13, height: 13)
         for mark in WeatherCode.Mark.allCases {
-            let bounds = Marks.path(mark, in: rect).boundingRect
+            let bounds = Marks.path(mark, in: rect).union(Marks.path(mark, in: rect, isDay: false)).boundingRect
             XCTAssertTrue(rect.insetBy(dx: -0.01, dy: -0.01).contains(bounds),
                           "\(mark) leaks past its rect: \(bounds)")
         }
@@ -93,7 +93,9 @@ final class MarksSheetTests: XCTestCase {
     private let entries = [
         Entry(id: "sun", code: 0, isDay: true, words: "Clear, mainly clear\n0, 1"),
         Entry(id: "night", code: 0, isDay: false, words: "Clear at night\n0, 1"),
-        Entry(id: "cloud", code: 2, isDay: true, words: "Partly cloudy, overcast\n2, 3"),
+        Entry(id: "partly", code: 2, isDay: true, words: "Partly cloudy\n2"),
+        Entry(id: "partly-night", code: 2, isDay: false, words: "Partly cloudy at night\n2"),
+        Entry(id: "cloud", code: 3, isDay: true, words: "Overcast\n3"),
         Entry(id: "fog", code: 45, isDay: true, words: "Fog\n45, 48"),
         Entry(id: "rain", code: 61, isDay: true, words: "Drizzle, rain, showers\n51–67, 80–82"),
         Entry(id: "snow", code: 71, isDay: true, words: "Snow, snow showers\n71–77, 85, 86"),

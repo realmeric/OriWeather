@@ -67,3 +67,22 @@ Here the hover card is the host's 59 pt card with no fill of its own: mark at
 on the right, which OriNotch's capsule does not carry. The shelf widget is the
 closer relative of OriNotch's capsule, with the same order left to right and
 the same dimming, at shelf sizes.
+
+## The marks, polished
+
+Seen large on one sheet (`shots/extra/marks.png`), OriNotch's glyphs showed
+what 13 pt hid: a step where a cloud's bump met its flat base, a rain cloud
+filled entirely blue, a grey sun standing in for the night, and partly cloudy
+drawn the same as overcast. They are redrawn in the same flat, one-weight
+style rather than the icon's:
+
+The cloud is one outline, a capsule and two bumps merged, so no seam shows.
+Rain, snow and the storm are two-tone: a pale cloud with blue drops, white
+flakes or a warm bolt, each with a thin gap cut round the part in front so the
+two stay two shapes at 13 pt. A clear night is a crescent moon. Partly cloudy
+(code 2) is its own mark now, a sun or by night a moon behind the cloud, and
+overcast (code 3) keeps the plain cloud. A sun ray the cloud would cut is left
+out whole rather than drawn as a stub past the cloud's edge, and the storm's
+bolt only meets the cloud's underside, so the gap round it leaves no loose
+sliver of cloud. Every mark still stays inside its rect at 16 and 13 pt, by
+day and by night.

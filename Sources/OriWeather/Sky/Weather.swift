@@ -49,6 +49,8 @@ enum TemperatureUnit: String, Codable, CaseIterable, Sendable {
 enum WeatherCode {
     enum Mark: Equatable, CaseIterable, Sendable {
         case sun
+        /// A sun (or by night a moon) behind a cloud.
+        case partlyCloudy
         case cloud
         case rain
         case snow
@@ -59,7 +61,8 @@ enum WeatherCode {
     static func mark(_ code: Int) -> Mark {
         switch code {
         case 0, 1: return .sun
-        case 2, 3: return .cloud
+        case 2: return .partlyCloudy
+        case 3: return .cloud
         case 45, 48: return .fog
         case 51 ... 67, 80 ... 82: return .rain
         case 71 ... 77, 85, 86: return .snow
