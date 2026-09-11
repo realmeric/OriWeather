@@ -45,24 +45,26 @@ Accept:
 
 Commit: `A droplet that loads and says nothing yet`
 
-## In progress
-
-## Ready
-
-### Phase 1: a droplet that loads
-
 #### OW-2 · The reading, carried over
 
 P0 · S · model
+
+Done in `e9f25ca`.
 
 `WeatherReading`, `WeatherCode` with its marks and words, `Place` with its two-decimal rounding, `WeatherFetching`, `OpenMeteo` with `url(for:)` and `reading(from:now:)`, `WeatherError` and `Ago`, copied from OriNotch's `Weather.swift` and `Notices.swift` as this repo's own files under `Sources/OriWeather/Sky/`, with `OpenMeteoTests` beside them: the recorded body from 2026-09-08 kept inline so no test reaches the network, the local wall clock with the offset beside it (14:00 in Istanbul is 11:00 UTC), the coordinate rounded before it is sent, the code table saying what to draw. Nothing in these files imports DroppyKit.
 
 Accept:
 
-- [ ] The five OpenMeteo tests pass unchanged in wording: the current block is read, the time is local with the offset beside it, an empty body is unreadable, the coordinate leaves as `41.01` and `28.95`, and 0 is sun, 48 fog, 65 rain, 75 snow, 95 storm.
-- [ ] `grep -L DroppyKit Sources/OriWeather/Sky/*.swift` lists every file in the folder.
+- [x] The five OpenMeteo tests pass unchanged in wording: the current block is read, the time is local with the offset beside it, an empty body is unreadable, the coordinate leaves as `41.01` and `28.95`, and 0 is sun, 48 fog, 65 rain, 75 snow, 95 storm.
+- [x] `grep -L DroppyKit Sources/OriWeather/Sky/*.swift` lists every file in the folder.
 
 Commit: `Read the sky the way OriNotch reads it`
+
+## In progress
+
+## Ready
+
+### Phase 1: a droplet that loads
 
 #### OW-3 · A city, not a location
 

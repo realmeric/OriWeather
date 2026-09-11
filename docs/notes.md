@@ -38,3 +38,17 @@ The MCP wiring does name the package folder: both `.mcp.json` files said
 `--package .../ori-weather` after the scaffold, so the move to `OriWeather`
 was followed by `droppykit agent`, which rewrote both and left `AGENTS.md` and
 `CLAUDE.md` alone.
+
+## OW-3, the geocoder (2026-09-11)
+
+The answer in `GeocoderTests` was taken from
+`https://geocoding-api.open-meteo.com/v1/search?name=Istanbul&count=5&language=en&format=json`
+on 2026-09-11 and is kept whole. Its first result is Istanbul, `admin1`
+Istanbul, `country` "Republic of Türkiye" (not "Turkey"), `timezone`
+Europe/Istanbul, at 41.01384, 28.94966. A name nobody has heard of comes back
+as `{"generationtime_ms":…}` with no `results` key at all rather than an empty
+array, which is why the reader treats a missing key as an empty list.
+
+The reader keeps six fields and drops the rest (`population`, `postcodes`,
+`elevation`, the ids). The coordinate is rounded inside `City.init`, so a city
+never holds more than two decimals, whichever way it was made.
