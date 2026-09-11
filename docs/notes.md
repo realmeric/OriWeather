@@ -250,3 +250,8 @@ synthetic press from the shell proved nothing, because the shell may not post
 key events (`CGPreflightPostEventAccess()` is false), so the keys were pressed
 through the screen. `make energy` after the network and wake observers went in:
 2.02 wakeups a second without the droplet, 1.78 seated, 2.03 unseated.
+
+The shortcut is Control-Option-Command-W since Meric asked for it. Pressed on
+the real screen with the Playground in front: W typed "w", Control-Option-W
+now does nothing, and Control-Option-Command-W took the weather off the wings
+and put it back.

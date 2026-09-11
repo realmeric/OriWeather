@@ -210,23 +210,23 @@ final class WhereaboutsTests: XCTestCase {
 @MainActor
 final class ShortcutTests: XCTestCase {
     func testTheSuggestionReadsTheWayMacOSWritesIt() {
-        XCTAssertEqual(WingShortcut.words(WingShortcut.suggestion), "⌃⌥W")
+        XCTAssertEqual(WingShortcut.words(WingShortcut.suggestion), "⌃⌥⌘W")
         let shiftCommandS = DropletKeyboardShortcut(keyCode: 1, modifiers: NSEvent.ModifierFlags([.shift, .command]).rawValue)
         XCTAssertEqual(WingShortcut.words(shiftCommandS), "⇧⌘S")
     }
 
-    /// The suggestion's modifiers are AppKit's control and option bits, not
-    /// Carbon's 1 << 12 and 1 << 11, which the host read as nothing and bound
-    /// a bare W.
+    /// The suggestion's modifiers are AppKit's control, option and command
+    /// bits, not Carbon's, which the host read as nothing and bound a bare W.
     func testTheSuggestionCarriesAppKitsModifiers() {
-        XCTAssertEqual(WingShortcut.suggestion.modifiers, NSEvent.ModifierFlags([.control, .option]).rawValue)
+        XCTAssertEqual(WingShortcut.suggestion.modifiers, NSEvent.ModifierFlags([.control, .option, .command]).rawValue)
         XCTAssertEqual(WingShortcut.suggestion.modifiers & 0xFFFF, 0, "no Carbon bits")
     }
 
     /// A bare W never flips the pin, whatever the host bound.
     func testOnlyAPressWithTheModifiersHeldCounts() {
-        XCTAssertTrue(WingShortcut.isGenuine(WingShortcut.suggestion, held: [.control, .option]))
-        XCTAssertTrue(WingShortcut.isGenuine(WingShortcut.suggestion, held: [.control, .option, .capsLock]))
+        XCTAssertTrue(WingShortcut.isGenuine(WingShortcut.suggestion, held: [.control, .option, .command]))
+        XCTAssertTrue(WingShortcut.isGenuine(WingShortcut.suggestion, held: [.control, .option, .command, .capsLock]))
+        XCTAssertFalse(WingShortcut.isGenuine(WingShortcut.suggestion, held: [.control, .option]), "the old two are not enough")
         XCTAssertFalse(WingShortcut.isGenuine(WingShortcut.suggestion, held: []))
         XCTAssertFalse(WingShortcut.isGenuine(WingShortcut.suggestion, held: [.control]))
         let bare = DropletKeyboardShortcut(keyCode: 13, modifiers: 0)
@@ -251,10 +251,10 @@ final class ShortcutTests: XCTestCase {
         droplet.shortcutPressed(held: [])
         await settle()
         XCTAssertNil(droplet.activitySubject.value, "a bare W flips nothing")
-        droplet.shortcutPressed(held: [.control, .option])
+        droplet.shortcutPressed(held: [.control, .option, .command])
         await settle()
         XCTAssertNotNil(droplet.activitySubject.value)
-        droplet.shortcutPressed(held: [.control, .option])
+        droplet.shortcutPressed(held: [.control, .option, .command])
         await settle()
         XCTAssertNil(droplet.activitySubject.value)
 

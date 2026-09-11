@@ -9,8 +9,8 @@ widget. When the network goes, the last reading stays up, dimmed, with how old
 it is where the condition was.
 
 "Keep on the notch" decides whether it takes the wings at all; off, it stays
-on the shelf. Control-Option-W flips it from anywhere, and Droppy's Settings,
-Shortcuts, rebinds it. A press without Control and Option never flips it.
+on the shelf. Control-Option-Command-W flips it from anywhere, and Droppy's Settings,
+Shortcuts, rebinds it. A press without all three never flips it.
 
 It is a Droplet, an extension that runs inside [Droppy](https://getdroppy.app),
 built with [DroppyKit](https://gitlab.com/droppyformac1/droppykit) 1.2.1.

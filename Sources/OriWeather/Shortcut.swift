@@ -9,14 +9,15 @@ enum WingShortcut {
     static let id = "wings"
     static let title = "Show or hide the weather on the wings"
 
-    /// Control-Option-W. The modifiers are AppKit's `NSEvent.ModifierFlags`,
+    /// Control-Option-Command-W, three modifiers so no app's own shortcut is
+    /// in the way. The modifiers are AppKit's `NSEvent.ModifierFlags`,
     /// whatever the SDK's comment says: `DropletKeyboardShortcut.modifiers` is
     /// "Carbon-style", but Droppy 15.3 (the Playground) read Carbon's control
     /// and option bits as no modifiers at all and bound a bare W, which ate
     /// the key everywhere. The field is a `UInt`, as AppKit's flags are.
     static let suggestion = DropletKeyboardShortcut(
         keyCode: 13,
-        modifiers: NSEvent.ModifierFlags([.control, .option]).rawValue
+        modifiers: NSEvent.ModifierFlags([.control, .option, .command]).rawValue
     )
 
     /// The modifiers a binding asks for, in AppKit's terms.
@@ -34,7 +35,7 @@ enum WingShortcut {
         return !wanted.isEmpty && held.intersection([.control, .option, .shift, .command]).isSuperset(of: wanted)
     }
 
-    /// "⌃⌥W", in the order macOS writes modifiers.
+    /// "⌃⌥⌘W", in the order macOS writes modifiers.
     static func words(_ shortcut: DropletKeyboardShortcut) -> String {
         let held = flags(shortcut)
         let marks: [(NSEvent.ModifierFlags, String)] = [(.control, "⌃"), (.option, "⌥"), (.shift, "⇧"), (.command, "⌘")]
