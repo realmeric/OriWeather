@@ -216,6 +216,21 @@ Accept:
 
 Commit: `Degrees the way the user counts them`
 
+#### OW-14 · Fixed skies for the harness
+
+P2 · S · setup
+
+Done in `916bd0b`. The harness has no flag to switch a capability off, so `make offline` hands the built harness a copy of the manifest without `network-client` and `check-report.py --offline` asserts nothing was granted and the wing still publishes; `make shots` itself stays the run with the switch on, which OW-6's capabilities box needs.
+
+`environment.isHarness` and an `OW_DEMO` variable read once at activation: in the harness, or with `OW_DEMO=1`, the fetcher is `DemoWeather`, which answers 25.5°, feels 24.2°, code 2, day, from Istanbul, with no request; `OW_DEMO=stale` answers once and refuses after two seconds, which is what an aeroplane looks like. The shots never touch the network, and neither does a Playground run that carries the variable.
+
+Accept:
+
+- [x] `make shots` runs with the harness's `network-client` switch off and every shot still carries a temperature.
+- [x] `DemoTests`: with `OW_DEMO=stale` the second read throws `refused` and the model's `isStale` flips with the reading still up.
+
+Commit: `A sky the harness can count on`
+
 ## In progress
 
 ## Ready
@@ -240,19 +255,6 @@ Accept:
 Commit: `The same weather on the other notch`
 
 ### Phase 3: the shelf and the room
-
-#### OW-14 · Fixed skies for the harness
-
-P2 · S · setup
-
-`environment.isHarness` and an `OW_DEMO` variable read once at activation: in the harness, or with `OW_DEMO=1`, the fetcher is `DemoWeather`, which answers 25.5°, feels 24.2°, code 2, day, from Istanbul, with no request; `OW_DEMO=stale` answers once and refuses after two seconds, which is what an aeroplane looks like. The shots never touch the network, and neither does a Playground run that carries the variable.
-
-Accept:
-
-- [ ] `make shots` runs with the harness's `network-client` switch off and every shot still carries a temperature.
-- [ ] `DemoTests`: with `OW_DEMO=stale` the second read throws `refused` and the model's `isStale` flips with the reading still up.
-
-Commit: `A sky the harness can count on`
 
 #### OW-15 · The icon and the avatar
 

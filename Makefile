@@ -4,11 +4,12 @@
 SDK := $(HOME)/Documents/Projects/apps/droppykit
 DROPPYKIT := $(SDK)/Scripts/droppykit
 
-.PHONY: test build validate shots offline install energy clean
+.PHONY: test build validate icon shots offline install energy clean
 
 test:
 	swift test
 	$(DROPPYKIT) build
+	$(MAKE) icon
 	$(DROPPYKIT) validate
 	$(MAKE) offline
 
@@ -17,6 +18,14 @@ build:
 
 validate:
 	$(DROPPYKIT) validate
+
+# The icon layer and the avatar, drawn from Marks.swift. Deterministic, so a
+# run that changed nothing leaves git clean.
+icon:
+	@mkdir -p .build
+	swiftc -parse-as-library -O -o .build/make-icon scripts/make-icon.swift \
+		Sources/OriWeather/Marks.swift Sources/OriWeather/Sky/Weather.swift
+	.build/make-icon
 
 shots:
 	$(DROPPYKIT) run -- --shots ./shots --report ./shots/report.json

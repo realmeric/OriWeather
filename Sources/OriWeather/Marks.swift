@@ -1,4 +1,3 @@
-import DroppyKit
 import SwiftUI
 
 /// The six weather marks, drawn rather than shipped.
@@ -7,6 +6,9 @@ import SwiftUI
 /// `Shape` in a unit square, asked for at the size it is drawn at and never
 /// scaled from a bitmap, and every one stays inside its rect: a shape that
 /// leaks past it at 13 pt is clipped by a wing without a word.
+///
+/// SwiftUI and nothing else, so `scripts/make-icon.swift` compiles this file
+/// with its own and the icon is drawn from the same shapes as the wing.
 enum Marks {
     /// A disc with eight rays. The rays stop short of the edge by half their
     /// own width, because a round cap drawn to the edge pokes out of it.
@@ -134,30 +136,6 @@ enum Marks {
         case .snow: Snow().path(in: rect)
         case .fog: Fog().path(in: rect)
         case .storm: Bolt().path(in: rect)
-        }
-    }
-}
-
-/// The weather's mark in its tint. By night the sun is drawn in the secondary
-/// white, as OriNotch draws it.
-struct WeatherMark: View {
-    let code: Int
-    let isDay: Bool
-
-    var body: some View {
-        switch WeatherCode.mark(code) {
-        case .sun:
-            Marks.Sun().fill(isDay ? Look.warm : AdaptiveColors.notchSurfaceSecondaryText)
-        case .cloud:
-            Marks.Cloud().fill(AdaptiveColors.notchSurfaceSecondaryText)
-        case .rain:
-            Marks.Rain().fill(Look.rain)
-        case .snow:
-            Marks.Snow().fill(AdaptiveColors.notchSurfacePrimaryText)
-        case .fog:
-            Marks.Fog().fill(AdaptiveColors.notchSurfaceTertiaryText)
-        case .storm:
-            Marks.Bolt().fill(Look.warm)
         }
     }
 }
