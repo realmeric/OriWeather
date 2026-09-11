@@ -68,7 +68,9 @@ make install   # into Droppy Playground
 make energy    # what it costs the Playground, against the Playground without it
 ```
 
-`make test` needs the DroppyKit checkout at `~/Documents/Projects/apps/droppykit`.
+`make test` needs the [DroppyKit](https://gitlab.com/droppyformac1/droppykit)
+checkout: `droppykit` on the PATH, or the repository cloned beside this one,
+or `make SDK=/path/to/droppykit test`.
 `OW_DEMO=1 make install` puts a fixed sky in the Playground without asking the
 network anything; `OW_DEMO=stale` shows what an aeroplane looks like.
 

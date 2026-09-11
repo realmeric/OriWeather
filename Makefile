@@ -1,8 +1,12 @@
 # The gate is `make test`: the unit tests, the bundle, the intake's checks,
 # and the harness's verdict with every surface drawn to a picture.
 
-SDK := $(HOME)/Documents/Projects/apps/droppykit
-DROPPYKIT := $(SDK)/Scripts/droppykit
+# The DroppyKit checkout: `droppykit` on the PATH if there is one, otherwise a
+# checkout beside this repository. `make SDK=/path/to/droppykit test` names
+# another.
+SDK ?= $(abspath $(CURDIR)/../droppykit)
+DROPPYKIT := $(or $(shell command -v droppykit 2>/dev/null),$(SDK)/Scripts/droppykit)
+export DROPPYKIT
 
 .PHONY: test build validate icon shots offline screenshots install energy clean
 
