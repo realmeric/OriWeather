@@ -35,6 +35,16 @@ the next droplet copies it unchanged, the rest is the droplet's own. The
 document adds the rounded corners and the icon's shadow; the layers draw
 neither.
 
+## The maker's mark
+
+The creator avatar, beside "Ori by realmeric" on every Ori droplet's Store
+row, is the rise on the cloud's ink (`#3A4660` to `#262F42`): the same sun at
+about half the icon's size, its crown a little below the middle so the
+Store's circle shows it (`drawAvatar`, through the same `sunrise` as
+`drawRise`). It is the same `Creator.png` in every Ori droplet. The rise on
+ink was Meric's choice of three on 2026-09-23; before it the avatar was a
+notch with a wing out either side, in ink on the pale blue paper.
+
 ## What was tried and dropped
 
 A notch hanging from the top of an ink tile, which read as a clip on

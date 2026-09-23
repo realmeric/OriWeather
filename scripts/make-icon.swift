@@ -14,18 +14,15 @@
 // stays inside the centre 820 of 1024; the rise runs to the edge on purpose,
 // and the corners cut it.
 //
-// The avatar is Meric's mark, a notch with a wing out either side, in
-// ink on paper, square and unrounded: the Store clips it to a circle itself.
+// The avatar is the maker's mark, the family's rise at dawn: the same sun,
+// nearer and higher so a circle shows its crown, on the ink the cloud is
+// drawn in. Square and unrounded: the Store clips it to a circle itself.
 //
 // Three previews land in shots/: the icon as the Store would compose it at
 // 1024, and the same at 28 pt, at 1x and 2x, the smallest size the Store
 // draws and the one that decides whether it reads.
 
 import AppKit
-
-/// Paper and ink, the two colours everything of Meric's is built from.
-let paper = NSColor(srgbRed: 0.757, green: 0.792, blue: 0.851, alpha: 1)   // #c1cad9
-let ink = NSColor(srgbRed: 0.165, green: 0.196, blue: 0.255, alpha: 1)     // #2a3241
 
 /// The ground, top to bottom, which icon.json carries as its fill.
 let groundTop = rgb(0xF7F9FC)
@@ -59,7 +56,7 @@ struct MakeIcon {
         for (name, draw) in layers {
             try png(pixels: 1024) { draw($0, 1024) }.write(to: assets.appendingPathComponent(name))
         }
-        try png(pixels: 512) { drawNotch(in: $0, side: 512) }.write(to: avatar)
+        try png(pixels: 512) { drawAvatar($0, 512) }.write(to: avatar)
 
         // What the Store composes: the document's paper gradient in a rounded
         // square, and the three layers on it at the document's scale, 1.0.
@@ -82,8 +79,21 @@ struct MakeIcon {
     /// coming up over its bottom edge, with its glow above it. The same on
     /// every Ori icon.
     static func drawRise(_ context: CGContext, _ side: CGFloat) {
-        let centre = CGPoint(x: side / 2, y: side * 2.02)
-        let radius = side * 1.22
+        sunrise(context, side, centreY: side * 2.02, radius: side * 1.22)
+    }
+
+    /// The maker's avatar: the rise on the cloud's ink, the sun at half the
+    /// icon's size and its crown a little below the middle.
+    static func drawAvatar(_ context: CGContext, _ side: CGFloat) {
+        context.drawLinearGradient(gradient([rgb(0x3A4660), rgb(0x262F42)]), start: .zero,
+                                   end: CGPoint(x: 0, y: side), options: [])
+        sunrise(context, side, centreY: side * 1.18, radius: side * 0.62)
+    }
+
+    /// A sun of `radius` centred `centreY` down the tile, in its glow, filled
+    /// from its crown to the tile's bottom edge.
+    static func sunrise(_ context: CGContext, _ side: CGFloat, centreY: CGFloat, radius: CGFloat) {
+        let centre = CGPoint(x: side / 2, y: centreY)
         context.drawRadialGradient(gradient([rgb(0xFFB85A, 0.55), rgb(0xFFB85A, 0)]),
                                    startCenter: centre, startRadius: radius,
                                    endCenter: centre, endRadius: radius + side * 0.22, options: [])
@@ -140,49 +150,6 @@ struct MakeIcon {
         context.drawLinearGradient(gradient([rgb(0x3A4660), rgb(0x262F42)]),
                                    start: CGPoint(x: 0, y: rect.minY), end: CGPoint(x: 0, y: rect.maxY), options: [])
         context.restoreGState()
-    }
-
-    /// Meric's mark: the notch, square where the bezel cuts it and round at
-    /// the bottom, with a wing either side overlapping it so the three are one
-    /// object small. Ink on a full paper square, unrounded.
-    static func drawNotch(in context: CGContext, side: CGFloat) {
-        context.setFillColor(paper.cgColor)
-        context.fill(CGRect(x: 0, y: 0, width: side, height: side))
-
-        let grid = side * 0.14
-        let box = CGRect(x: grid, y: grid, width: side - grid * 2, height: side - grid * 2)
-        let bodyWidth = box.width * 0.62
-        let bodyHeight = box.height * 0.36
-        // Flipped context: y grows downward, so the square top is minY.
-        let body = CGRect(x: box.midX - bodyWidth / 2, y: box.midY - bodyHeight * 0.58,
-                          width: bodyWidth, height: bodyHeight)
-        let corner = bodyHeight * 0.46
-        let mark = CGMutablePath()
-        mark.move(to: CGPoint(x: body.minX, y: body.minY))
-        mark.addLine(to: CGPoint(x: body.minX, y: body.maxY - corner))
-        mark.addArc(center: CGPoint(x: body.minX + corner, y: body.maxY - corner), radius: corner,
-                    startAngle: .pi, endAngle: .pi / 2, clockwise: true)
-        mark.addLine(to: CGPoint(x: body.maxX - corner, y: body.maxY))
-        mark.addArc(center: CGPoint(x: body.maxX - corner, y: body.maxY - corner), radius: corner,
-                    startAngle: .pi / 2, endAngle: 0, clockwise: true)
-        mark.addLine(to: CGPoint(x: body.maxX, y: body.minY))
-        mark.closeSubpath()
-
-        context.setFillColor(ink.cgColor)
-        context.addPath(mark)
-        context.fillPath()
-
-        // Filled one by one: a wing wound the other way from the body would
-        // punch a hole where the two overlap.
-        let wingHeight = bodyHeight * 0.36
-        let wingWidth = box.width * 0.19
-        let wingY = body.maxY - bodyHeight * 0.2 - wingHeight
-        for x in [body.minX - wingWidth + wingHeight / 2, body.maxX - wingHeight / 2] {
-            context.addPath(CGPath(roundedRect: CGRect(x: x, y: wingY, width: wingWidth, height: wingHeight),
-                                   cornerWidth: wingHeight / 2, cornerHeight: wingHeight / 2,
-                                   transform: nil))
-            context.fillPath()
-        }
     }
 
     /// A square bitmap drawn in a flipped context, so y grows downward the way
