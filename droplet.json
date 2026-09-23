@@ -26,7 +26,8 @@
     "name": "Ori by realmeric",
     "kind": "community",
     "url": "https://github.com/realmeric",
-    "avatar": "Creator.png"
+    "avatar": "Creator.png",
+    "gitlab": "realmeric1"
   },
   "source": {
     "repository": "https://gitlab.com/droppyformac1/droplets/-/tree/main/droplets/ori-weather",
