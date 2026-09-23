@@ -21,12 +21,14 @@ extension OriWeatherDroplet: SettingsPaneProviding {
 }
 
 /// The room: a city, a unit, an interval and the pin, built from Droppy's own
-/// settings rows so it stays in step with the pages around it.
+/// settings rows so it stays in step with the pages around it. Rooted in
+/// `DropletSettingsPane`, so Droppy mounts it in its grouped Form and every
+/// row is the Form's own, separated by the Form rather than by dividers.
 struct WeatherRoom: View {
     @ObservedObject var droplet: OriWeatherDroplet
 
     var body: some View {
-        VStack(alignment: .leading, spacing: DroppySpacing.lg) {
+        DropletSettingsPane {
             if let search = droplet.search {
                 CityCard(droplet: droplet, search: search)
             }
@@ -61,7 +63,6 @@ struct WeatherRoom: View {
                     isOn: Binding(get: { droplet.pinned }, set: { droplet.pinned = $0 })
                 )
                 if droplet.canUseShortcut {
-                    DropletSettingsDivider()
                     DropletControlRow(
                         title: "Shortcut",
                         infoTip: "Shows or hides the weather on the wings from anywhere. Change it in Droppy's Settings, Shortcuts."
@@ -75,8 +76,8 @@ struct WeatherRoom: View {
 }
 
 /// The city row, and the matches under it. The SDK has no text-field row, so
-/// this is the one place the room goes off the components: a plain field in a
-/// stacked row, filled rather than outlined.
+/// the field is the system's own in a stacked row: the guides keep text fields
+/// native, with their border and focus ring.
 private struct CityCard: View {
     @ObservedObject var droplet: OriWeatherDroplet
     @ObservedObject var search: CitySearch
@@ -88,26 +89,22 @@ private struct CityCard: View {
                 subtitle: "From the city this Mac's internet address is in, checked against its time zone, and looked up again on a new network, after sleep and when the zone changes. With a VPN in another country, the time zone's city instead. GeoJS answers, and sees the address and nothing else.",
                 isOn: Binding(get: { droplet.automatic }, set: { droplet.automatic = $0 })
             )
-            DropletSettingsDivider()
             DropletStackedRow(
                 title: "City",
                 infoTip: "The weather is read for a city you name, not for where this Mac is. Open-Meteo is sent the name while you type and a coordinate rounded to about a kilometre."
             ) {
                 VStack(alignment: .leading, spacing: DroppySpacing.xs) {
-                    TextField("Search for a city", text: $search.query)
-                        .textFieldStyle(.plain)
-                        .font(.callout)
-                        .padding(.horizontal, DroppySpacing.sm)
-                        .padding(.vertical, DroppySpacing.xsm)
-                        .background(RoundedRectangle(cornerRadius: DroppyRadius.small, style: .continuous)
-                            .fill(AdaptiveColors.overlayAuto(DroppyOpacity.light)))
+                    // Labelled by the row's title: in a Form a field's own
+                    // label would sit beside it, and the prompt goes inside.
+                    TextField("City", text: $search.query, prompt: Text(verbatim: "Search for a city"))
+                        .labelsHidden()
+                        .textFieldStyle(.roundedBorder)
                     Text(verbatim: caption)
                         .font(.caption)
                         .foregroundStyle(AdaptiveColors.secondaryTextAuto)
                 }
             }
             ForEach(search.matches) { city in
-                DropletSettingsDivider()
                 Button {
                     droplet.choose(city)
                 } label: {

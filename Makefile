@@ -10,8 +10,11 @@ export DROPPYKIT
 
 .PHONY: test build validate icon shots offline screenshots install energy clean
 
+# The tests build on SwiftPM's native engine. Swift 6.4's default engine
+# codesigns the test bundle, and codesign refuses the Finder info iCloud Drive
+# writes on every folder under ~/Documents, where this repository lives.
 test:
-	swift test
+	swift test --build-system native
 	$(DROPPYKIT) build
 	$(MAKE) icon
 	$(DROPPYKIT) validate

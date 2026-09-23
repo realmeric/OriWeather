@@ -3,10 +3,10 @@
 Weather on Droppy's notch, drawn with better taste.
 
 A mark and the temperature on the wing when nothing else wants the notch.
-Hover it and the wing grows into a card: the condition, the city, what it
-feels like. Put it on the shelf and it sits there too, alone or beside another
-widget. When the network goes, the last reading stays up, dimmed, with how old
-it is where the condition was.
+Hover it and Droppy opens the shelf, where the widget has the condition, what
+it feels like, today's high and low and the hours ahead, alone or beside
+another widget. When the network goes, the last reading stays up, dimmed,
+with how old it is where the condition was.
 
 While the Mac is locked it sits in Droppy's status widgets row too, as a
 symbol, the degrees and the condition, or the degrees in a ring, whichever
@@ -17,13 +17,16 @@ on the shelf. Control-Option-Command-W flips it from anywhere, and Droppy's Sett
 Shortcuts, rebinds it. A press without all three never flips it.
 
 It is a Droplet, an extension that runs inside [Droppy](https://getdroppy.app),
-built with [DroppyKit](https://gitlab.com/droppyformac1/droppykit) 1.2.1.
+built with [DroppyKit](https://gitlab.com/droppyformac1/droppykit) 1.14.0.
 
 ## What it needs
 
-Droppy 15.3 or later, with the droplet signed by the Droppy Store. Or
-[Droppy Playground](https://getdroppy.app/download/playground), the free app
-that loads a droplet straight from `droppykit build`.
+Droppy 15.3 or later carrying DroppyKit 1.9.0 or newer, which draws the
+settings page in Droppy's native form. The Store's copy is signed by Droppy; a
+build of your own runs once you approve it under Settings, Store, Local
+droplets. [Droppy Playground](https://getdroppy.app/download/playground) loads
+a build straight from `droppykit build` too, from the first Playground that
+carries DroppyKit 1.9.0.
 
 ## What it sends
 

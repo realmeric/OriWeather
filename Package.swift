@@ -12,7 +12,7 @@ let package = Package(
         .library(name: "OriWeather", type: .dynamic, targets: ["OriWeather"])
     ],
     dependencies: [
-        .package(url: "https://gitlab.com/droppyformac1/droppykit.git", from: "1.2.0")
+        .package(url: "https://gitlab.com/droppyformac1/droppykit.git", from: "1.9.0")
     ],
     targets: [
         .target(

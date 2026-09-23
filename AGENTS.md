@@ -9,8 +9,8 @@ the notch, the shelf, the lock screen and the menu bar.
 
 - Droplet id: `ori-weather`. It is also `OriWeatherDroplet.id` in Swift and `id` in `droplet.json`; the three must agree or the loader refuses the bundle.
 - Swift product: `OriWeather`, a dynamic library. The harness target is `OriWeatherHarness`.
-- SDK checkout: `../droppykit` (DroppyKit 1.2.1). Docs online: https://getdroppy.app/docs/droppykit
-- Host: Droppy 15.3 or later, or the free Droppy Playground (https://getdroppy.app/download/playground), which loads unsigned bundles.
+- SDK checkout: `../droppykit` (DroppyKit 1.14.0). Docs online: https://getdroppy.app/docs/droppykit
+- Host: Droppy 15.3 or later, which runs an unsigned bundle once its user approves that build under Settings, Store, Local droplets and asks again each time it opens, or the free Droppy Playground (https://getdroppy.app/download/playground), which loads unsigned bundles without asking.
 
 ## The loop
 
@@ -58,9 +58,52 @@ package pins; `droppykit update` moves both to the newest release. A build that 
   `preferredPairedWidth` are required; Droppy refuses a descriptor that leaves either to a
   host fallback. Solo and paired are different compositions, not one view at two widths:
   branch on `context.isPaired`.
+- **Layout traits describe the widget's rectangle.** Every number in
+  `ShelfWidgetLayoutTraits` is the area the widget draws in, in points at the Regular shelf
+  size, exactly what the harness renders; Droppy adds its own chrome around it. `.fixed(150)`
+  is a 150-point rectangle, alone and in a row, clamped to 48 through 480. A widget that needs
+  more height declares more; it never pads its way out of a clip. A solo widget is never
+  narrower than 352 on a notch or 370 on an island, so lay out to `context.availableSize`.
+- **No card, no border around the widget.** Droppy paints nothing behind a widget and almost
+  every one of its own widgets lays its content directly on the shelf's black. Put no
+  background, fill, outline or rounded box on the widget's root view. `notchSurfaceCardFill`
+  is for a tile or a chip inside the widget that has to read as raised, never a frame.
+- **Lay the widget out like Droppy's.** The root view fills the rectangle
+  (`.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)`) with ONE
+  padding, `.padding(context.contentInsets)`, and nothing on top of it. That is the host's own
+  inset for the slot and it is ZERO under a notch: the shelf's chrome already inset the
+  rectangle, so padding again puts the widget lower and narrower than the built-in beside it.
+  Leading text, trailing `.monospacedDigit()` numbers, rows that span the
+  full width, a header row of a 12pt symbol and a 12pt semibold title with the widget's control
+  at its trailing end, `DroppySpacing` steps between rows. Declare the height the content
+  needs; never leave unused space or fill it with padding.
+- **The physical notch is cleared for you, except on a HUD strip.** The shelf, a takeover,
+  a HUD card and a live activity are inset past the camera housing by the host; never pad for
+  it. A HUD strip is handed the whole width across the housing: put its content at the two
+  outer edges and nothing in the middle (`host.environment.notchGeometry.closedWidth` is the
+  housing), the way the World Clock example's strip does. Never centre a strip.
+- **Droppy owns every motion around your surfaces; you animate only what you swap.** A live
+  activity row and a HUD are mounted exactly like Droppy's own, so never put an entrance
+  transition on the view a factory returns (it plays twice). A live activity is compact only:
+  hovering or clicking it opens the shelf, `makeExpanded` is not mounted, and Stop / Start
+  belong in the shelf widget. A glyph, label or control you swap while a surface is up takes
+  `DroppyTransition.compactContent` in a wing or strip and `DroppyTransition.element` in a
+  card, never a transition or spring of your own (`minAPI` 1.8.0).
+- **Buttons are Liquid Glass, Droppy's own.** `DroppyCircleButtonStyle` (20pt on an item,
+  24pt in a row) for an icon action, `DroppyQuietButtonStyle` and `DroppyAccentButtonStyle`
+  (`.small`) for labelled ones, `DroppyGlassButtonStyle` for a label with its own sizing.
+  Never a flat wash, a bordered chip or a white button of your own. A list with a control per
+  row wraps in `droppyFlatGlassControls()`. Only a live activity row's controls keep
+  `DroppyLiveActivityControlStyle`.
 - **Everything `activate(host:)` starts, `deactivate()` stops.** Timers, observers, tasks,
   connections. Swift cannot unload code, so anything left running runs until Droppy
   relaunches.
+- **A widget the user watches holds the shelf open while it runs.** The shelf closes when the
+  pointer leaves it; a teleprompter, countdown or live transcript calls
+  `host.shelf.setHoldsOpen(true)` when its work starts and `false` the moment it ends
+  (`shelf-write`, `minAPI` 1.5.0). A widget with nothing to show until it is configured sends
+  the user to its settings pane with `host.workspace.openSettings()`, and asks for permissions
+  there through `host.permissions`, never from the shelf.
 - **Host calls are gated by `capabilities`.** A service call without its capability in
   `droplet.json` is refused: it returns `false` or `nil` and logs one line. Declare what you
   use and only that; the user sees the list.
@@ -72,9 +115,11 @@ package pins; `droppykit update` moves both to the newest release. A build that 
 - **Look like Droppy, not like a guest.** Surfaces are dark. Foreground colours come from
   `AdaptiveColors`, spacing from `DroppySpacing`, radii from `DroppyRadius` with
   `style: .continuous`. No borders or outlines, no gradients, no ALL-CAPS labels, sentence
-  case everywhere, and never paint your own background on a widget. Settings panes are built
-  from `DropletSettingsCard`, `DropletControlRow`, `DropletToggleRow`, `DropletStackedRow`
-  and `DropletSliderRow`.
+  case everywhere, and never paint your own background on a widget. Settings panes are rooted
+  in `DropletSettingsPane` (`minAPI` 1.9.0) and built from `DropletSettingsCard`,
+  `DropletSettingsSection`, `DropletControlRow`, `DropletToggleRow`, `DropletStackedRow` and
+  `DropletSliderRow`; the host mounts the pane in its native grouped form, so the pane's
+  content is a list of sections, never a `VStack`, and it places no dividers.
 - **`droplet.json` is the truth for the build.** `Info.plist` is generated from it.
   `version` is numeric `major.minor.patch`; `summary` is at most 60 characters;
   `minAppVersion` stays `15.3.0` unless the droplet needs something newer; `kit.minAPI` is
@@ -140,10 +185,17 @@ AGENTS.md, CLAUDE.md, .cursor/    this brief and the agent wiring
 
 ## Submitting
 
-Droppy itself only loads droplets the Store review signed, which is why the Playground
-exists. When the droplet is done: replace the placeholder icon and creator avatar, fill in
-`creator` and `source` in `droplet.json`, push the repository, and run `droppykit submit`. It
-opens getdroppy.app/submit-droplet with the repository, commit and id filled in.
+Your own build runs in Droppy only after you approve it under Settings, Store, Local
+droplets, and Droppy asks again each time it opens; everyone else gets the droplet from
+the Store, signed by Droppy after review.
+When the droplet is done: replace the placeholder icon and creator avatar, fill in
+`creator` and `source` in `droplet.json`, write `CHANGELOG.md`, and run `droppykit submit`.
+The Store is a repository (gitlab.com/droppyformac1/droplets, one folder per droplet):
+`submit` forks it, copies this package into `droplets/<id>/`, pushes a branch and opens
+the merge request; when a maintainer merges it, the pipeline builds, signs and publishes
+it. `droppykit submit --print` shows the plan without doing it (needs `glab`, signed in).
+Opening the merge request means accepting the Droplet developer terms at
+https://getdroppy.app/droplet-developer-terms.
 
 ## This repository
 
@@ -154,3 +206,9 @@ opens getdroppy.app/submit-droplet with the repository, commit and id filled in.
 `.mcp.json` and `.cursor/` are not in the repository: `droppykit agent` writes
 them with absolute paths for one Mac. After cloning, run `droppykit agent` in
 the package to write your own, with the DroppyKit checkout beside this one.
+
+The Store's copy is `droplets/ori-weather` in gitlab.com/droppyformac1/droplets.
+`droppykit submit` copies this folder as it is on disk, and it holds files
+that stay on this Mac (`KANBAN.md`, `docs/look.md`), so run it from an export
+of the commit: `git archive HEAD | tar -x -C <empty folder>`, then
+`droppykit submit` in that folder.

@@ -33,9 +33,16 @@ enum Look {
     /// (352 on a notch), so the widget is laid out at the width it gets.
     static let shelfSoloWidth: CGFloat = 370
     static let shelfPairedWidth: CGFloat = 170
-    /// The widget's height: the header, the reading and the hours ahead,
-    /// and nothing more.
-    static let shelfHeight: CGFloat = 152
+    /// The widget's height: the header, the reading and the hours ahead, 129
+    /// points, inside the 12 a solo card on an island is inset on every
+    /// edge. Under a notch the host insets nothing, and what that leaves sits
+    /// above the hours.
+    static let shelfHeight: CGFloat = 153
+    /// The header row, as tall as one with a control at its end, like the
+    /// SDK's example. Under a notch the host pads nothing and clips the
+    /// widget at an 18 pt corner, and a shorter row puts the symbol in the
+    /// curve.
+    static let headerHeight: CGFloat = 20
     /// Alone on the shelf: the mark and the degrees large enough to read
     /// from across the desk.
     static let shelfMark: CGFloat = 34

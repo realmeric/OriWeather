@@ -1,8 +1,10 @@
 import DroppyKit
 import SwiftUI
 
-/// The card the wing grows into on hover: the mark, the degrees large with the
-/// condition under them, and the city with what it feels like on the right.
+/// The card the wing grew into on hover, before Droppy opened the shelf there
+/// instead: the mark, the degrees large with the condition under them, and the
+/// city with what it feels like on the right. Nothing in Droppy mounts it now
+/// (see `makeExpanded`).
 ///
 /// Exactly `availableWidth` by `cardContentHeight` and not a point taller,
 /// because a taller view is clipped without a word. Nothing avoids the camera

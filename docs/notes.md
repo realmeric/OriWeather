@@ -377,3 +377,73 @@ It is written down as unproven, to be measured again on an idle Mac.
 
 The version is 1.0.1: the Store compares versions to decide who needs an
 update, and the guide says to raise it on every submission.
+
+## DroppyKit 1.14.0, and the Store as a repository (2026-09-23)
+
+The SDK went from 1.4.1 to 1.14.0, still ABI 1 and Droppy 15.3. The checkout
+was on a tag again, so it was put on `main`, which is 1.14.0, where
+`droppykit update` can fast-forward next time; the package pin moved with
+`swift package update droppykit`. Two of the new APIs are called now,
+`ShelfWidgetContext.contentInsets` (1.6.0) and `DropletSettingsPane` (1.9.0),
+so `kit.minAPI` and the `from:` in `Package.swift` are 1.9.0.
+
+The widget pads `context.contentInsets` instead of 14 points: zero under a
+notch, 12 on every edge for a solo card on an island. With the padding gone
+the header sat in the 18 point corner the host clips a widget to, and the
+shots showed the pin's head and the low's degree sign cut off, and beside
+another widget the first and last letters of the bottom row. The header is 20
+points tall now, the height the World Clock example's header gets from its
+button; the high and low moved from the end of the header to the end of the
+reading; the paired rows follow the condition instead of standing on the
+bottom edge. The solo composition measures 129 points, and the height is 153
+so that it fits inside the island's inset. Under a notch that leaves 24
+points above the hours.
+
+The harness hands both of its shelf stages the session's curvature, so its
+island never gets that inset and its 34 point corner cuts the pin, as it does
+the SDK's own World Clock. `IslandTests` draws the island card the way the
+host insets it, into `shots/extra/shelf-island.png`, and fails if the
+composition outgrows it. The Store's shelf screenshot is the notch stage only.
+
+Since 1.8.1 a live activity is compact only: hovering or clicking it opens the
+shelf, onto the widget `expandedWidgetID` names, and `makeExpanded` is not
+mounted. The card stays, because the protocol still requires it and the
+harness still draws it, but the description, the README and the Store's wing
+screenshot stopped promising it.
+
+The settings pane is rooted in `DropletSettingsPane`, which Droppy mounts in
+its grouped Form; the dividers went, because the Form separates the rows. The
+guide now says to keep text fields native, so the city field is the system's
+rounded one. In a Form a field's title becomes a label beside it, so the
+field is labelled by its row and "Search for a city" is its prompt. With a
+name typed in (a prefill for one shot, not committed) the matches came out as
+Form rows.
+
+No host on this Mac can load the droplet yet. The Playground is 1.0.12, with
+DroppyKit 1.4 and no `contentInsets`; the newest Playground, 1.0.20 from
+2026-09-13, is older than 1.9.0, which was tagged on 2026-09-22; Droppy is
+15.2.3-nightly.20260912, below 15.3, with 1.6. So the install step of the
+loop and `make energy` were not run this round. The unit tests, the harness,
+`droppykit validate` and the Store's own `scripts/validate.py` were.
+
+Swift 6.4 builds tests on the swiftbuild engine by default, which codesigns
+the test bundle, and codesign refuses it with "resource fork, Finder
+information, or similar detritus not allowed": iCloud Drive's file provider
+writes Finder info on every folder under `~/Documents`. `make test` builds the
+tests on the native engine. `droppykit build` signs nothing and was not
+affected.
+
+The Store is a repository now, gitlab.com/droppyformac1/droplets, one folder
+per droplet, and a merge request is the submission. Its pipeline wants
+`source.repository` to be the folder's page there, `creator.gitlab` to be the
+maintainer's GitLab username (it generates `CODEOWNERS`), and `CHANGELOG.md`
+to open with the version's entry. `source.commit` is ignored and was dropped,
+which ends the "Pin the commit the Store review reads" commits: the merged
+commit is what the pipeline builds. `droppykit submit` copies the package as
+it is on disk and leaves out only the build products and the agent files, so
+from this folder it would also send `KANBAN.md` and `docs/look.md`, which stay
+on this Mac, and an SDK clone that sits untracked in `droppykit/`. It is run
+from an export of the commit instead.
+
+The version stays 1.0.1. The 1.0.0 that went through the old form was never
+published, and 1.0.1 is the version the merge request was asked for.

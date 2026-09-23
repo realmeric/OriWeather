@@ -38,7 +38,10 @@ extension OriWeatherDroplet: LiveActivityProviding {
         AnyView(CompanionDetail(droplet: self))
     }
 
-    /// The card the row grows into on hover.
+    /// The card the row grew into on hover. Droppy stopped mounting it in
+    /// DroppyKit 1.8.1: hovering or clicking the row now opens the shelf, onto
+    /// the widget `expandedWidgetID` names. It stays because the protocol
+    /// still requires it, and the harness still draws it.
     public func makeExpanded(context: LiveActivityContext) -> AnyView {
         AnyView(ExpandedCard(droplet: self, context: context))
     }
