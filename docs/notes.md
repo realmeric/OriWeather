@@ -383,21 +383,23 @@ update, and the guide says to raise it on every submission.
 The SDK went from 1.4.1 to 1.14.0, still ABI 1 and Droppy 15.3. The checkout
 was on a tag again, so it was put on `main`, which is 1.14.0, where
 `droppykit update` can fast-forward next time; the package pin moved with
-`swift package update droppykit`. Two of the new APIs are called now,
-`ShelfWidgetContext.contentInsets` (1.6.0) and `DropletSettingsPane` (1.9.0),
-so `kit.minAPI` and the `from:` in `Package.swift` are 1.9.0.
+`swift package update droppykit`. `kit.minAPI` stays 1.1.0 and the `from:`
+in `Package.swift` 1.2.0, because nothing newer is called; why, is under
+"What loads it" below.
 
-The widget pads `context.contentInsets` instead of 14 points: zero under a
-notch, 12 on every edge for a solo card on an island. With the padding gone
-the header sat in the 18 point corner the host clips a widget to, and the
+The widget pads what the host gives its own widgets instead of 14 points: zero
+under a notch, 12 on every edge for a solo card on an island. DroppyKit 1.6.0
+hands that over as `ShelfWidgetContext.contentInsets`; the droplet works it
+out from `usesIslandCurvature`, which the 1.4 hosts have too. With the padding
+gone the header sat in the 18 point corner the host clips a widget to, and the
 shots showed the pin's head and the low's degree sign cut off, and beside
 another widget the first and last letters of the bottom row. The header is 20
 points tall now, the height the World Clock example's header gets from its
 button; the high and low moved from the end of the header to the end of the
 reading; the paired rows follow the condition instead of standing on the
 bottom edge. The solo composition measures 129 points, and the height is 153
-so that it fits inside the island's inset. Under a notch that leaves 24
-points above the hours.
+so that it fits inside the island's inset. Under a notch that leaves 24 points
+above the hours.
 
 The harness hands both of its shelf stages the session's curvature, so its
 island never gets that inset and its 34 point corner cuts the pin, as it does
@@ -411,20 +413,25 @@ mounted. The card stays, because the protocol still requires it and the
 harness still draws it, but the description, the README and the Store's wing
 screenshot stopped promising it.
 
-The settings pane is rooted in `DropletSettingsPane`, which Droppy mounts in
-its grouped Form; the dividers went, because the Form separates the rows. The
-guide now says to keep text fields native, so the city field is the system's
-rounded one. In a Form a field's title becomes a label beside it, so the
-field is labelled by its row and "Search for a city" is its prompt. With a
-name typed in (a prefill for one shot, not committed) the matches came out as
-Form rows.
+The guide now says to keep text fields native, so the city field is the
+system's rounded one. In a Form a field's title becomes a label beside it,
+so the field is labelled by its row and "Search for a city" is its prompt.
 
-No host on this Mac can load the droplet yet. The Playground is 1.0.12, with
-DroppyKit 1.4 and no `contentInsets`; the newest Playground, 1.0.20 from
-2026-09-13, is older than 1.9.0, which was tagged on 2026-09-22; Droppy is
-15.2.3-nightly.20260912, below 15.3, with 1.6. So the install step of the
-loop and `make energy` were not run this round. The unit tests, the harness,
-`droppykit validate` and the Store's own `scripts/validate.py` were.
+What loads it. The guides root a settings pane in `DropletSettingsPane`
+(1.9.0), and a first build did, with `minAPI` 1.9.0: Droppy mounted it in its
+grouped Form, and with a name typed in (a prefill for one shot, not
+committed) the matches came out as Form rows. The Playground here refused it:
+"Needs DroppyKit 1.9.0 or newer; this Droppy has 1.4.0." Nothing that could
+load it had shipped: the newest Playground, 1.0.20 from 2026-09-13, is older
+than 1.9.0, tagged on 2026-09-22, and getdroppy.app still hands out Droppy
+15.2.2-beta.1, below the 15.3 every droplet needs. So the pane stays a stack
+of cards, with its dividers for the hosts that need them: a host with 1.9 or
+later draws those cards in its Form's chrome by hand, which is the harness's
+shot, and an older one draws its own. Built against 1.14.0 and declaring
+1.1.0, the droplet loaded in Playground 1.0.12 ("Droplet ori-weather 1.0.1
+activated", "1 running of 1 installed"): compiling against a newer SDK than
+the host costs nothing while no newer symbol is called. `make energy` was not
+run this round.
 
 Swift 6.4 builds tests on the swiftbuild engine by default, which codesigns
 the test bundle, and codesign refuses it with "resource fork, Finder

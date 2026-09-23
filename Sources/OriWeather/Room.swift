@@ -21,14 +21,15 @@ extension OriWeatherDroplet: SettingsPaneProviding {
 }
 
 /// The room: a city, a unit, an interval and the pin, built from Droppy's own
-/// settings rows so it stays in step with the pages around it. Rooted in
-/// `DropletSettingsPane`, so Droppy mounts it in its grouped Form and every
-/// row is the Form's own, separated by the Form rather than by dividers.
+/// settings rows so it stays in step with the pages around it. A stack of
+/// cards rather than `DropletSettingsPane`, which needs DroppyKit 1.9.0: a
+/// host with 1.9 or later draws these cards in its grouped Form's chrome, and
+/// an older one separates the rows by the dividers.
 struct WeatherRoom: View {
     @ObservedObject var droplet: OriWeatherDroplet
 
     var body: some View {
-        DropletSettingsPane {
+        VStack(alignment: .leading, spacing: DroppySpacing.lg) {
             if let search = droplet.search {
                 CityCard(droplet: droplet, search: search)
             }
@@ -63,6 +64,7 @@ struct WeatherRoom: View {
                     isOn: Binding(get: { droplet.pinned }, set: { droplet.pinned = $0 })
                 )
                 if droplet.canUseShortcut {
+                    DropletSettingsDivider()
                     DropletControlRow(
                         title: "Shortcut",
                         infoTip: "Shows or hides the weather on the wings from anywhere. Change it in Droppy's Settings, Shortcuts."
@@ -89,13 +91,14 @@ private struct CityCard: View {
                 subtitle: "From the city this Mac's internet address is in, checked against its time zone, and looked up again on a new network, after sleep and when the zone changes. With a VPN in another country, the time zone's city instead. GeoJS answers, and sees the address and nothing else.",
                 isOn: Binding(get: { droplet.automatic }, set: { droplet.automatic = $0 })
             )
+            DropletSettingsDivider()
             DropletStackedRow(
                 title: "City",
                 infoTip: "The weather is read for a city you name, not for where this Mac is. Open-Meteo is sent the name while you type and a coordinate rounded to about a kilometre."
             ) {
                 VStack(alignment: .leading, spacing: DroppySpacing.xs) {
-                    // Labelled by the row's title: in a Form a field's own
-                    // label would sit beside it, and the prompt goes inside.
+                    // Labelled by the row's title, which a Form would
+                    // otherwise print beside the field; the prompt goes inside.
                     TextField("City", text: $search.query, prompt: Text(verbatim: "Search for a city"))
                         .labelsHidden()
                         .textFieldStyle(.roundedBorder)
@@ -105,6 +108,7 @@ private struct CityCard: View {
                 }
             }
             ForEach(search.matches) { city in
+                DropletSettingsDivider()
                 Button {
                     droplet.choose(city)
                 } label: {
