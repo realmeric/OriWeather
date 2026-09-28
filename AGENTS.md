@@ -207,11 +207,10 @@ https://getdroppy.app/droplet-developer-terms.
 them with absolute paths for one Mac. After cloning, run `droppykit agent` in
 the package to write your own, with the DroppyKit checkout beside this one.
 
-The settings pane is a stack of cards and the widget works its inset out
-from `usesIslandCurvature`, where the brief above says `DropletSettingsPane`
-and `contentInsets`. Those need DroppyKit 1.9.0 and 1.6.0, and no Playground
-or Droppy release carried them when 1.0.1 was submitted; `docs/notes.md` has
-the refusal. Move to them when one does, and raise `kit.minAPI` with them.
+The settings pane is rooted in `DropletSettingsPane` and the widget pads
+`context.contentInsets` once at its root, as the brief above says. That makes
+`kit.minAPI` 1.9.0, and nothing the droplet calls is newer; `docs/notes.md`
+has the audit.
 
 The Store's copy is `droplets/ori-weather` in gitlab.com/droppyformac1/droplets.
 `droppykit submit` copies this folder as it is on disk, and it holds files

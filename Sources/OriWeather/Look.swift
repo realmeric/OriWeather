@@ -34,16 +34,10 @@ enum Look {
     static let shelfSoloWidth: CGFloat = 370
     static let shelfPairedWidth: CGFloat = 170
     /// The widget's height: the header, the reading and the hours ahead, 129
-    /// points, inside the 12 a solo card on an island is inset on every
-    /// edge. Under a notch the host insets nothing, and what that leaves sits
-    /// above the hours.
+    /// points, inside the host's `contentInsets`, which are 12 on every edge
+    /// of a solo card on an island. Under a notch the host insets nothing,
+    /// and what that leaves sits above the hours.
     static let shelfHeight: CGFloat = 153
-    /// What Droppy insets a widget by: 12 on every edge of a solo card on an
-    /// island, whose arc cuts the corners, and nothing anywhere else.
-    /// DroppyKit 1.6.0 hands the same number over as
-    /// `ShelfWidgetContext.contentInsets`; working it out from the curvature
-    /// keeps the droplet loading on hosts older than that.
-    static func widgetInset(onIsland: Bool) -> CGFloat { onIsland ? 12 : 0 }
     /// The header row, as tall as one with a control at its end, like the
     /// SDK's example. Under a notch the host pads nothing and clips the
     /// widget at an 18 pt corner, and a shorter row puts the symbol in the

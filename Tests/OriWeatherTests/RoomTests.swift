@@ -54,4 +54,14 @@ final class RoomTests: XCTestCase {
         XCTAssertEqual(test.preferences.namespacedKey("pinned"), "droplet.ori-weather.pinned")
         droplet.deactivate()
     }
+
+    /// A name asked about with nothing back says so, whether the geocoder
+    /// knew no town by it or the network did not answer; a name too short to
+    /// ask about, or one that found something, does not.
+    func testNothingFoundIsSaidOnlyForANameThatWasAskedAbout() {
+        XCTAssertTrue(CitySection.foundNothing(query: "Xqzv", matches: []))
+        XCTAssertFalse(CitySection.foundNothing(query: "X", matches: []))
+        XCTAssertFalse(CitySection.foundNothing(query: "  ", matches: []))
+        XCTAssertFalse(CitySection.foundNothing(query: "Istanbul", matches: [Sky.istanbul]))
+    }
 }

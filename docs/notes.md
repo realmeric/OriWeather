@@ -454,3 +454,35 @@ from an export of the commit instead.
 
 The version stays 1.0.1. The 1.0.0 that went through the old form was never
 published, and 1.0.1 is the version the merge request was asked for.
+
+## The Store's review of !35: the host's inset and the native pane (2026-09-28)
+
+Jordy's review of the merge request at `cb33c1d7` asked for the two things
+the round before had held back: `ShelfWidgetContext.contentInsets` instead of
+`Look.widgetInset`, and a settings pane rooted in `DropletSettingsPane` with
+native controls. `Look.widgetInset` is gone and the widget pads
+`context.contentInsets` once at its root; the number is the same (12 on every
+edge of a solo card on an island, zero anywhere else), so the layout and the
+153 point height are unchanged, and `IslandTests` still holds.
+
+The pane is `DropletSettingsPane` with two headerless cards and no dividers.
+The unit and the interval are a SwiftUI `Picker` with the menu style inside
+`DropletGroupedPickerRow`, the system's pop-up button; each city the search
+finds is a row with a bordered Choose button, where it was a plain button
+wrapped round a row. The caption under the field says "Searching…" while the
+geocoder is asked and "Nothing found" when a name came back empty, which is
+also what an offline Mac sees. There are no section headers: "Weather" would
+sit too close to the droplet's own name, which the Store's pipeline refuses
+as a title in a pane.
+
+`kit.minAPI` is 1.9.0 and `Package.swift` asks for DroppyKit `from: "1.9.0"`.
+Every other DroppyKit symbol under `Sources/OriWeather/` was checked against
+the SDK's history (`git log -S`, first tag containing it): everything is in
+1.0.0 except `DroppyLiveActivityMetrics.cardContentHeight`, which is 1.1.0,
+so nothing asks for more than 1.9.0. `creator.gitlab` is a manifest field
+(1.11.0 in the SDK's types), read by the Store's pipeline and not by the
+droplet's code; a host older than 1.11.0 ignores the key.
+
+This round was written in a Linux session with no Swift toolchain and no Mac,
+so it was not built, validated, shot or installed there. Those steps are the
+Mac's.

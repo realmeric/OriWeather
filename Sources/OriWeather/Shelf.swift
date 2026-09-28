@@ -33,8 +33,9 @@ extension OriWeatherDroplet: ShelfWidgetProviding {
 /// The weather on the shelf. Solo and paired are different compositions, not
 /// one view at two widths, and the switch is `isCompact`. No background:
 /// Droppy paints nothing behind a widget. The one padding is the host's own
-/// for the slot, which is zero under a notch, where the shelf's chrome has
-/// already inset the rectangle (`Look.widgetInset`).
+/// for the slot, `context.contentInsets`: zero under a notch, where the
+/// shelf's chrome has already inset the rectangle, and 12 on every edge of a
+/// solo card on an island, whose arc cuts the corners.
 struct WeatherWidget: View {
     @ObservedObject var droplet: OriWeatherDroplet
     let context: ShelfWidgetContext
@@ -61,7 +62,7 @@ struct WeatherWidget: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
             }
         }
-        .padding(Look.widgetInset(onIsland: context.usesIslandCurvature))
+        .padding(context.contentInsets)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .environment(\.weatherInk, ink)
     }
