@@ -454,3 +454,48 @@ from an export of the commit instead.
 
 The version stays 1.0.1. The 1.0.0 that went through the old form was never
 published, and 1.0.1 is the version the merge request was asked for.
+
+## Review of !35: the host's inset, the native pane, minAPI 1.9.0 (2026-09-28)
+
+Jordy's review of cb33c1d7 asked for three things: pad the widget by
+`context.contentInsets` instead of `Look.widgetInset`, root the settings pane
+in `DropletSettingsPane` with native controls, and declare the `minAPI` those
+need, with the package's lower bound to match. All three are in:
+`.padding(context.contentInsets)` once at the widget's root, the pane rooted in
+`DropletSettingsPane` with the unit and the interval as
+`DropletGroupedPickerRow`s around a menu `Picker` and no dividers placed,
+`kit.minAPI` 1.9.0 and `from: "1.9.0"` in `Package.swift`. Every API the
+ledger adds from 1.9.1 to 1.14.0 was searched for in the sources and none is
+called, so nothing asks for more than 1.9.0.
+
+What loads it. Playground 1.0.20 refused it ("Needs DroppyKit 1.9.0 or newer;
+this Droppy has 1.8.1."); 1.0.27, from getdroppy.app on this day, loaded it
+("Droplet ori-weather 1.0.1 activated", "1 running of 1 installed"). The Store
+pipeline builds against DroppyKit 1.19.0 (its `droppykit.lock`), so 1.9.0
+builds there.
+
+Seen in Playground 1.0.27, with Droppy 16 quit because its notch sits over the
+Playground's. The pane is Droppy's grouped Form under its own header: two
+sections, the pop-ups and the switches the Form's own. Typing "Kaunas" listed
+Kaunas, Lithuania and Kaonasughu, Solomon Islands as Form rows; choosing Kaunas
+switched the automatic city off and the wings went to the night mark and 13°.
+Turning the automatic city on again found Istanbul. On the shelf, solo under
+the notch the widget starts at the rectangle's edge with no inset of its own,
+and solo on the island the host's 12 points keep the pin and the low inside
+the arc; paired beside Now Playing, the notch and the island both show the
+header, 13°, "Clear" and the two rows whole. With `OW_DEMO=stale` the reading
+stayed up dimmed with "2 h ago" where the condition was. Removing the droplet
+from its page logged "clock stopped" as the host removed it and cleared the
+wings; reinstalling brought them back with Kaunas and the pin kept.
+Playground 1.0.27 has no switch that turns a local droplet off and on, so
+removal and reinstall stood in for disable and re-enable.
+
+"Denied location access" has nothing to deny: the droplet asks for no location
+permission. What stands in for it is the network refused, which
+`make offline` checks with every capability taken away: no problems, nothing
+read, the shortcut row gone with its capability.
+
+The branch's conflict with Store main was `CODEOWNERS`, which main regenerated
+after openclip became dropclip and tinycast left. Main's `validate.py` also
+refuses a pane that repeats the droplet's name or icon, which this one never
+did.

@@ -20,43 +20,42 @@ extension OriWeatherDroplet: SettingsPaneProviding {
     }
 }
 
-/// The room: a city, a unit, an interval and the pin, built from Droppy's own
-/// settings rows so it stays in step with the pages around it. A stack of
-/// cards rather than `DropletSettingsPane`, which needs DroppyKit 1.9.0: a
-/// host with 1.9 or later draws these cards in its grouped Form's chrome, and
-/// an older one separates the rows by the dividers.
+/// The room: a city, a unit, an interval and the pin, rooted in
+/// `DropletSettingsPane` (DroppyKit 1.9.0), so Droppy mounts the sections in
+/// its grouped Form and every row is the Form's own: the cards are sections,
+/// the toggles its switches, the pickers its pop-up buttons. The Form
+/// separates the rows, so no divider is placed.
 struct WeatherRoom: View {
     @ObservedObject var droplet: OriWeatherDroplet
 
     var body: some View {
-        VStack(alignment: .leading, spacing: DroppySpacing.lg) {
+        DropletSettingsPane {
             if let search = droplet.search {
                 CityCard(droplet: droplet, search: search)
             }
             DropletSettingsCard {
-                settingsUnifiedPickerRow(
+                DropletGroupedPickerRow(
                     title: "Unit",
-                    subtitle: "Converted from the one reading, never fetched twice.",
-                    options: TemperatureUnit.allCases,
-                    groupPosition: .top,
-                    isSelected: { $0 == droplet.unit },
-                    action: { droplet.unit = $0 }
-                ) { unit, selected, enabled in
-                    settingsUnifiedSegmentLabel(icon: "thermometer.medium",
-                                                title: unit == .celsius ? "Celsius" : "Fahrenheit",
-                                                isSelected: selected, isEnabled: enabled)
+                    subtitle: "Converted from the one reading, never fetched twice."
+                ) {
+                    Picker("Unit", selection: Binding(get: { droplet.unit }, set: { droplet.unit = $0 })) {
+                        ForEach(TemperatureUnit.allCases, id: \.self) { unit in
+                            Text(verbatim: unit == .celsius ? "Celsius" : "Fahrenheit").tag(unit)
+                        }
+                    }
+                    .pickerStyle(.menu)
                 }
-                settingsUnifiedPickerRow(
+                DropletGroupedPickerRow(
                     title: "Refresh every",
-                    subtitle: "One reading per interval, and only while the weather is on the notch or the shelf.",
-                    options: Preferences.intervals,
-                    groupPosition: .middle,
-                    isSelected: { $0 == droplet.intervalMinutes },
-                    action: { droplet.intervalMinutes = $0 }
-                ) { minutes, selected, enabled in
-                    settingsUnifiedSegmentLabel(icon: "clock",
-                                                title: minutes == 60 ? "1 hour" : "\(minutes) min",
-                                                isSelected: selected, isEnabled: enabled)
+                    subtitle: "One reading per interval, and only while the weather is on the notch or the shelf."
+                ) {
+                    Picker("Refresh every", selection: Binding(get: { droplet.intervalMinutes },
+                                                               set: { droplet.intervalMinutes = $0 })) {
+                        ForEach(Preferences.intervals, id: \.self) { minutes in
+                            Text(verbatim: minutes == 60 ? "1 hour" : "\(minutes) min").tag(minutes)
+                        }
+                    }
+                    .pickerStyle(.menu)
                 }
                 DropletToggleRow(
                     title: "Keep on the notch",
@@ -64,7 +63,6 @@ struct WeatherRoom: View {
                     isOn: Binding(get: { droplet.pinned }, set: { droplet.pinned = $0 })
                 )
                 if droplet.canUseShortcut {
-                    DropletSettingsDivider()
                     DropletControlRow(
                         title: "Shortcut",
                         infoTip: "Shows or hides the weather on the wings from anywhere. Change it in Droppy's Settings, Shortcuts."
@@ -79,7 +77,8 @@ struct WeatherRoom: View {
 
 /// The city row, and the matches under it. The SDK has no text-field row, so
 /// the field is the system's own in a stacked row: the guides keep text fields
-/// native, with their border and focus ring.
+/// native, with their border and focus ring. Each match is a row of its own,
+/// which is how the Form lays out content under a row.
 private struct CityCard: View {
     @ObservedObject var droplet: OriWeatherDroplet
     @ObservedObject var search: CitySearch
@@ -91,7 +90,6 @@ private struct CityCard: View {
                 subtitle: "From the city this Mac's internet address is in, checked against its time zone, and looked up again on a new network, after sleep and when the zone changes. With a VPN in another country, the time zone's city instead. GeoJS answers, and sees the address and nothing else.",
                 isOn: Binding(get: { droplet.automatic }, set: { droplet.automatic = $0 })
             )
-            DropletSettingsDivider()
             DropletStackedRow(
                 title: "City",
                 infoTip: "The weather is read for a city you name, not for where this Mac is. Open-Meteo is sent the name while you type and a coordinate rounded to about a kilometre."
@@ -108,7 +106,6 @@ private struct CityCard: View {
                 }
             }
             ForEach(search.matches) { city in
-                DropletSettingsDivider()
                 Button {
                     droplet.choose(city)
                 } label: {

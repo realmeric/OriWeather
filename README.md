@@ -21,10 +21,12 @@ built with [DroppyKit](https://gitlab.com/droppyformac1/droppykit) 1.14.0.
 
 ## What it needs
 
-Droppy 15.3 or later. The Store's copy is signed by Droppy; a build of your
-own runs once you approve it under Settings, Store, Local droplets.
+Droppy 15.3 or later carrying DroppyKit 1.9.0 or later, which the settings
+pane is rooted in; an older host refuses the bundle and says so on its Store
+row. The Store's copy is signed by Droppy; a build of your own runs once you
+approve it under Settings, Store, Local droplets.
 [Droppy Playground](https://getdroppy.app/download/playground), the free app,
-loads a build straight from `droppykit build`.
+loads a build straight from `droppykit build` from version 1.0.27.
 
 ## What it sends
 
