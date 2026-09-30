@@ -4,12 +4,10 @@ import SwiftUI
 import XCTest
 @testable import OriWeather
 
-/// The harness hands both of its shelf stages the session's own curvature, so
-/// its island never gets the 12 pt a solo card there is inset on every edge,
-/// and the island's corner cuts into a widget the host would have inset. This
-/// draws that card the way the host does, at the declared size, and checks
-/// the solo composition fits inside the inset. The picture lands in
-/// `shots/extra/`.
+/// A solo card on an island, drawn the way the host draws it: the island's
+/// curvature, the host's inset for it (none since DroppyKit 1.20.1, the shell
+/// being the clip) and the declared size. The solo composition has to fit. The
+/// picture lands in `shots/extra/`.
 @MainActor
 final class IslandTests: XCTestCase {
     func testTheSoloWidgetFitsInsideTheIslandsInset() async throws {

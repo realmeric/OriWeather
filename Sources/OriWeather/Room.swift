@@ -75,9 +75,9 @@ struct WeatherRoom: View {
     }
 }
 
-/// The city row, and the matches under it. The SDK has no text-field row, so
-/// the field is the system's own in a stacked row: the guides keep text fields
-/// native, with their border and focus ring. Each match is a row of its own,
+/// The city row, and the matches under it. The SDK has no search row, so the
+/// field is the system's search field in a stacked row, the one Droppy's own
+/// settings search with. Each match is a row of its own,
 /// which is how the Form lays out content under a row.
 private struct CityCard: View {
     @ObservedObject var droplet: OriWeatherDroplet
@@ -95,11 +95,7 @@ private struct CityCard: View {
                 infoTip: "The weather is read for a city you name, not for where this Mac is. Open-Meteo is sent the name while you type and a coordinate rounded to about a kilometre."
             ) {
                 VStack(alignment: .leading, spacing: DroppySpacing.xs) {
-                    // Labelled by the row's title, which a Form would
-                    // otherwise print beside the field; the prompt goes inside.
-                    TextField("City", text: $search.query, prompt: Text(verbatim: "Search for a city"))
-                        .labelsHidden()
-                        .textFieldStyle(.roundedBorder)
+                    CitySearchField(text: $search.query, prompt: "Search for a city")
                     Text(verbatim: caption)
                         .font(.caption)
                         .foregroundStyle(AdaptiveColors.secondaryTextAuto)

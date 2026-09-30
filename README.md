@@ -69,17 +69,19 @@ is only fetched again if it is older than the interval.
 
 ## Building it
 
+With the [DroppyKit](https://gitlab.com/droppyformac1/droppykit) checkout on
+the PATH:
+
 ```bash
-make test      # unit tests, the bundle, the Store's checks, the harness's verdict
-make install   # into Droppy Playground
-make energy    # what it costs the Playground, against the Playground without it
+droppykit build      # the bundle, universal
+droppykit run        # the harness, every surface at Droppy's own metrics
+swift test           # the unit tests
 ```
 
-`make test` needs the [DroppyKit](https://gitlab.com/droppyformac1/droppykit)
-checkout: `droppykit` on the PATH, or the repository cloned beside this one,
-or `make SDK=/path/to/droppykit test`.
-`OW_DEMO=1 make install` puts a fixed sky in the Playground without asking the
-network anything; `OW_DEMO=stale` shows what an aeroplane looks like.
+The development tooling, `make test` (the gate), the energy check against
+Droppy Playground, the icon script and the notes on what the machine taught
+along the way, lives in [github.com/realmeric/OriWeather](https://github.com/realmeric/OriWeather).
+The Store's copy of the droplet carries only the package.
 
 The limit worth knowing: the harness draws every surface at Droppy's own
 metrics, but it does not decide who gets the notch. What the droplet does when

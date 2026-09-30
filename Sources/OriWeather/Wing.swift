@@ -47,7 +47,8 @@ extension OriWeatherDroplet: LiveActivityProviding {
     }
 }
 
-/// The mark at the wing's glyph size.
+/// The mark at the wing's glyph size, dimmed with the figure beside it once
+/// the reading has stopped arriving.
 struct WingMark: View {
     @ObservedObject var droplet: OriWeatherDroplet
 
@@ -56,6 +57,7 @@ struct WingMark: View {
             WeatherMark(code: glance.reading.code, isDay: glance.reading.isDay)
                 .frame(width: DroppyLiveActivityMetrics.iconSize,
                        height: DroppyLiveActivityMetrics.iconSize)
+                .opacity(glance.isStale ? Look.staleOpacity : 1)
                 .accessibilityHidden(true)
         }
     }
@@ -63,18 +65,21 @@ struct WingMark: View {
 
 /// The degrees at the wing's label size, in plain SF,
 /// with monospaced digits so the wing does not jitter when the figure moves.
+/// An old reading is dimmed, as it is on the shelf: a two hour old number at
+/// full brightness reads as the temperature now.
 struct WingDegrees: View {
     @ObservedObject var droplet: OriWeatherDroplet
 
     var body: some View {
         if let glance = droplet.glance {
-            WingFigure(text: glance.degrees)
+            WingFigure(text: glance.degrees, isStale: glance.isStale)
         }
     }
 }
 
 struct WingFigure: View {
     let text: String
+    var isStale = false
 
     var body: some View {
         Text(verbatim: text)
@@ -83,6 +88,7 @@ struct WingFigure: View {
             .foregroundStyle(AdaptiveColors.notchSurfacePrimaryText)
             .lineLimit(1)
             .fixedSize()
+            .opacity(isStale ? Look.staleOpacity : 1)
     }
 }
 

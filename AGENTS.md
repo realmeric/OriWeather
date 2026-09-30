@@ -216,4 +216,6 @@ The Store's copy is `droplets/ori-weather` in gitlab.com/droppyformac1/droplets.
 `droppykit submit` copies this folder as it is on disk, and it holds files
 that stay on this Mac (`KANBAN.md`, `docs/look.md`), so run it from an export
 of the commit: `git archive HEAD | tar -x -C <empty folder>`, then
-`droppykit submit` in that folder.
+`droppykit submit` in that folder. The Store folder holds the package and
+nothing else, as its CONTRIBUTING.md lists: `docs/`, `scripts/` and the
+`Makefile` stay in this repository and are left out of the Store's copy.

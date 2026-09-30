@@ -499,3 +499,30 @@ The branch's conflict with Store main was `CODEOWNERS`, which main regenerated
 after openclip became dropclip and tinycast left. Main's `validate.py` also
 refuses a pane that repeats the droplet's name or icon, which this one never
 did.
+
+## Jordy's review of !35, and 1.0.2 (2026-09-30)
+
+The SDK went to 1.20.1, which changed what `contentInsets` is: 8 points on
+every edge under a notch, enough to clear the 18 point corner the host clips a
+widget to, and nothing for a solo card on an island, whose shell is the clip.
+With the inset clearing the corner, the paired rows go back to the floor,
+where Jordy asked for them: measured in the harness they stood 42 points above
+it against 25 from the walls. Measured on the rendered pixels (`GapTests`,
+under a notch), the paired rows now stand 8.5 points off the floor and the
+walls 8.5 and 8.5; the solo hours stood 10.5 against 8.5 and 9, because their
+degrees are figures and the line's descent under the baseline is empty, so the
+strip is let down by that descent and stands 8. A bitmap context's first row
+is the top of the image, which the first measurement got backwards.
+
+The harness now builds on the swiftbuild engine and codesigns a resource
+bundle, and failed on iCloud's Finder info the way the tests had. `.build`
+carries `com.apple.fileprovider.ignore#P` now, so iCloud Drive leaves it
+alone, and the harness and a plain `swift test` both pass.
+
+The city field is an `NSSearchField`, the magnifier, the prompt and the clear
+button of Droppy's own settings; DroppyKit has no search row. The wing dims
+an old reading as the shelf does, the mark and the figure alike. The Store's
+copy leaves out `docs/`, `scripts/` and the `Makefile`, and the README points
+here for them. The changelog is one entry, written for the person installing
+it, and the version is 1.0.2, since Meric wanted the round after review to be
+one.

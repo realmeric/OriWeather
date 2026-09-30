@@ -1,3 +1,5 @@
+import AppKit
+import DroppyKit
 import SwiftUI
 
 /// Every number and colour of this droplet's own, in one place.
@@ -34,10 +36,13 @@ enum Look {
     static let shelfSoloWidth: CGFloat = 370
     static let shelfPairedWidth: CGFloat = 170
     /// The widget's height: the header, the reading and the hours ahead, 129
-    /// points, inside the host's `contentInsets` for a solo card on an
-    /// island, 12 on every edge. Under a notch the host insets nothing, and
-    /// what that leaves sits above the hours.
+    /// points, inside the host's `contentInsets`, 8 on every edge under a
+    /// notch since DroppyKit 1.20.1. What that leaves sits above the hours.
     static let shelfHeight: CGFloat = 153
+    /// How far a line of the label font runs under its baseline, which a row
+    /// of figures leaves empty.
+    static let lastLineDescent = -NSFont.systemFont(ofSize: DroppyLiveActivityMetrics.labelFontSize,
+                                                    weight: .medium).descender
     /// The header row, as tall as one with a control at its end, like the
     /// SDK's example. Under a notch the host pads nothing and clips the
     /// widget at an 18 pt corner, and a shorter row puts the symbol in the

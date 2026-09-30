@@ -131,7 +131,11 @@ private struct SoloWeather: View {
             if !glance.hours.isEmpty {
                 // Down to the bottom edge, with no gap of its own: what the
                 // height leaves over the composition sits above the hours.
+                // The degrees are figures with nothing under their baseline,
+                // so the strip is let down by the line's descent to stand as
+                // far from the floor as the content stands from the walls.
                 HourStrip(hours: glance.hours)
+                    .offset(y: Look.lastLineDescent)
                     .frame(maxHeight: .infinity, alignment: .bottom)
             }
         }
@@ -169,9 +173,10 @@ private struct HourStrip: View {
 
 /// Beside another widget: the header, the mark and the degrees, the
 /// condition, and two rows with the label leading and the number trailing:
-/// what it feels like, and today's high and low. The rows follow the
-/// condition rather than sitting on the bottom edge, where the host's corner
-/// clip would cut their first and last letters.
+/// what it feels like, and today's high and low. The rows stand on the
+/// floor, as far from it as the content sits from the walls: the host's inset
+/// keeps them clear of the corner clip, and the height the solo layout needs
+/// is left over between the condition and the rows.
 private struct PairedWeather: View {
     let glance: Glance
     @Environment(\.weatherInk) private var ink
@@ -192,6 +197,7 @@ private struct PairedWeather: View {
             Text(verbatim: glance.detail)
                 .font(.system(size: DroppyLiveActivityMetrics.labelFontSize, weight: .medium))
                 .foregroundStyle(ink.secondary)
+            Spacer(minLength: 0)
             row("Feels like", glance.feelsLike)
             if let high = glance.high, let low = glance.low {
                 row("High / low", "\(high) / \(low)")
