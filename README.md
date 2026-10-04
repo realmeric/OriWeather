@@ -78,9 +78,10 @@ droppykit build      # the bundle, universal
 droppykit run        # the harness, every surface at Droppy's own metrics
 ```
 
-The tests and the development tooling, `make test` (the gate), the energy check against
-Droppy Playground, the icon script and the notes on what the machine taught
-along the way, lives in [github.com/realmeric/OriWeather](https://github.com/realmeric/OriWeather).
+The tests and the development tooling, `make test` (the gate), the energy
+check against Droppy Playground, the icon script and the notes on what the
+machine taught along the way, live in
+[github.com/realmeric/OriWeather](https://github.com/realmeric/OriWeather).
 The Store's copy of the droplet carries only the package.
 
 The limit worth knowing: the harness draws every surface at Droppy's own
