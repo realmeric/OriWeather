@@ -25,13 +25,6 @@ let package = Package(
                 "OriWeather",
                 .product(name: "DroppyKitHarness", package: "droppykit")
             ]
-        ),
-        .testTarget(
-            name: "OriWeatherTests",
-            dependencies: [
-                "OriWeather",
-                .product(name: "DroppyKitHarness", package: "droppykit")
-            ]
         )
     ]
 )

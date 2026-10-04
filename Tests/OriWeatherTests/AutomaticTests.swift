@@ -24,7 +24,27 @@ final class AutomaticTests: XCTestCase {
         XCTAssertNil(ZoneCity.pick([], in: "Europe/Paris"))
     }
 
-    /// Nobody has named a city, so it is found from the time zone, and the
+    /// Nobody has named a city and nobody has said to find one, so nobody is
+    /// asked anything: not the locator, not the geocoder, not the weather.
+    func testWithNoCityNothingIsLookedUpUntilTheUserSaysSo() async throws {
+        let fetcher = FakeWeather(reading: Sky.reading())
+        let geocoder = FakeGeocoder(answer: [texas, paris])
+        let locator = FakeLocator(answer: paris)
+        let droplet = OriWeatherDroplet(fetcher: fetcher, geocoder: geocoder, locator: locator)
+        droplet.timeZone = { "Europe/Paris" }
+        try droplet.activate(host: TestHost(city: nil).host)
+        await settle()
+        XCTAssertFalse(droplet.automatic)
+        XCTAssertNil(droplet.chosenCity)
+        XCTAssertNil(droplet.glance)
+        let located = await locator.counter.count
+        let geocoded = await geocoder.counter.count
+        let read = await fetcher.counter.count
+        XCTAssertEqual([located, geocoded, read], [0, 0, 0])
+        droplet.deactivate()
+    }
+
+    /// Turned on, with no city named, it is found from the time zone, and the
     /// weather is read for it.
     func testWithNoCityTheTimeZoneFindsOne() async throws {
         let fetcher = FakeWeather(reading: Sky.reading())
@@ -32,6 +52,7 @@ final class AutomaticTests: XCTestCase {
         droplet.timeZone = { "Europe/Paris" }
         let test = TestHost(city: nil)
         try droplet.activate(host: test.host)
+        droplet.automatic = true
         await settle()
         XCTAssertTrue(droplet.automatic)
         XCTAssertEqual(droplet.chosenCity, paris)
@@ -62,7 +83,9 @@ final class AutomaticTests: XCTestCase {
         let geocoder = AtlasGeocoder(atlas: ["Istanbul": [Sky.istanbul], "Paris": [texas, paris]])
         let droplet = OriWeatherDroplet(fetcher: FakeWeather(reading: Sky.reading()), geocoder: geocoder)
         droplet.timeZone = { "Europe/Istanbul" }
-        try droplet.activate(host: TestHost(city: nil).host)
+        let host = TestHost(city: nil)
+        Preferences(service: host.preferences).automatic = true
+        try droplet.activate(host: host.host)
         await settle()
         XCTAssertEqual(droplet.chosenCity, Sky.istanbul)
         droplet.liveActivitySeatDidChange(.compact)
@@ -126,7 +149,9 @@ final class WhereaboutsTests: XCTestCase {
         let droplet = OriWeatherDroplet(fetcher: FakeWeather(reading: Sky.reading()),
                                         geocoder: geocoder, locator: locator)
         droplet.timeZone = { "Europe/Istanbul" }
-        try droplet.activate(host: TestHost(city: nil).host)
+        let host = TestHost(city: nil)
+        Preferences(service: host.preferences).automatic = true
+        try droplet.activate(host: host.host)
         await settle()
         XCTAssertEqual(droplet.chosenCity, ankara)
         let asked = await geocoder.counter.count
@@ -140,7 +165,9 @@ final class WhereaboutsTests: XCTestCase {
                                         geocoder: AtlasGeocoder(atlas: ["Istanbul": [Sky.istanbul]]),
                                         locator: FakeLocator(answer: frankfurt))
         droplet.timeZone = { "Europe/Istanbul" }
-        try droplet.activate(host: TestHost(city: nil).host)
+        let host = TestHost(city: nil)
+        Preferences(service: host.preferences).automatic = true
+        try droplet.activate(host: host.host)
         await settle()
         XCTAssertEqual(droplet.chosenCity, Sky.istanbul)
         droplet.deactivate()

@@ -11,8 +11,8 @@ extension OriWeatherDroplet: ShelfWidgetProviding {
         [
             ShelfWidgetDescriptor(
                 id: Self.widgetID,
-                title: "Weather",
-                systemImage: "cloud.sun.fill",
+                title: "OriWeather",
+                systemImage: "sun.horizon.fill",
                 layoutTraits: ShelfWidgetLayoutTraits(
                     preferredSoloWidth: Look.shelfSoloWidth,
                     preferredPairedWidth: Look.shelfPairedWidth,
@@ -56,15 +56,32 @@ struct WeatherWidget: View {
                     SoloWeather(glance: glance)
                 }
             } else {
-                Text(verbatim: "Choose a city in the droplet's settings.")
-                    .font(.system(size: DroppyLiveActivityMetrics.labelFontSize))
-                    .foregroundStyle(ink.tertiary)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+                NoCity(open: droplet.openSettings)
             }
         }
         .padding(context.contentInsets)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .environment(\.weatherInk, ink)
+    }
+}
+
+/// Nothing to show until there is a city. It is never looked up without
+/// being asked, so the widget says the two ways to get one and opens the
+/// settings where both are.
+private struct NoCity: View {
+    let open: () -> Void
+    @Environment(\.weatherInk) private var ink
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: DroppySpacing.sm) {
+            Text(verbatim: "Choose a city, or let OriWeather find it from your internet address.")
+                .font(.system(size: DroppyLiveActivityMetrics.labelFontSize))
+                .foregroundStyle(ink.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            Button("Open settings", action: open)
+                .buttonStyle(DroppyAccentButtonStyle(size: .small))
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
     }
 }
 

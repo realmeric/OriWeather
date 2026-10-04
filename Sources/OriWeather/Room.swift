@@ -59,7 +59,7 @@ struct WeatherRoom: View {
                 }
                 DropletToggleRow(
                     title: "Keep on the notch",
-                    subtitle: "On, the weather sits on the wings when nothing else wants the notch. Off, it stays on the shelf and leaves the wings alone.",
+                    subtitle: "Shows the weather on the wings when nothing else wants the notch.",
                     isOn: Binding(get: { droplet.pinned }, set: { droplet.pinned = $0 })
                 )
                 if droplet.canUseShortcut {
@@ -87,12 +87,12 @@ private struct CityCard: View {
         DropletSettingsCard {
             DropletToggleRow(
                 title: "Find the city automatically",
-                subtitle: "From the city this Mac's internet address is in, checked against its time zone, and looked up again on a new network, after sleep and when the zone changes. With a VPN in another country, the time zone's city instead. GeoJS answers, and sees the address and nothing else.",
+                subtitle: "Uses the city this Mac's internet address is in.",
                 isOn: Binding(get: { droplet.automatic }, set: { droplet.automatic = $0 })
             )
             DropletStackedRow(
                 title: "City",
-                infoTip: "The weather is read for a city you name, not for where this Mac is. Open-Meteo is sent the name while you type and a coordinate rounded to about a kilometre."
+                infoTip: "The weather is read for the city you name, or the one found for you once you turn that on. Finding it asks GeoJS which city this Mac's internet address is in, checked against its time zone, and again on a new network, after sleep and when the zone changes; GeoJS sees the address and nothing else. Open-Meteo is sent the name you type and a coordinate rounded to about a kilometre."
             ) {
                 VStack(alignment: .leading, spacing: DroppySpacing.xs) {
                     CitySearchField(text: $search.query, prompt: "Search for a city")
@@ -119,7 +119,7 @@ private struct CityCard: View {
 
     private var caption: String {
         guard let city = droplet.chosenCity else {
-            return droplet.automatic ? "Looking for the city." : "No city yet."
+            return droplet.automatic ? "Looking for the city." : "No city yet. Search for one, or turn on finding it."
         }
         return Self.describe(city) + (droplet.automatic ? ", found automatically" : "")
     }

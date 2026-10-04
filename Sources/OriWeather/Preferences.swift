@@ -33,10 +33,10 @@ struct Preferences {
         nonmutating set { service.setValue(newValue, forKey: Key.city) }
     }
 
-    /// Whether the city is found from this Mac's time zone. On until the user
-    /// names one, and never switched on over a city somebody already chose.
+    /// Whether the city is found from this Mac's internet address. Off until
+    /// the user turns it on: nobody's address is looked up unasked.
     var automatic: Bool {
-        get { service.value(forKey: Key.automatic, as: Bool.self) ?? !service.hasValue(forKey: Key.city) }
+        get { service.value(forKey: Key.automatic, as: Bool.self) ?? false }
         nonmutating set { service.setValue(newValue, forKey: Key.automatic) }
     }
 

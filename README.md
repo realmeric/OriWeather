@@ -17,7 +17,7 @@ on the shelf. Control-Option-Command-W flips it from anywhere, and Droppy's Sett
 Shortcuts, rebinds it. A press without all three never flips it.
 
 It is a Droplet, an extension that runs inside [Droppy](https://getdroppy.app),
-built with [DroppyKit](https://gitlab.com/droppyformac1/droppykit) 1.14.0.
+built with [DroppyKit](https://gitlab.com/droppyformac1/droppykit).
 
 ## What it needs
 
@@ -31,8 +31,8 @@ loads a build straight from `droppykit build` from version 1.0.27.
 ## What it sends
 
 A city's name to Open-Meteo's geocoder, the one you type into the settings
-pane once the typing has paused. When the city is found automatically, one
-request to GeoJS, which answers with the city your internet address is in; it
+pane once the typing has paused. If you turn on finding the city, which is off
+until you do, one request to GeoJS, which answers with the city your internet address is in; it
 sees the address, which Open-Meteo sees anyway, and nothing else. That is asked
 at start, on a new network, after sleep and when the time zone changes, never
 twice in ten minutes, and only while the weather is on screen. A coordinate rounded to two decimals, about a
@@ -43,9 +43,10 @@ Nothing else, to nobody else. Open-Meteo needs no key and no account.
 
 ## What it does not do
 
-It does not ask where your Mac is. There is no location permission to grant.
-Until you name a city, it uses the city your internet address is in, and
-checks that against your time zone: an address in another zone is a VPN, and
+It does not ask where your Mac is. There is no location permission to grant,
+and nothing is looked up until you say so: you name a city, or you turn on
+finding one. Then it uses the city your internet address is in, and checks
+that against your time zone: an address in another zone is a VPN, and
 then the city the zone is named after is used instead (Europe/Istanbul is
 Istanbul).
 
@@ -75,10 +76,9 @@ the PATH:
 ```bash
 droppykit build      # the bundle, universal
 droppykit run        # the harness, every surface at Droppy's own metrics
-swift test           # the unit tests
 ```
 
-The development tooling, `make test` (the gate), the energy check against
+The tests and the development tooling, `make test` (the gate), the energy check against
 Droppy Playground, the icon script and the notes on what the machine taught
 along the way, lives in [github.com/realmeric/OriWeather](https://github.com/realmeric/OriWeather).
 The Store's copy of the droplet carries only the package.

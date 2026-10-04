@@ -103,6 +103,7 @@ struct CompanionMark: View {
             WeatherMark(code: glance.reading.code, isDay: glance.reading.isDay)
                 .frame(width: side, height: side)
                 .frame(width: slot.width, height: slot.height)
+                .opacity(glance.isStale ? Look.staleOpacity : 1)
                 .accessibilityHidden(true)
         }
     }
@@ -124,6 +125,7 @@ struct CompanionDetail: View {
             .font(.system(size: DroppyLiveActivityMetrics.labelFontSize, weight: .medium))
             .lineLimit(1)
             .frame(maxWidth: .infinity, alignment: .leading)
+            .opacity(glance.isStale ? Look.staleOpacity : 1)
         }
     }
 }

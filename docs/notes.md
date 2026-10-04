@@ -526,3 +526,26 @@ copy leaves out `docs/`, `scripts/` and the `Makefile`, and the README points
 here for them. The changelog is one entry, written for the person installing
 it, and the version is 1.0.2, since Meric wanted the round after review to be
 one.
+
+## Jordy's second review of !35 (2026-10-04)
+
+The Store folder holds nothing but the package, tests included, so the tests
+are a package of their own now, `Tests/Package.swift`, depending on the
+droplet's by path. The droplet's `Package.swift` has no test target and is the
+same file here and in the Store. `@testable import` works across the two in a
+debug build, and `#filePath` still finds `Sources/` three folders up.
+
+Nothing is looked up before the user says so. "Find the city automatically"
+was on until a city was named, and activation asked GeoJS at once; it is off
+until it is turned on, and with no city the widget says the two ways to get
+one and opens the settings (`host.workspace.openSettings()`, DroppyKit 1.5.0).
+A stored `automatic` is left as it is, so a Mac that already had it on keeps
+it.
+
+The widget is "OriWeather" with `sun.horizon.fill`: "Weather" and
+`cloud.sun.fill` were Droppy's own Weather widget's, and the list showed two
+alike. A toggle row's subtitle is its tip, one short sentence; the GeoJS and
+Open-Meteo detail is the city row's tip. The companion pill dims a stale
+reading like the wing. The harness's codesign failed once more with `.build`
+already marked for iCloud to ignore: `.build/out` had been made before the
+mark held, and deleting it settled it. `Tests/.build` carries the mark too.

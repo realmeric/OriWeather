@@ -217,5 +217,8 @@ The Store's copy is `droplets/ori-weather` in gitlab.com/droppyformac1/droplets.
 that stay on this Mac (`KANBAN.md`, `docs/look.md`), so run it from an export
 of the commit: `git archive HEAD | tar -x -C <empty folder>`, then
 `droppykit submit` in that folder. The Store folder holds the package and
-nothing else, as its CONTRIBUTING.md lists: `docs/`, `scripts/` and the
-`Makefile` stay in this repository and are left out of the Store's copy.
+nothing else, as its CONTRIBUTING.md lists: `docs/`, `scripts/`, the
+`Makefile` and `Tests/` stay in this repository and are left out of the
+Store's copy. The tests are a package of their own, `Tests/Package.swift`,
+so the droplet's `Package.swift` is the same in both places:
+`swift test --package-path Tests`.

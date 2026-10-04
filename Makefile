@@ -14,7 +14,7 @@ export DROPPYKIT
 # codesigns the test bundle, and codesign refuses the Finder info iCloud Drive
 # writes on every folder under ~/Documents, where this repository lives.
 test:
-	swift test --build-system native
+	swift test --package-path Tests --build-system native
 	$(DROPPYKIT) build
 	$(MAKE) icon
 	$(DROPPYKIT) validate

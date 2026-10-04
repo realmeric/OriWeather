@@ -237,8 +237,9 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
         // until there is a state, and the clock runs only while seated.
         model.refresh(because: .launch)
         // With no city at all there is nothing to show until one is found, so
-        // it is found now. With one, the lookup waits until somebody can see
-        // the weather (updateClock), because an unseen droplet asks nobody
+        // it is found now, if the user turned finding on; nothing is asked
+        // before that. With one, the lookup waits until somebody can see the
+        // weather (updateClock), because an unseen droplet asks nobody
         // anything (D6).
         if preferences.city == nil { findCity(force: false) }
     }
@@ -325,6 +326,12 @@ public final class OriWeatherDroplet: NSObject, ObservableObject, Droplet {
             return
         }
         pinned.toggle()
+    }
+
+    /// Droppy's Settings, on this droplet's page: where the empty widget sends
+    /// somebody to name a city or to turn finding one on.
+    func openSettings() {
+        host?.workspace.openSettings()
     }
 
     /// Whether the user granted the shortcut its capability; without it the
